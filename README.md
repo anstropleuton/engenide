@@ -2,41 +2,13 @@
 
 This is a sketch design document for the Engenide Programming Language, not a formal specification. This does not include grammar or precise definitions. The purpose is to document my rough ideas before I forget them.
 
-## TODO <!-- omit from toc -->
-
-- [ ] Refine ideas.
-  - [ ] Architecture.
-  - [ ] Modifiers.
-  - [ ] Expression.
-  - [ ] Keywords.
-  - [ ] Macros, Generics, Reflection, Metaprogramming.
-  - [ ] Multi-threading.
-  - [ ] Tooling.
-  - [ ] Plugin system.
-- [ ] Formalize into actual specification.
-- [ ] Develop a standard library.
-- [ ] Include examples.
-- [ ] Develop tooling.
-  - [ ] Processor.
-  - [ ] Compiler.
-  - [ ] Interpreter.
-  - [ ] Assembler.
-  - [ ] Evaluator.
-  - [ ] Formal ABI.
-  - [ ] Build system.
-  - [ ] Packing system.
-  - [ ] Language presets.
-  - [ ] Plugin system.
-- [ ] Official Engenide website.
-- [ ] Official Engenide Package Repository (EPR).
-
 ## Table of Content <!-- omit from toc -->
 
 - [1. Overview](#1-overview)
   - [1.1. What is Engenide?](#11-what-is-engenide)
   - [1.2. Features](#12-features)
   - [1.3. Philosophy](#13-philosophy)
-  - [1.4. Architecture](#14-architecture)
+  - [1.4. What isn't Engenide?](#14-what-isnt-engenide)
 - [2. Lexical Structure](#2-lexical-structure)
   - [2.1. Source Encoding](#21-source-encoding)
   - [2.2. Whitespace](#22-whitespace)
@@ -127,9 +99,9 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [5.11. `require` and `comply`](#511-require-and-comply)
   - [5.12. `with` and `be`](#512-with-and-be)
   - [5.13. `with` and `emit`](#513-with-and-emit)
-  - [5.13. `defer` Blocks](#513-defer-blocks)
-  - [5.14. `label` and `goto`](#514-label-and-goto)
-  - [5.15. Omission](#515-omission)
+  - [5.14. `defer` Blocks](#514-defer-blocks)
+  - [5.15. `label` and `goto`](#515-label-and-goto)
+  - [5.16. Omission](#516-omission)
 - [6. Functions](#6-functions)
   - [6.1. Multiple Returns](#61-multiple-returns)
   - [6.2. Naming Returns](#62-naming-returns)
@@ -248,19 +220,20 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [23.3. Reflecting Enum Types](#233-reflecting-enum-types)
 - [24. Compile-time Evaluation](#24-compile-time-evaluation)
 - [25. Tooling](#25-tooling)
-  - [25.1. CLI Usage](#251-cli-usage)
-    - [25.1.1. Create a Project](#2511-create-a-project)
-    - [25.1.2. Build the project](#2512-build-the-project)
-    - [25.1.3. Use toolchain without a Project](#2513-use-toolchain-without-a-project)
-  - [25.2. Project Configuration](#252-project-configuration)
-    - [25.2.1. Project Metadata](#2521-project-metadata)
-    - [25.2.2. Build Targets](#2522-build-targets)
-    - [25.2.3. Dependencies](#2523-dependencies)
-    - [25.2.4. Configuring Dependencies](#2524-configuring-dependencies)
-    - [25.2.5. Packaging and Publishing](#2525-packaging-and-publishing)
-    - [25.2.6. Custom Repository](#2526-custom-repository)
-    - [25.2.7. Language Presets](#2527-language-presets)
-    - [25.2.8. Presets as Language Constructs](#2528-presets-as-language-constructs)
+  - [25.1. Architecture](#251-architecture)
+  - [25.2. CLI Usage](#252-cli-usage)
+    - [25.2.1. Create a Project](#2521-create-a-project)
+    - [25.2.2. Build the project](#2522-build-the-project)
+    - [25.2.3. Use toolchain without a Project](#2523-use-toolchain-without-a-project)
+  - [25.3. Project Configuration](#253-project-configuration)
+    - [25.3.1. Project Metadata](#2531-project-metadata)
+    - [25.3.2. Build Targets](#2532-build-targets)
+    - [25.3.3. Dependencies](#2533-dependencies)
+    - [25.3.4. Configuring Dependencies](#2534-configuring-dependencies)
+    - [25.3.5. Packaging and Publishing](#2535-packaging-and-publishing)
+    - [25.3.6. Custom Repository](#2536-custom-repository)
+    - [25.3.7. Language Presets](#2537-language-presets)
+    - [25.3.8. Presets as Language Constructs](#2538-presets-as-language-constructs)
 - [26. Plugin System](#26-plugin-system)
   - [26.1. Example Plugins](#261-example-plugins)
 - [27. Example Programs](#27-example-programs)
@@ -290,22 +263,32 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [27.24. Caesar Cipher](#2724-caesar-cipher)
   - [27.25. Sudoku Verifier](#2725-sudoku-verifier)
   - [27.26. Grid Pathfinding (A\* Algorithm)](#2726-grid-pathfinding-a-algorithm)
+  - [27.27. Expression Evaluator](#2727-expression-evaluator)
+  - [27.28. Random Password Generator](#2728-random-password-generator)
+  - [27.29. Book Borrowing Library](#2729-book-borrowing-library)
+  - [27.30. Shape Area Calculator](#2730-shape-area-calculator)
+  - [27.31. Bank Account Management](#2731-bank-account-management)
+  - [27.32. Logger](#2732-logger)
+  - [27.33. Chat Application](#2733-chat-application)
+  - [27.34. Two Player Tic-Tac-Toe](#2734-two-player-tic-tac-toe)
+  - [27.35. Game of Life](#2735-game-of-life)
+  - [27.36. Sushi For Two](#2736-sushi-for-two)
 - [28. Appendix A - List of Keywords](#28-appendix-a---list-of-keywords)
 - [29. Appendix B - List of Built-in Operators](#29-appendix-b---list-of-built-in-operators)
-- [31. Appendix C - Language Presets](#31-appendix-c---language-presets)
-  - [31.1. `hostile` Presets Features](#311-hostile-presets-features)
-  - [31.2. `strict` Presets Features](#312-strict-presets-features)
-  - [31.3. `balanced` Presets Features](#313-balanced-presets-features)
-  - [31.4. `friendly` Presets Features](#314-friendly-presets-features)
-  - [31.5. `express` Presets Features](#315-express-presets-features)
+- [30. Appendix C - Language Presets](#30-appendix-c---language-presets)
+  - [30.1. `hostile` Presets Features](#301-hostile-presets-features)
+  - [30.2. `strict` Presets Features](#302-strict-presets-features)
+  - [30.3. `balanced` Presets Features](#303-balanced-presets-features)
+  - [30.4. `friendly` Presets Features](#304-friendly-presets-features)
+  - [30.5. `express` Presets Features](#305-express-presets-features)
 
 ## 1. Overview
 
 ### 1.1. What is Engenide?
 
-Engenide is a statically-typed, RTTI-dynamics, compiled, interpreted, bytecode, omni-paradigm, fully-feature, systems-level+general-purpose, versatile programming language designed around freedom of expression. It deliberately removes arbitrary constraints to provide extensive flexibility to the language.
+Engenide is a statically-typed, RTTI-dynamics, compiled, interpreted, bytecode, omni-paradigm, fully-featured, systems-level, general-purpose, DSL-powering, versatile, flexible, customizable, configurable, adaptive programming language designed around freedom of expression. It deliberately removes arbitrary constraints to provide extensive flexibility to the language.
 
-Engenide derives a lot of its features from other languages that have solved key problems, such as C, C++, C#, Python, Rust, Java, JavaScript, TypeScript, Go, Kotlin, Vala, Zig, Swift, Scala, Dart, and many, many others. It aims to bring greats of those worlds while maintaining interoperability between the features.
+Engenide derives a lot of its features from other languages that have solved key problems, such as C, C++, C#, Python, Rust, Java, JavaScript, TypeScript, Go, Kotlin, Vala, Zig, Swift, Scala, Dart, Haskell, OCaml, Lisp, and many, many others. It aims to bring greats of those worlds while maintaining interoperability between the features.
 
 Engenide also aims to provide flexibility and expressiveness by inventing consistent semantics where traditional programming lacks. It is useful for ease of use and developer ergonomics, and also helps eliminate arbitrary constraints.
 
@@ -324,7 +307,8 @@ The default, defacto implementation, also licensed under the terms of MIT licens
 - **Customizability**: Engenide allows you to customize the language to fit it to the problem, not the other way around. It allows customizing operators (with custom operators), literals (typing), macros (syntax extender) and even type modifiers and semantics. All can be limited to be within a scope.
 - **Flexibility**: Removal of artificial barriers allows expressive code to be written in any context, such as a property variable declared in a function scope.
 - **Configurability**: Engenide is configurable to limit certain features to allow maximum safety and consistency in the codebase. These configuration is also detectable by the code, which allows developing library suitable for all configuration.
-- **Safety**: All behavior in Engenide is defined, and undefined behavior (such as interoperability with C) can be traced back to grepable parts of the source code.
+- **Determinism**: All deterministic behavior, such as integer overflow, uninitialized memory, etc. are defined (wrap-around, zero-initialized, etc.).
+- **Safety**: Engenide provides safety features, such as null safety, memory safety, thread safety, type safety, exception system, and many others to ensure robust code.
 - **Embedability**: All of Engenide can be accessed as a library in C (or any language with C interoperability) which allows Engenide to be used as programmable configuration file.
 - **C Interoperability**: Engenide code can be accessed by C, and vice versa, which allows Engenide code to be usable in an existing project.
 
@@ -334,17 +318,11 @@ The main philosophy of Engenide is *"If it makes sense semantically, it is allow
 
 This freedom, when mastered, will enable creation of beautiful program. It also has a guaranteed potential for misuse. Great care is required to proceed with the language, which makes up for a steeper learning curve.
 
-For teams, Engenide provides several containments to limit the language's liberating features to provide a much tighter scope of collaboration.
+For teams, Engenide provides several language presets to limit the language's liberating features, and to provide a much tighter scope of collaboration.
 
-### 1.4. Architecture
+### 1.4. What isn't Engenide?
 
-Engenide Engine is a composition of:
-
-1. **Engenide Processor** (Frontend): Processes source code into bytecode. The processor can accept partial code as well, to facilitate interpreter. The bytecode is fully optimized from the source code for zero overhead.
-2. **Engenide Compiler** (Backend #1): Compiles bytecode down to machine-level instructions. It also further optimizes the bytecode for efficient binary.
-3. **Engenide Interpreter** (Backend #2): Interprets bytecode live if the instructions are partial, or JIT-compiles the bytecode for interpretation.
-4. **Engenide Assembler**: Both Compiler and Interpreter (JIT mode) uses the Assembler to convert bytecode into machine-level instructions.
-5. **Engenide Evaluator**: Engenide Processor and Interpreter (Live mode) uses Evaluator to evaluate bytecode. During processing, all code that are isolated from IO are evaluated during compile-time to allow minimal bytecode size. The runtime only needs to deal with IO related code.
+...
 
 ## 2. Lexical Structure
 
@@ -599,7 +577,7 @@ fn main() {
 An operator is a composition of one or more of the following characters:
 
 ```eng
-~ ! % ^ & * - + = [ ] \ | < > / ?
+~ ! % ^ & * - + = \ | < > /
 ```
 
 As well as Unicode characters with Unicode character class Math.
@@ -619,7 +597,7 @@ Certain patterns for custom operators are not overloadable due to conflict with 
 Punctuations (aka Delimiters) are single-character tokens, specifically any of:
 
 ```eng
-@ ( ) { } : ; , .
+@ ( ) [ ] { } : ; , . ?
 ```
 
 These symbols have a special meaning, just like keyword, and are not treated as operators. These serve as syntax markers.
@@ -1246,7 +1224,7 @@ let b: int? = 20;
 let c: int? = null;
 ```
 
-Accessing a nullable type that does not hold a value throws `null_reference` exception.
+Accessing a nullable type that does not hold a value throws `null_access` exception.
 
 ```eng
 let d = a + b + c;
@@ -1268,7 +1246,7 @@ if c == null {
 }
 ```
 
-A not-null assertion operator `?!` is used to throw `null_reference` exception if no value is present.
+A not-null assertion operator `?!` is used to throw `null_access` exception if no value is present.
 
 ```eng
 a?!;
@@ -2431,7 +2409,7 @@ let values = [
 ]; # values is [2, 4, 6, 8, 10]
 ```
 
-### 5.13. `defer` Blocks
+### 5.14. `defer` Blocks
 
 `defer` block allows deferring execution of code until the surrounding scope is exited.
 
@@ -2449,7 +2427,7 @@ fn main() {
 };
 ```
 
-### 5.14. `label` and `goto`
+### 5.15. `label` and `goto`
 
 `label` and `goto` allows jumping to a specific point in the code within the same function.
 
@@ -2467,7 +2445,7 @@ fn main() {
 };
 ```
 
-### 5.15. Omission
+### 5.16. Omission
 
 Parenthesis or braces (but not both) can be omitted in all control statements to simplify raeding.
 
@@ -2683,7 +2661,7 @@ Functions can also be overloaded by varying just parameter name as well. In this
 
 ```eng
 fn radius(area: float) {
-    return (area / math.pi)  0.5;
+    return (area / math.pi) ** 0.5;
 };
 
 fn radius(circumference: float) {
@@ -3917,7 +3895,7 @@ class abstract_class {
 
 fn main() {
     let abstract_value = abstract_class();
-    # abstract_value.virtual_function here is null. Calling null function causes `null_reference` exception to be thrown.
+    # abstract_value.virtual_function here is null. Calling null function causes `null_access` exception to be thrown.
 };
 ```
 
@@ -6180,20 +6158,6 @@ Note: Several combinators can also take optional addition parameters:
 - `slide()` can also take `step` parameter to specify the step size between slides.
 - `nth()` can also take `offset` parameter to specify the starting index for n-th selection.
 
-Example: Sushi for two:
-
-```eng
-# Our sushies
-let sushi = [1, 2, 2, 1, 2, 2, 2, 1, 1];
-
-# Solution
-let solution = sushi
-    -> group_by(): (x == y)
-    -> map(): (x.count)
-    -> adjacent(): min
-    -> max() * 2; # 4
-```
-
 These combinators are non-exhaustive. There are several other combinators such as `differ`, `indices_of`, `deltas`, `singles`, `keys` (first in pair), `values` (last in pair), etc. in the standard library. Several combinators are also parallelized for performance. They all work with lazy arrays and produce lazy arrays where applicable.
 
 ### 19.3. Placeholder Pipeline
@@ -6208,20 +6172,6 @@ let crazy = values
     |> ($, $ [*] 2);    # [(2, 4), (6, 12), (12, 24), (20, 40), (30, 60)]
     |> $1               # [4, 12, 24, 40, 60]
     -> max();           # 60
-```
-
-Let's make our sushi solution faster using `|>` operator:
-
-```
-# Solution2, faster
-let solution2 = sushi
-    -> adjacent(): (x != y)
-    -> enumerate()
-    -> indices()
-    |> [0] + $ + [sushi.count]
-    -> adjacent(): (x - y)
-    -> adjacent(): (x <? y)
-    -> max() * 2; # 4
 ```
 
 ### 19.4. Custom Combinators
@@ -6677,9 +6627,19 @@ fn main() {
 
 ## 25. Tooling
 
-### 25.1. CLI Usage
+### 25.1. Architecture
 
-#### 25.1.1. Create a Project
+Engenide Engine is a composition of:
+
+1. **Engenide Processor** (Frontend): Processes source code into bytecode. The processor can accept partial code as well, to facilitate interpreter. The bytecode is fully optimized from the source code for zero overhead.
+2. **Engenide Compiler** (Backend #1): Compiles bytecode down to machine-level instructions. It also further optimizes the bytecode for efficient binary.
+3. **Engenide Interpreter** (Backend #2): Interprets bytecode live if the instructions are partial, or JIT-compiles the bytecode for interpretation.
+4. **Engenide Assembler**: Both Compiler and Interpreter (JIT mode) uses the Assembler to convert bytecode into machine-level instructions.
+5. **Engenide Evaluator**: Engenide Processor and Interpreter (Live mode) uses Evaluator to evaluate bytecode. During processing, all code that are isolated from IO are evaluated during compile-time to allow minimal bytecode size. The runtime only needs to deal with IO related code.
+
+### 25.2. CLI Usage
+
+#### 25.2.1. Create a Project
 
 ```
 $ eng new my-awesome-project
@@ -6725,7 +6685,7 @@ fn main() {
 };
 ```
 
-#### 25.1.2. Build the project
+#### 25.2.2. Build the project
 
 1. Using compiler:
 
@@ -6753,7 +6713,7 @@ $ eng assemble hello_world.bc -o hello_world # Compile bytecode to native
 $ eng evaluate hello_world.bc # Interpret bytecode directly
 ```
 
-#### 25.1.3. Use toolchain without a Project
+#### 25.2.3. Use toolchain without a Project
 
 1. Using compiler:
 
@@ -6775,13 +6735,13 @@ $ eng assemble hello_world.bc -o hello_world # Compile bytecode to native
 $ eng evaluate hello_world.bc # Interpret bytecode directly
 ```
 
-### 25.2. Project Configuration
+### 25.3. Project Configuration
 
 The `project.eng` file is the main and only configuration file for an Engenide project. It is a full Engenide program that uses the `eng.project` module to define the project structure, build targets, dependencies, and other configurations.
 
 Note: The `project.eng` file is executed at build time, so it can include any valid Engenide code. The entire language is available for use in the `project.eng` file, including I/O. Use with care or break all CI/CD pipelines!
 
-#### 25.2.1. Project Metadata
+#### 25.3.1. Project Metadata
 
 Project metadata includes information about the project such as name, version, description, author, license, and other relevant details.
 
@@ -6792,7 +6752,7 @@ import project: eng.project;
 project.name = "My Awesome Project";
 ```
 
-#### 25.2.2. Build Targets
+#### 25.3.2. Build Targets
 
 Build targets define the output artifacts of the project, such as executables, libraries, or modules. Each target can have its own source files, dependencies, build options, and output settings.
 
@@ -6805,7 +6765,7 @@ my_executable.standard = "eng-25";
 my_executable.entry = "main()";
 ```
 
-#### 25.2.3. Dependencies
+#### 25.3.3. Dependencies
 
 Dependencies can be added to the project to include external libraries or modules.
 
@@ -6834,7 +6794,7 @@ let local_lib = project.add_local_dependency("local_lib", "./libs/local_lib.zip"
 
 Note for custom dependency types: Path/zip must contain a valid Engenide project with `project.eng` file.
 
-#### 25.2.4. Configuring Dependencies
+#### 25.3.4. Configuring Dependencies
 
 Dependencies can be expose certain configuration options to the consumers. These options can be set in the `project.eng` file of the consumer project.
 
@@ -6853,7 +6813,7 @@ let some_library = project.add_dependency("some_library", "1.2.3");
 some_library.configure(.feature_xyz = true);
 ```
 
-#### 25.2.5. Packaging and Publishing
+#### 25.3.5. Packaging and Publishing
 
 To publish a project, the project must be packaged first.
 
@@ -6866,7 +6826,7 @@ Warning: All the source files will be included in the package by default. Propri
 
 Note: The official Engenide Package Repository is reserved for already-popular open-source projects. For other projects, using a custom package repository is recommended and encouraged.
 
-#### 25.2.6. Custom Repository
+#### 25.3.6. Custom Repository
 
 Setting up and using a custom package repository is straightforward.
 
@@ -6894,7 +6854,7 @@ $ eng publish # Publishes to https://my.custom.repo.com
 let some_library = project.add_net_dependency("some_library", "https://my.custom.repo.com/some_library/1.0.0.zip");
 ```
 
-#### 25.2.7. Language Presets
+#### 25.3.7. Language Presets
 
 Engenide supports language presets to customize the language features and behaviors. Presets can be used to enable or disable specific features, set default behaviors, and configure language settings. It is helpful for teams to maintain consistent coding styles and practices across the project.
 
@@ -6932,7 +6892,7 @@ Using custom preset:
 project.preset = my_custom_preset;
 ```
 
-#### 25.2.8. Presets as Language Constructs
+#### 25.3.8. Presets as Language Constructs
 
 Presets can be used within the code itself selectively to enable or disable certain features in specific scopes. The `policy` keyword is used to apply a preset to a specific block of code.
 
@@ -7080,8 +7040,6 @@ fn main() {
 };
 ```
 
-Note: consider using `math.fibonacci_sequence` for generating Fibonacci sequence rather than hand-rolling it.
-
 ### 27.3. Factorial Calculation
 
 ```eng
@@ -7102,7 +7060,7 @@ fn main() {
 };
 ```
 
-Note: consider using `num!` (factorial operator) for calculating factorial rather than hand-rolling it.
+Note: consider using `num!` (factorial operator).
 
 ### 27.4. Prime Number Checker
 
@@ -7134,7 +7092,7 @@ fn main() {
 };
 ```
 
-Note: consider using `math.is_prime` for checking prime numbers rather than hand-rolling it.
+Note: consider using `math.is_prime`.
 
 ### 27.5. Palindrome Checker
 
@@ -7162,7 +7120,7 @@ fn main() {
 import io: eng.std.io;
 import fs: eng.std.fs;
 
-fn word_count(file_path: string) -> (words: int, lines: int, characters: int) {
+fn word_count(file_path: string) -> words: int, lines: int, characters: int {
     let content = fs.read_file(file_path);
     words = content.split(" ").count;
     lines = content.split("\n").count;
@@ -7185,7 +7143,7 @@ import rand: eng.std.rand;
 
 fn main() {
     rand.device_seed();
-    let random_number = rand.uniform_int(1, 100);
+    let random_number = rand.uniform_int(1, 101);
     let attempts_left = 10;
 
     while attempts_left > 0 {
@@ -7267,7 +7225,7 @@ fn main() {
     let number = int.parse(io.scanln("Enter a number to generate its multiplication table: "));
 
     for let i in 1:10 {
-        io.println("$number x $i = ${result * i}");
+        io.println("$number x $i = ${number * i}");
     }
 };
 ```
@@ -7286,7 +7244,7 @@ fn gcd(a: int, b: int) -> int {
 };
 
 fn lcm(a: int, b: int) -> int {
-    return (a * b) / gcd(a, b);
+    return a * b / gcd(a, b);
 };
 
 fn main() {
@@ -7299,14 +7257,14 @@ fn main() {
 };
 ```
 
-Note: consider using `math.gcd` and `math.lcm` for calculating GCD and LCM rather than hand-rolling it.
+Note: consider using `math.gcd` and `math.lcm`.
 
 ### 27.12. Password Validator
 
 ```eng
 import io: eng.std.io;
 
-fn is_valid_password(password: string) -> (has_upper: bool, has_lower: bool, has_digit: bool, has_special: bool, is_valid: bool) {
+fn is_valid_password(password: string) -> has_upper: bool, has_lower: bool, has_digit: bool, has_special: bool, is_valid: bool {
     if password.length < 8 {
         return; # All false by default
     }
@@ -7449,7 +7407,7 @@ fn main() {
 };
 ```
 
-Note: all these sorting algorithms and more are available in arrays. Consider using `arr.sort()` (or `arr.bubble_sort()`, `arr.insertion_sort()`, etc.) for sorting rather than hand-rolling it.
+Note: consider using `arr.sort()`.
 
 ### 27.14. Search Algorithms
 
@@ -7503,7 +7461,7 @@ fn main() {
 };
 ```
 
-Note: both linear search and binary search are available in arrays. Consider using `arr.index_of(target)` for linear search and `arr.binary_search(target)` for binary search rather than hand-rolling it.
+Note: consider using `arr.index_of(target)`.
 
 ### 27.15. Rock-Paper-Scissors
 
@@ -7528,8 +7486,8 @@ fn determine_winner(player1: choice, player2: choice) -> winner {
     }
 
     return with switch (player1, player2) {
-        case (choice.rock, choice.scissors) be winner.player1;
-        case (choice.paper, choice.rock) be winner.player1;
+        case (choice.rock, choice.scissors),
+        case (choice.paper, choice.rock),
         case (choice.scissors, choice.paper) be winner.player1;
         else be winner.player2;
     };
@@ -7663,7 +7621,7 @@ import time: eng.std.time;
 fn main() {
     let seconds = int.parse(io.scanln("Enter countdown time in seconds: "));
 
-    for let i in seconds:-1:0 {
+    for let i in seconds:0:-1 {
         io.println("$i");
         time.sleep(1.0);
     }
@@ -7703,17 +7661,18 @@ import io: eng.std.io;
 
 fn main() {
     let numbers = [1, 2, 2, 3, 4, 4, 5];
-    let unique_numbers = [with for let num in numbers {
+    let unique_numbers = [];
+    for let num in numbers {
         if !unique_numbers.contains(num) {
-            emit num;
+            unique_numbers += num;
         }
-    }];
+    }
 
     io.println("Unique elements: ${unique_numbers}");
 };
 ```
 
-Note: consider using `arr.unique()` for getting unique elements, or converting to a set and back to an array rather than hand-rolling it.
+Note: consider using `arr.unique()`.
 
 ### 27.21. Matrix Operations
 
@@ -7730,8 +7689,8 @@ fn main() {
     let mat1 = matrix(2, 2, [[1.0, 2.0], [3.0, 4.0]]);
     let mat2 = matrix(2, 2, [[5.0, 6.0], [7.0, 8.0]]);
 
-    let addition = matrix(2, 2, mat1.data [+] mat2.data); # Element-wise array operation
-    let subtraction = matrix(2, 2, mat1.data [-] mat2.data);
+    let addition = matrix(2, 2, mat1.data [[+]] mat2.data); # Element-wise array operation
+    let subtraction = matrix(2, 2, mat1.data [[-]] mat2.data);
 
     let multiplication = matrix(2, 2, [
         with for let i in 0:mat1.rows {
@@ -7753,7 +7712,7 @@ fn main() {
 };
 ```
 
-Note: consider using `math.matrix` and its built-in operations for matrix manipulations rather than hand-rolling it.
+Note: consider using `math.matrix`.
 
 ### 27.22. CSV Address Book Reader
 
@@ -7847,14 +7806,19 @@ fn main() {
 import io: eng.std.io;
 
 fn is_valid_sudoku(board: int[9][9]) -> bool {
-    let rows: int{};
-    let cols: int{};
-    let boxes: int{};
+    let rows: int => int{};
+    let cols: int => int{};
+    let boxes: int => int{};
 
     for (let i in 0:9, let j in 0:9) {
         let num = board[i][j];
         if num != 0 {
             let box_index = (i / 3) * 3 + (j / 3);
+
+            if !rows.contains_key(i) { rows.insert(i, int{}); }
+            if !cols.contains_key(j) { cols.insert(j, int{}); }
+            if !boxes.contains_key(box_index) { boxes.insert(box_index, int{}); }
+
             if rows[i].contains(num) || cols[j].contains(num) || boxes[box_index].contains(num) {
                 return false;
             }
@@ -7862,6 +7826,28 @@ fn is_valid_sudoku(board: int[9][9]) -> bool {
             cols[j].insert(num);
             boxes[box_index].insert(num);
         }
+    }
+
+    return true;
+};
+
+fn main() {
+    let board: int[9][9] = [
+        [5, 3, 4, 6, 7, 8, 9, 1, 2],
+        [6, 7, 2, 1, 9, 5, 3, 4, 8],
+        [1, 9, 8, 3, 4, 2, 5, 6, 7],
+        [8, 5, 9, 7, 6, 1, 4, 2, 3],
+        [4, 2, 6, 8, 5, 3, 7, 9, 1],
+        [7, 1, 3, 9, 2, 4, 8, 5, 6],
+        [9, 6, 1, 5, 3, 7, 2, 8, 4],
+        [2, 8, 7, 4, 1, 9, 6, 3, 5],
+        [3, 4, 5, 2, 8, 6, 1, 7, 9],
+    ];
+
+    if is_valid_sudoku(board) {
+        io.println("The Sudoku board is valid.");
+    } else {
+        io.println("The Sudoku board is invalid.");
     }
 };
 ```
@@ -7876,7 +7862,7 @@ fn a_star(start: (int, int), goal: (int, int), grid: bool[][]) -> (int, int)[]? 
     let cols = grid[0].count;
 
     fn heuristic(a: (int, int), b: (int, int)) -> int {
-        return abs(a[0] - b[0]) + abs(a[1] - b[1]);
+        return |a[0] - b[0]| + |a[1] - b[1]|;
     };
 
     fn neighbors(pos: (int, int)) -> (int, int)[] {
@@ -7886,7 +7872,7 @@ fn a_star(start: (int, int), goal: (int, int), grid: bool[][]) -> (int, int)[]? 
                     emit (pos[0] + dr, pos[1] + dc);
                 }
             }
-        ]
+        ];
     };
 
     let open_set = { (0, start) };
@@ -7950,6 +7936,900 @@ fn main() {
     } else {
         io.println("No path found.");
     }
+};
+```
+
+### 27.27. Expression Evaluator
+
+```eng
+import io: eng.std.io;
+
+class token {
+    enum token_type {
+        number,
+        plus,
+        minus,
+        multiply,
+        divide,
+        lparen,
+        rparen;
+    };
+
+    let type: token_type;
+    let value: float?;
+};
+
+class ast {};
+
+class number_node: ast {
+    let value: float;
+};
+
+class binary_op_node: ast {
+    let left: ast%;
+    let operator: token.token_type;
+    let right: ast%;
+};
+
+fn lex(expr: string) -> token[] {
+    let tokens: token[] = [];
+    let i = 0;
+
+    fn peek() -> char? {
+        if i < expr.length {
+            be expr[i];
+        } else {
+            be null;
+        }
+    };
+
+    fn next() {
+        i += 1;
+    };
+
+    while i < expr.length {
+        let current = peek();
+        if current.is_whitespace() {
+            next();
+            cont;
+        } else if current.is_digit() || current == '.' {
+            let num_str = "";
+            while (peek()?.is_digit() || peek() ==? '.') ?? false {
+                num_str += peek();
+                next();
+            }
+            tokens += token(token.token_type.number, float.parse(num_str));
+        } else if current == '+' {
+            tokens += token(token.token_type.plus, null);
+            next();
+        } else if current == '-' {
+            tokens += token(token.token_type.minus, null);
+            next();
+        } else if current == '*' {
+            tokens += token(token.token_type.multiply, null);
+            next();
+        } else if current == '/' {
+            tokens += token(token.token_type.divide, null);
+            next();
+        } else if current == '(' {
+            tokens += token(token.token_type.lparen, null);
+            next();
+        } else if current == ')' {
+            tokens += token(token.token_type.rparen, null);
+            next();
+        } else {
+            io.println("Unknown character: $current");
+            next();
+        }
+    }
+
+    return tokens;
+};
+
+fn parse_term(tokens: token[], pos: int) -> ast%, int {
+    let token = tokens[pos];
+    if token.type == token.token_type.number {
+        return number_node(token.value?!), pos + 1;
+    } else if token.type == token.token_type.lparen {
+        let (node, new_pos) = parse_expression(tokens, pos + 1);
+        if tokens[new_pos].type != token.token_type.rparen {
+            io.println("Expected ')'");
+        }
+        return node, new_pos + 1;
+    } else {
+        io.println("Unexpected token: $token");
+        return number_node(0.0), pos + 1;
+    }
+};
+
+fn parse_factor(tokens: token[], pos: int) -> ast%, int {
+    let (left, new_pos) = parse_term(tokens, pos);
+    let current_pos = new_pos;
+
+    while current_pos < tokens.count && (tokens[current_pos].type == token.token_type.multiply || tokens[current_pos].type == token.token_type.divide) {
+        let operator = tokens[current_pos].type;
+        let (right, next_pos) = parse_term(tokens, current_pos + 1);
+        left = binary_op_node(left, operator, right);
+        current_pos = next_pos;
+    }
+
+    return left, current_pos;
+};
+
+fn parse_expression(tokens: token[], pos: int) -> ast%, int {
+    let (left, new_pos) = parse_factor(tokens, pos);
+    let current_pos = new_pos;
+
+    while current_pos < tokens.count && (tokens[current_pos].type == token.token_type.plus || tokens[current_pos].type == token.token_type.minus) {
+        let operator = tokens[current_pos].type;
+        let (right, next_pos) = parse_factor(tokens, current_pos + 1);
+        left = binary_op_node(left, operator, right);
+        current_pos = next_pos;
+    }
+
+    return left, current_pos;
+};
+
+fn parse(tokens: token[]) -> ast% {
+    let (node, _) = parse_expression(tokens, 0);
+    return node;
+};
+
+fn evaluate(node: ast%) -> float {
+    if node is number_node {
+        return (node as number_node).value;
+    } else if node is binary_op_node {
+        let bin_node = node as binary_op_node;
+        let left_val = evaluate(bin_node.left);
+        let right_val = evaluate(bin_node.right);
+
+        return with switch bin_node.operator {
+            case token.token_type.plus { be left_val + right_val; }
+            case token.token_type.minus { be left_val - right_val; }
+            case token.token_type.multiply { be left_val * right_val; }
+            case token.token_type.divide { be left_val / right_val; }
+        };
+    } else {
+        io.println("Unknown AST node");
+        return 0.0;
+    }
+};
+
+fn main() {
+    io.println("Welcome to the Expression Evaluator!");
+    io.println("Enter an expression to evaluate or 'exit' to quit.");
+    while true {
+        let input = io.scanln(">> ");
+        if input == "exit" {
+            break;
+        }
+
+        let tokens = lex(input);
+        let ast = parse(tokens);
+        let result = evaluate(ast);
+        io.println("Result: $result");
+    }
+};
+```
+
+### 27.28. Random Password Generator
+
+```eng
+import io: eng.std.io;
+import rand: eng.std.rand;
+
+fn generate_password(length: int) -> string {
+    let lower = "abcdefghijklmnopqrstuvwxyz";
+    let upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let digit = "0123456789";
+    let special = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
+
+    let proportions = [
+        rand.uniform_float(),
+        rand.uniform_float(),
+        rand.uniform_float(),
+        rand.uniform_float(),
+    ];
+
+    proportions = [
+        proportions[0] / proportions.sum(),
+        proportions[1] / proportions.sum(),
+        proportions[2] / proportions.sum(),
+        proportions[3] / proportions.sum(),
+    ];
+
+    let counts: int[] = [
+        min(proportions[0] * length, 1),
+        min(proportions[1] * length, 1),
+        min(proportions[2] * length, 1),
+        min(proportions[3] * length, 1),
+    ];
+
+    let lowers = rand.sample_multiple(lower, counts[0]);
+    let uppers = rand.sample_multiple(upper, counts[1]);
+    let digits = rand.sample_multiple(digit, counts[2]);
+    let specials = rand.sample_multiple(special, counts[3]);
+
+    return rand.shuffle(lowers + uppers + digits + specials).take(length); # Ensure total length matches requested length
+};
+
+fn main() {
+    let length = int.parse(io.scanln("Enter desired password length: "));
+    if length < 4 {
+        io.println("Password length should be at least 4.");
+        return;
+    }
+    
+    let count = int.parse(io.scanln("Enter number of passwords to generate: "));
+
+    for let i in 0:count {
+        let password = generate_password(length);
+        io.println("${i + 1}: $password");
+    }
+};
+```
+
+### 27.29. Book Borrowing Library
+
+```eng
+import io: eng.std.io;
+
+class book {
+    let title: string;
+    let author: string;
+    let is_borrowed: bool = false;
+};
+
+class person {
+    let name: string;
+    let borrowed_books: book[] = [];
+};
+
+class library {
+    let books: book[] = [];
+    let members: person[] = [];
+
+    fn add_book(new_book: book) {
+        books += new_book;
+    };
+
+    fn register_member(new_member: person) {
+        members += new_member;
+    };
+
+    fn borrow_book(member_name: string, book_title: string) -> bool {
+        let member = members.find(): (x.name == member_name);
+        let book = books.find(): (x.title == book_title && !x.is_borrowed);
+
+        if member != null && book != null {
+            book.is_borrowed = true;
+            member.borrowed_books += book;
+            return true;
+        }
+        return false;
+    };
+
+    fn return_book(member_name: string, book_title: string) -> bool {
+        let member = members.find(): (x.name == member_name);
+        let book = member?.borrowed_books.find(): (x.title == book_title);
+
+        if member != null && book != null {
+            book.is_borrowed = false;
+            member.borrowed_books.remove(book);
+            return true;
+        }
+        return false;
+    };
+};
+
+fn main() {
+    let lib = library();
+
+    lib.add_book(book("1984", "George Orwell"));
+    lib.add_book(book("To Kill a Mockingbird", "Harper Lee"));
+    lib.add_book(book("The Great Gatsby", "F. Scott Fitzgerald"));
+
+    lib.register_member(person("Alice"));
+    lib.register_member(person("Bob"));
+
+    if lib.borrow_book("Alice", "1984") {
+        io.println("Alice borrowed '1984'.");
+    } else {
+        io.println("Failed to borrow '1984'.");
+    }
+
+    if lib.return_book("Alice", "1984") {
+        io.println("Alice returned '1984'.");
+    } else {
+        io.println("Failed to return '1984'.");
+    }
+};
+```
+
+### 27.30. Shape Area Calculator
+
+```eng
+import io: eng.std.io;
+
+class shape {
+    virt fn area() -> float {
+        return 0.0;
+    };
+};
+
+class circle: shape {
+    let radius: float;
+
+    orid fn area() -> float {
+        return 3.14159 * radius * radius;
+    };
+};
+
+class rectangle: shape {
+    let width: float;
+    let height: float;
+
+    orid fn area() -> float {
+        return width * height;
+    };
+};
+
+class triangle: shape {
+    let base: float;
+    let height: float;
+
+    orid fn area() -> float {
+        return 0.5 * base * height;
+    };
+};
+
+fn main() {
+    let shapes: shape%[] = [
+        circle(5.0),
+        rectangle(4.0, 6.0),
+        triangle(3.0, 4.0),
+    ];
+
+    for let shape in shapes {
+        io.println("Area: ${shape.area()}");
+    }
+};
+```
+
+### 27.31. Bank Account Management
+
+```eng
+import io: eng.std.io;
+
+class bank_account {
+    let account_number: string;
+    let owner: string;
+    priv let _balance: float = 0.0;
+
+    let balance: prop: float {
+        get {
+            return _balance;
+        };
+    };
+
+    fn deposit(amount: float) {
+        if amount > 0.0 {
+            _balance += amount;
+            io.println("Deposited: $amount. New balance: $_balance");
+        } else {
+            io.println("Deposit amount must be positive.");
+        }
+    };
+
+    fn withdraw(amount: float) {
+        if amount > 0.0 && amount <= _balance {
+            _balance -= amount;
+            io.println("Withdrew: $amount. New balance: $_balance");
+        } else {
+            io.println("Insufficient funds or invalid amount.");
+        }
+    };
+};
+
+fn main() {
+    let account = bank_account("123456789", "John Doe");
+
+    account.deposit(500.0);
+    account.withdraw(200.0);
+    io.println("Final balance: ${account.balance}");
+};
+```
+
+### 27.32. Logger
+
+```eng
+import io: eng.std.io;
+import fs: eng.std.fs;
+import time: eng.std.time;
+
+class logger {
+    let log_file: fs.file;
+
+    ctor(log_file_path: string) {
+        log_file = fs.open_file(log_file_path, fs.file_mode.append);
+    };
+
+    fn log_warning(message: string) {
+        let log_entry = "[WARNING] ${time.now()}: $message\n";
+        log_file.println(log_entry);
+        io.println(log_entry);
+    };
+
+    fn log_error(message: string) {
+        let log_entry = "[ERROR] ${time.now()}: $message\n";
+        log_file.println(log_entry);
+        io.println(log_entry);
+    };
+
+    fn log_info(message: string) {
+        let log_entry = "[INFO] ${time.now()}: $message\n";
+        log_file.println(log_entry);
+        io.println(log_entry);
+    };
+
+    fn log_trace(message: string) {
+        let log_entry = "[TRACE] ${time.now()}: $message\n";
+        log_file.println(log_entry);
+        io.println(log_entry);
+    };
+};
+
+class server_config {
+    let host: string;
+    let port: int;
+    let timeout: int;
+};
+
+fn load_server_config(file_path: string, error: fn (message: string) -> void, warning: fn (message: string) -> void, info: fn (message: string) -> void) -> server_config? {
+    try {
+        let content = fs.read_file(file_path);
+        let lines = content.split("\n");
+        let host: string?;
+        let port: int?;
+        let timeout: int = 30;
+
+        for let line in lines {
+            let parts = line.split("=");
+            if parts.count != 2 {
+                error("Invalid config line: $line");
+                cont;
+            }
+
+            let key = parts[0].trim();
+            let value = parts[1].trim();
+
+            switch key {
+                case "host" {
+                    host = value;
+                    info("Configured host: $host");
+                }
+                case "port" {
+                    try {
+                        port = int.parse(value);
+                        info("Configured port: $port");
+                    }
+                    catch {
+                        error("Invalid port value: $value");
+                    }
+                }
+                case "timeout" {
+                    try {
+                        timeout = int.parse(value);
+                        info("Configured timeout: $timeout seconds");
+                    }
+                    catch {
+                        error("Invalid timeout value: $value.");
+                    }
+                }
+                case "wait_time" {
+                    warning("Config key 'wait_time' is deprecated. Use 'timeout' instead.");
+                    try {
+                        timeout = int.parse(value);
+                        info("Configured timeout (from wait_time): $timeout seconds");
+                    }
+                    catch {
+                        error("Invalid wait_time value: $value.");
+                    }
+                }
+                else {
+                    warning("Unknown config key: $key");
+                }
+            }
+        }
+        
+        if host == null {
+            error("Missing 'host' in configuration.");
+            return null;
+        }
+
+        if port == null {
+            error("Missing or invalid 'port' in configuration.");
+            return null;
+        }
+
+        info("Configuration loaded successfully.");
+        return server_config(host?!, port?!, timeout);
+    }
+    catch (err: eng.std.except.exception) {
+        error("Failed to load configuration: $err");
+        return null;
+    }
+};
+
+fn main() {
+    let passive_logs = logger("passive.log");
+    let critical_logs = logger("critical.log");
+
+    let config = load_server_config("server.conf",
+        critical_logs.log_error,
+        passive_logs.log_warning,
+        passive_logs.log_info,
+    );
+
+    if config != null {
+        io.println("Server configuration loaded:");
+        io.println("Host: ${config!.host}");
+        io.println("Port: ${config!.port}");
+        io.println("Timeout: ${config!.timeout} seconds");
+    } else {
+        io.println("Failed to load server configuration.");
+    }
+};
+```
+
+### 27.33. Chat Application
+
+`server.eng`:
+```eng
+import io: eng.std.io;
+import net: eng.std.net;
+
+let clients: net.tcp_socket{};
+mutex clients_mutex;
+
+fn broadcast_message(message: string, sender: net.tcp_socket) {
+    clients_mutex(): fn {
+        for let client in (clients - sender) {
+            client.println(message);
+        }
+    }
+};
+
+fn handle_client(client: net.tcp_socket) {
+    while true {
+        let message = client.scanln();
+        if message == null {
+            io.println("Client disconnected.");
+            clients_mutex(): fn { clients.remove(client); };
+            break;
+        }
+        io.println("Received: $message");
+        broadcast_message(message, client);
+    }
+};
+
+fn main() {
+    let server = net.tcp_listener(8080);
+    io.println("Chat server started on port 8080.");
+
+    while true {
+        let client = server.accept();
+        io.println("New client connected.");
+        clients_mutex: fn { clients += client; };
+        fork handle_client(client);
+    }
+};
+```
+
+`client.eng`:
+```eng
+import io: eng.std.io;
+import net: eng.std.net;
+
+fn main() {
+    let client = net.tcp_socket.connect("localhost", 8080);
+    io.println("Connected to chat server.");
+
+    fork {
+        while true {
+            let message = client.scanln();
+            if message == null {
+                io.println("Disconnected from server.");
+                break;
+            }
+            io.println("Server: $message");
+        }
+    };
+
+    while true {
+        let user_input = io.scanln();
+        if user_input == "exit" {
+            io.println("Exiting chat.");
+            break;
+        }
+        client.println(user_input);
+    }
+};
+```
+
+### 27.34. Two Player Tic-Tac-Toe
+
+`server.eng`:
+```eng
+import io: eng.std.io;
+import net: eng.std.net;
+
+enum cell {
+    empty,
+    x,
+    o;
+};
+
+class player {
+    let socket: net.tcp_socket;
+    let symbol: cell;
+};
+
+class game {
+    let board: cell[3][3] = [[cell.empty] * 3] * 3;
+    let players: player[2];
+    let current_turn: int = 0;
+
+    fn display_board() -> string {
+        let display = "";
+        for let row in board {
+            for let cell in row {
+                display += with switch cell {
+                    case cell.empty { be "."; }
+                    case cell.x { be "X"; }
+                    case cell.o { be "O"; }
+                } + " ";
+            }
+            display += "\n";
+        }
+        return display;
+    };
+
+    fn get_current_player() -> player {
+        return players[current_turn];
+    };
+
+    fn make_move(row: int, col: int) -> bool {
+        if board[row][col] == cell.empty {
+            board[row][col] = players[current_turn].symbol;
+            current_turn = (current_turn + 1) % 2;
+            return true;
+        }
+        return false;
+    };
+
+    fn check_winner() -> player_id: int, is_draw: bool {
+        player_id = -1;
+
+        for let i in 0:3 {
+            if board[i][0] != cell.empty && board[i][0] == board[i][1] && board[i][1] == board[i][2] {
+                player_id = with if board[i][0] == cell.x { be 0; } else { be 1; };
+                return;
+            }
+            if board[0][i] != cell.empty && board[0][i] == board[1][i] && board[1][i] == board[2][i] {
+                player_id = with if board[0][i] == cell.x { be 0; } else { be 1; };
+                return;
+            }
+        }
+
+        if board[0][0] != cell.empty && board[0][0] == board[1][1] && board[1][1] == board[2][2] {
+            player_id = with if board[0][0] == cell.x { be 0; } else { be 1; };
+            return;
+        }
+        if board[0][2] != cell.empty && board[0][2] == board[1][1] && board[1][1] == board[2][0] {
+            player_id = with if board[0][2] == cell.x { be 0; } else { be 1; };
+            return;
+        }
+
+        is_draw = true;
+        for let row in board {
+            for let cell in row {
+                if cell == cell.empty {
+                    is_draw = false;
+                    break 2;
+                }
+            }
+        }
+    };
+
+    fn reset() {
+        board = [[cell.empty] * 3] * 3;
+        current_turn = 0;
+    };
+};
+
+fn main() {
+    let server = net.tcp_listener(9090);
+    io.println("Tic-Tac-Toe server started on port 9090.");
+
+    let game_instance = game();
+
+    let player_1_socket = server.accept();
+    let player_2_socket = server.accept();
+
+    game_instance.players = [
+        player(player_1_socket, cell.x),
+        player(player_2_socket, cell.o),
+    ];
+
+    while true {
+        let current_player = game_instance.get_current_player();
+
+        if current_player.socket.is_closed() {
+            io.println("A player has disconnected. Ending game.");
+            break;
+        }
+
+        current_player.socket.println("Your turn! Enter your move as 'row,col':");
+
+        let move_input = current_player.socket.scanln();
+        let parts = move_input.split(",");
+
+        if parts.count != 2 {
+            current_player.socket.println("Invalid input. Try again.");
+            cont;
+        }
+
+        let row = int.parse(parts[0].trim()) !! -1;
+        let col = int.parse(parts[1].trim()) !! -1;
+
+        if row < 0 || row > 2 || col < 0 || col > 2 || !game_instance.make_move(row, col) {
+            current_player.socket.println("Invalid move. Try again.");
+            cont;
+        }
+
+        for let player in game_instance.players {
+            player.socket.println("Current Board:\n${game_instance.display_board()}");
+        }
+
+        let (winner_id, is_draw) = game_instance.check_winner();
+        if winner_id != -1 {
+            for let player in game_instance.players {
+                if player == game_instance.players[winner_id] {
+                    player.socket.println("You win!");
+                } else {
+                    player.socket.println("You lose!");
+                }
+            }
+            game_instance.reset();
+            for let player in game_instance.players {
+                player.socket.println("Starting a new game!");
+            }
+        } else if is_draw {
+            for let player in game_instance.players {
+                player.socket.println("It's a draw!");
+            }
+            game_instance.reset();
+            for let player in game_instance.players {
+                player.socket.println("Starting a new game!");
+            }
+        }
+    }
+};
+```
+
+`client.eng`:
+```eng
+import io: eng.std.io;
+import net: eng.std.net;
+
+fn main() {
+    let client = net.tcp_socket.connect("localhost", 9090);
+    io.println("Connected to Tic-Tac-Toe server.");
+
+    fork {
+        while true {
+            let message = client.scanln();
+            if message == null {
+                io.println("Disconnected from server.");
+                break;
+            }
+            io.println("Server: $message");
+        }
+    };
+
+    while true {
+        let user_input = io.scanln();
+        if user_input == "exit" {
+            io.println("Exiting game.");
+            break;
+        }
+        client.println(user_input);
+    }
+};
+```
+
+### 27.35. Game of Life
+
+```eng
+import io: eng.std.io;
+
+fn print_grid(grid: bool[][]) {
+    io.print(grid.map(): (x.map(): (with if x { be "##" } else { be "  "; }).join()).join("\n"));
+};
+
+fn get_next_generation(current: bool[][]) -> bool[][] {
+    let rows = current.count;
+    let cols = current[0].count;
+    let next: bool[rows][cols] = [[false] * cols] * rows;
+
+    fn count_live_neighbors(r: int, c: int) -> int {
+        let count = 0;
+        for (let dr in -1:2, let dc in -1:2) {
+            if dr == 0 && dc == 0 {
+                cont;
+            }
+            let nr = r + dr;
+            let nc = c + dc;
+            if 0 <= nr < rows && 0 <= nc < cols && current[nr][nc] {
+                count += 1;
+            }
+        }
+        return count;
+    };
+
+    for (let r in 0:rows, let c in 0:cols) {
+        let live_neighbors = count_live_neighbors(r, c);
+        if current[r][c] {
+            next[r][c] = (live_neighbors == 2 || live_neighbors == 3);
+        } else {
+            next[r][c] = (live_neighbors == 3);
+        }
+    }
+
+    return next;
+};
+
+fn main() {
+    let rows = 10;
+    let cols = 10;
+    let grid: bool[rows][cols] = [[false] * cols] * rows;
+
+    # Initialize with a glider pattern
+    grid[1][2] = true;
+    grid[2][3] = true;
+    grid[3][1] = true;
+    grid[3][2] = true;
+    grid[3][3] = true;
+
+    for let generation in 0:100 {
+        onward {
+            io.println("\n\n");
+        }
+        io.println("Generation $generation:");
+        print_grid(grid);
+        grid = get_next_generation(grid);
+    }
+};
+```
+
+### 27.36. Sushi For Two
+
+```eng
+import io: eng.std.io;
+
+fn main() {
+    # https://codeforces.com/contest/1138/problem/A
+    # 1 -> Tuna, 2 -> Pufferfish
+    let sushi = [1, 2, 2, 1, 2, 2, 2, 1, 1];
+
+    let solution = sushi
+        -> group_by(): (x == y)
+        -> map(): (x.count)
+        -> adjacent(): min
+        -> max() * 2; # 4
+
+    io.println("Longest contiguous segment length: $solution");
 };
 ```
 
@@ -8196,7 +9076,7 @@ Operator descriptions:
 50. `x = y` - Binary infix `=` operator (`assignment`) that:
     - Assigns the value of `y` to `x`.
 
-## 31. Appendix C - Language Presets
+## 30. Appendix C - Language Presets
 
 List of language presets (aka. the language difficulty modes):
 
@@ -8226,166 +9106,166 @@ List of language presets (aka. the language difficulty modes):
     - The "No fun allowed" mode.
     - This is preferable for nobody.
 
-### 31.1. `hostile` Presets Features
+### 30.1. `hostile` Presets Features
 
 List of all the features enabled in `hostile` preset:
 1. None lol
 
-### 31.2. `strict` Presets Features
+### 30.2. `strict` Presets Features
 
 List of all the features enabled in `strict` preset:
-1. `multi_line_comment` - `strict` - Allows multi-line comments using `#{ ... }#`.
-2. `string_interop` - `strict` -  - Allows string interpolation expressions within string literals.
-3. `variabt_type` - `strict` - Allows the use of variant types.
-4. `explicit_type_conversion` - `strict` - Allows explicit type conversions definition and usage.
-5. `numeric_type_conversion` - `strict` - Allows numeric type conversions between different numeric types.
-6. `polymorphism` - `strict` - Allows polymorphism definition and usage.
-7. `dynamic_array` - `strict` - Allows dynamic arrays.
-8. `negative_indexing` - `strict` - Allows negative indexing for arrays and strings.
-9. `range_indexing` - `strict` - Allows subarray and range indexing for arrays and strings.
-10. `array_generator` - `strict` - Allows array generators and generator expressions.
-11. `array_packing` - `strict` - Allows array packing and unpacking.
-12. `tuple_type` - `strict` - Allows tuple type definition and usage.
-13. `typle_packing` - `strict` - Allows tuple packing and unpacking.
-14. `unary_operator` - `strict` - Allows unary operator definition and usage.
-15. `binary_operator` - `strict` - Allows binary operator definition and usage.
-16. `multi_part_operator` - `strict` - Allows multi-part operator definition and usage.
-17. `member_access_chaining` - `strict` - Allows member access chaining.
-18. `iterative_for` - `strict` - Allows `for` loops to iterate over iterable collections.
-19. `match_destructuring` - `strict` - Allows destructuring patterns in match expressions.
-20. `named_argument` - `strict` - Allows calling functions with named arguments.
-21. `default_parameter` - `strict` - Allows functions to have default parameter values.
-22. `function_overloading` - `strict` - Allows function overloading definition and usage.
-23. `variadic_parameter` - `strict` - Allows functions to have variadic parameters.
-24. `first_class_function` - `strict` - Allows functions to be treated as first-class citizens.
-25. `anonymous_function` - `strict` - Allows anonymous function (lambda) definition and usage.
-26. `trailing_parameter` - `strict` - Allows passing function from trailing function syntax.
-27. `expression_function` - `strict` - Allows single-expression function definition.
-28. `function_binding` - `strict` - Allows function binding to create partially applied functions.
-29. `recursion` - `strict` - Allows functions to be recursive.
-30. `default_default_constructor` - `strict` - Allows classes to have a default constructor automatically generated.
-31. `default_constructor` - `strict` - Allows classes to have a default constructor.
-32. `default_param_constructor` - `strict` - Allows classes to have a parameterized constructor with default parameters.
-33. `param_constructor` - `strict` - Allows classes to have a parameterized constructor.
-34. `factory_constructor` - `strict` - Allows classes to have a factory constructor.
-35. `default_copy_constructor` - `strict` - Allows classes to have a copy constructor automatically generated.
-36. `copy_constructor` - `strict` - Allows classes to have a copy constructor.
-37. `default_move_constructor` - `strict` - Allows classes to have a move constructor automatically generated.
-38. `move_constructor` - `strict` - Allows classes to have a move constructor.
-39. `default_swap_constructor` - `strict` - Allows classes to have a swap constructor automatically generated.
-40. `swap_constructor` - `strict` - Allows classes to have a swap constructor.
-41. `destructor` - `strict` - Allows classes to have a destructor.
-42. `class_access_control` - `strict` - Allows access control modifiers for class members.
-43. `class_friend_access` - `strict` - Allows classes to declare friend access.
-44. `inheritance` - `strict` - Allows classes to inherit from other classes.
-45. `virtual_override` - `strict` - Allows virtual members and member overriding in classes.
-46. `abstract_class` - `strict` - Allows abstract classes and abstract members.
-47. `sealed_class` - `strict` - Allows sealed classes.
-48. `anonymous_class` - `strict` - Allows anonymous class definition and usage.
-49. `namespace_extension` - `strict` - Allows extending namespaces by reopening them.
-50. `namespace_access_control` - `strict` - Allows access control modifiers for namespaces members.
-51. `enum_class` - `strict` - Allows enums to behave as classes (can have members, can inherit, support polymorphism, etc.).
-52. `enum_enum_inheritance` - `strict` - Allows enums to inherit from other enums, inheriting named values.
-53. `enum_default_value` - `strict` - Allows specifying default values for enum instances.
-54. `enum_value_generation` - `strict` - Allows automatic generation of enum values.
-55. `enum_iteration` - `strict` - Allows iteration over enum named values.
-56. `enum_sum_type` - `strict` - Allows enums to be used as sum types.
-57. `property` - `strict` - Allows defining properties with getter and setter methods.
-58. `property_class` - `strict` - Allows properties to behave as classes (can have members, can inherit, support polymorphism, etc.).
-59. `property_outside_class` - `strict` - Allows defining properties outside of classes.
-60. `operator_overloading` - `strict` - Allows operator overloading definition and usage.
-61. `literal_typing` - `strict` - Allows specifying types for literals.
-62. `coroutine` - `strict` - Allows defining and using coroutines.
-63. `coroutine_probing` - `strict` - Allows probing coroutine state without resuming it.
-64. `coroutine_yield` - `strict` - Allows yielding multiple values from coroutines.
-65. `multi_threading` - `strict` - Allows multi-threading support.
-66. `mutex_sync` - `strict` - Allows mutex synchronization primitives.
-67. `semaphore_sync` - `strict` - Allows semaphore synchronization primitives.
-68. `atomic_operation` - `strict` - Allows atomic operations for shared data.
-69. `conditional_variable` - `strict` - Allows conditional variables for thread synchronization.
-70. `thread_local` - `strict` - Allows thread-local storage.
-71. `parallel_loop` - `strict` - Allows parallel loops for data parallelism.
-72. `generic_programming` - `strict` - Allows generic programming with type parameters.
-73. `generic_constraint` - `strict` - Allows constraints on generic type parameters using `where` and concept definitions.
-74. `generic_specialization` - `strict` - Allows explicit specialization of generic functions and classes.
-75. `concept_as_trait` - `strict` - Allows concepts to be used as traits for type checking and constraints.
-76. `array_wise_ops` - `strict` - Allows array element-wise operations.
-77. `array_pipeline` - `strict` - Allows array pipeline operations.
-78. `c_interoperability` - `strict` - Allows interoperability with C code.
-79. `compile_time_evaluation` - `strict` - Allows compile-time evaluation of expressions and functions.
-80. `policy_mutation` - `strict` - Allows mutation of policies in source code.
+1. `multi_line_comment` - Allows multi-line comments using `#{ ... }#`.
+2. `string_interop` - Allows string interpolation expressions within string literals.
+3. `variabt_type` - Allows the use of variant types.
+4. `explicit_type_conversion` - Allows explicit type conversions definition and usage.
+5. `numeric_type_conversion` - Allows numeric type conversions between different numeric types.
+6. `polymorphism` - Allows polymorphism definition and usage.
+7. `dynamic_array` - Allows dynamic arrays.
+8. `negative_indexing` - Allows negative indexing for arrays and strings.
+9. `multi_indexing` - Allows subarray and range indexing for arrays and strings.
+10. `array_generator` - Allows array generators and generator expressions.
+11. `array_packing` - Allows array packing and unpacking.
+12. `tuple_type` - Allows tuple type definition and usage.
+13. `tuple_packing` - Allows tuple packing and unpacking.
+14. `unary_operator` - Allows unary operator definition and usage.
+15. `binary_operator` - Allows binary operator definition and usage.
+16. `multi_part_operator` - Allows multi-part operator definition and usage.
+17. `member_access_chaining` - Allows member access chaining.
+18. `iterative_for` - Allows `for` loops to iterate over iterable collections.
+19. `match_destructuring` - Allows destructuring patterns in match expressions.
+20. `named_argument` - Allows calling functions with named arguments.
+21. `default_parameter` - Allows functions to have default parameter values.
+22. `function_overloading` - Allows function overloading definition and usage.
+23. `variadic_parameter` - Allows functions to have variadic parameters.
+24. `first_class_function` - Allows functions to be treated as first-class citizens.
+25. `anonymous_function` - Allows anonymous function (lambda) definition and usage.
+26. `trailing_parameter` - Allows passing function from trailing function syntax.
+27. `expression_function` - Allows single-expression function definition.
+28. `function_binding` - Allows function binding to create partially applied functions.
+29. `recursion` - Allows functions to be recursive.
+30. `default_default_constructor` - Allows classes to have a default constructor automatically generated.
+31. `default_constructor` - Allows classes to have a default constructor.
+32. `default_param_constructor` - Allows classes to have a parameterized constructor with default parameters.
+33. `param_constructor` - Allows classes to have a parameterized constructor.
+34. `factory_constructor` - Allows classes to have a factory constructor.
+35. `default_copy_constructor` - Allows classes to have a copy constructor automatically generated.
+36. `copy_constructor` - Allows classes to have a copy constructor.
+37. `default_move_constructor` - Allows classes to have a move constructor automatically generated.
+38. `move_constructor` - Allows classes to have a move constructor.
+39. `default_swap_constructor` - Allows classes to have a swap constructor automatically generated.
+40. `swap_constructor` - Allows classes to have a swap constructor.
+41. `destructor` - Allows classes to have a destructor.
+42. `class_access_control` - Allows access control modifiers for class members.
+43. `class_friend_access` - Allows classes to declare friend access.
+44. `inheritance` - Allows classes to inherit from other classes.
+45. `virtual_override` - Allows virtual members and member overriding in classes.
+46. `abstract_class` - Allows abstract classes and abstract members.
+47. `sealed_class` - Allows sealed classes.
+48. `anonymous_class` - Allows anonymous class definition and usage.
+49. `namespace_extension` - Allows extending namespaces by reopening them.
+50. `namespace_access_control` - Allows access control modifiers for namespaces members.
+51. `enum_class` - Allows enums to behave as classes (can have members, can inherit, support polymorphism, etc.).
+52. `enum_enum_inheritance` - Allows enums to inherit from other enums, inheriting named values.
+53. `enum_default_value` - Allows specifying default values for enum instances.
+54. `enum_value_generation` - Allows automatic generation of enum values.
+55. `enum_iteration` - Allows iteration over enum named values.
+56. `enum_sum_type` - Allows enums to be used as sum types.
+57. `property` - Allows defining properties with getter and setter methods.
+58. `property_class` - Allows properties to behave as classes (can have members, can inherit, support polymorphism, etc.).
+59. `property_outside_class` - Allows defining properties outside of classes.
+60. `operator_overloading` - Allows operator overloading definition and usage.
+61. `literal_typing` - Allows specifying types for literals.
+62. `coroutine` - Allows defining and using coroutines.
+63. `coroutine_probing` - Allows probing coroutine state without resuming it.
+64. `coroutine_yield` - Allows yielding multiple values from coroutines.
+65. `multi_threading` - Allows multi-threading support.
+66. `mutex_sync` - Allows mutex synchronization primitives.
+67. `semaphore_sync` - Allows semaphore synchronization primitives.
+68. `atomic_operation` - Allows atomic operations for shared data.
+69. `conditional_variable` - Allows conditional variables for thread synchronization.
+70. `thread_local` - Allows thread-local storage.
+71. `parallel_loop` - Allows parallel loops for data parallelism.
+72. `generic_programming` - Allows generic programming with type parameters.
+73. `generic_constraint` - Allows constraints on generic type parameters using `where` and concept definitions.
+74. `generic_specialization` - Allows explicit specialization of generic functions and classes.
+75. `concept_as_trait` - Allows concepts to be used as traits for type checking and constraints.
+76. `array_wise_ops` - Allows array element-wise operations.
+77. `array_pipeline` - Allows array pipeline operations.
+78. `c_interoperability` - Allows interoperability with C code.
+79. `compile_time_evaluation` - Allows compile-time evaluation of expressions and functions.
+80. `policy_mutation` - Allows mutation of policies in source code.
 
-### 31.3. `balanced` Presets Features
+### 30.3. `balanced` Presets Features
 
 List of all the features enabled in `balanced` preset:
 0. All features in `strict` preset, AND:
-1. `comment_evaluation` - `balanced` - Fence blocks inside comments are processed and evaluated, providing linting, formatting and analysis (both compile-time and run-time) for code within comments.
-2. `unicode_identifier` - `balanced` - Allows the use of Unicode characters in identifiers (variable names, function names, etc.).
-3. `backtick_identifier` - `balanced` - Allows the use of backtick identifiers.
-4. `nesting_string_interop` - `balanced` - Allows nesting of string interpolation expressions within the format section of another string interpolation.
-5. `default_initialization` - `balanced` - Allows variables to be default-initialized if no explicit initializer is provided.
-6. `multiple_declaration` - `balanced` - Allows multiple declarations in a single `let` statement.
-7. `any_type` - `balanced` - Allows the use of `any` type.
-8. `variant_intersection` - `balanced` - Allows variant intersection using `&`.
-9. `implicit_type_conversion` - `balanced` - Allows implicit type conversions definition and usage.
-10. `swap_semantics` - `balanced` - Allows swap semantics definition and usage.
-11. `untyped_array` - `balanced` - Allows untyped arrays (`any[]`).
-12. `automatic_map` - `balanced` - Allows automatically selecting between different map implementations based on key type.
-13. `automatic_set` - `balanced` - Allows automatically selecting between different set implementations based on element type.
-14. `operator_overloading` - `balanced` - Allows operator overloading definition and usage.
-15. `declaration_in_control_structure` - `balanced` - Allows variable declarations within control structures (e.g., `if`, `while`, `for`, etc.).
-16. `else_in_control_structure` - `balanced` - Allows `else` blocks in control structures, excluding always-on `if`-`else` and `switch`-`else`.
-17. `loop_staging` - `balanced` - Allows `once` and `onward` blocks in loops.
-18. `switch_placeholder` - `balanced` - Allows placeholder substitution in switch-case statements.
-19. `match_mixing` - `balanced` - Allows mixing destructuring and comparison in match expressions.
-20. `with_be` - `balanced` - Allows `with`-`be` expressions.
-21. `multi_return` - `balanced` - Allows functions to return multiple values.
-22. `named_value_argument` - `balanced` - Allows calling functions with named value arguments.
-23. `function_dynamic_dispatch` - `balanced` - Allows dynamic dispatch of variant type to function overloading.
-24. `anonymous_function_implicit_capture` - `balanced` - Allows anonymous functions to implicitly capture variables from the enclosing scope.
-25. `retain_function` - `balanced` - Allows defining retaining local variables in functions.
-26. `function_composition` - `balanced` - Allows function binding to also allow function composition and expression-based composition.
-27. `side_channeling` - `balanced` - Allows side-channeling values to functions.
-28. `retain_class` - `balanced` - Allows defining retaining member variables in classes.
-29. `mutable_member_variable` - `balanced` - Allows member variables to be mutable in constant instances.
-30. `class_unpacking` - `balanced` - Allows unpacking public member variables of a class instance.
-31. `dotted_declaration` - `balanced` - Allows dotted declarations nested namespaces and entities.
-32. `implicit_content` - `balanced` - Allows namespaces to implicitly encapsulate declarations within them.
-33. `spilling` - `balanced` - Allows spilling namespace members into current scope.
-34. `custom_enum_value_generation` - `balanced` - Allows custom automatic generation of enum values.
-35. `custom_operator` - `balanced` - Allows defining custom operators.
-36. `declarative_macro` - `balanced` - Allows defining declarative macros.
-37. `attribute_macro` - `balanced` - Allows defining attribute macros.
-38. `engine_macro` - `balanced` - Allows defining engine macros.
-39. `concept_as_polymorphism` - `balanced` - Allows concepts to be used for polymorphism and dynamic dispatch.
+1. `comment_evaluation` - Fence blocks inside comments are processed and evaluated, providing linting, formatting and analysis (both compile-time and run-time) for code within comments.
+2. `unicode_identifier` - Allows the use of Unicode characters in identifiers (variable names, function names, etc.).
+3. `backtick_identifier` - Allows the use of backtick identifiers.
+4. `nesting_string_interop` - Allows nesting of string interpolation expressions within the format section of another string interpolation.
+5. `default_initialization` - Allows variables to be default-initialized if no explicit initializer is provided.
+6. `multiple_declaration` - Allows multiple declarations in a single `let` statement.
+7. `any_type` - Allows the use of `any` type.
+8. `variant_intersection` - Allows variant intersection using `&`.
+9. `implicit_type_conversion` - Allows implicit type conversions definition and usage.
+10. `swap_semantics` - Allows swap semantics definition and usage.
+11. `untyped_array` - Allows untyped arrays (`any[]`).
+12. `automatic_map` - Allows automatically selecting between different map implementations based on key type.
+13. `automatic_set` - Allows automatically selecting between different set implementations based on element type.
+14. `operator_overloading` - Allows operator overloading definition and usage.
+15. `declaration_in_control_structure` - Allows variable declarations within control structures (e.g., `if`, `while`, `for`, etc.).
+16. `else_in_control_structure` - Allows `else` blocks in control structures, excluding always-on `if`-`else` and `switch`-`else`.
+17. `loop_staging` - Allows `once` and `onward` blocks in loops.
+18. `switch_placeholder` - Allows placeholder substitution in switch-case statements.
+19. `match_mixing` - Allows mixing destructuring and comparison in match expressions.
+20. `with_be` - Allows `with`-`be` expressions.
+21. `multi_return` - Allows functions to return multiple values.
+22. `named_value_argument` - Allows calling functions with named value arguments.
+23. `function_dynamic_dispatch` - Allows dynamic dispatch of variant type to function overloading.
+24. `anonymous_function_implicit_capture` - Allows anonymous functions to implicitly capture variables from the enclosing scope.
+25. `retain_function` - Allows defining retaining local variables in functions.
+26. `function_composition` - Allows function binding to also allow function composition and expression-based composition.
+27. `side_channeling` - Allows side-channeling values to functions.
+28. `retain_class` - Allows defining retaining member variables in classes.
+29. `mutable_member_variable` - Allows member variables to be mutable in constant instances.
+30. `class_unpacking` - Allows unpacking public member variables of a class instance.
+31. `dotted_declaration` - Allows dotted declarations nested namespaces and entities.
+32. `implicit_content` - Allows namespaces to implicitly encapsulate declarations within them.
+33. `spilling` - Allows spilling namespace members into current scope.
+34. `custom_enum_value_generation` - Allows custom automatic generation of enum values.
+35. `custom_operator` - Allows defining custom operators.
+36. `declarative_macro` - Allows defining declarative macros.
+37. `attribute_macro` - Allows defining attribute macros.
+38. `engine_macro` - Allows defining engine macros.
+39. `concept_as_polymorphism` - Allows concepts to be used for polymorphism and dynamic dispatch.
 
-### 31.4. `friendly` Presets Features
+### 30.4. `friendly` Presets Features
 
 List of all the features enabled in `friendly` preset:
 0. All features in `balanced` preset, AND:
-1. `automatic_multi_conversion` - `friendly` - Allows automatic multi-step type conversions.
-2. `non_last_default_parameter` - `friendly` - Allows functions to have non-last parameters with default values.
-3. `function_compat` - `friendly` - Allows passing function arguments with compatible but not exactly matching types.
-4. `multiple_inheritance` - `friendly` - Allows classes to inherit from multiple base classes.
-5. `catalyzing_base` - `friendly` - Allows classes to catalyze base classes for multiple inheritance.
-6. `operator_with_implicit_conversion` - `friendly` - Allows operators to work with implicitly convertible types.
-7. `lock_free` - `friendly` - Allows lock-free operations using memory order semantics.
-8. `undefining_entity` - `friendly` - Allows undefining previously defined entities using `undef`.
-9. `manual_memory_management` - `friendly` - Allows manual memory management using `alloc`, `dealloc` and `realloc`, along with raw pointers.
+1. `automatic_multi_conversion` - Allows automatic multi-step type conversions.
+2. `non_last_default_parameter` - Allows functions to have non-last parameters with default values.
+3. `function_compat` - Allows passing function arguments with compatible but not exactly matching types.
+4. `multiple_inheritance` - Allows classes to inherit from multiple base classes.
+5. `catalyzing_base` - Allows classes to catalyze base classes for multiple inheritance.
+6. `operator_with_implicit_conversion` - Allows operators to work with implicitly convertible types.
+7. `lock_free` - Allows lock-free operations using memory order semantics.
+8. `undefining_entity` - Allows undefining previously defined entities using `undef`.
+9. `manual_memory_management` - Allows manual memory management using `alloc`, `dealloc` and `realloc`, along with raw pointers.
 
-### 31.5. `express` Presets Features
+### 30.5. `express` Presets Features
 
 List of all the features enabled in `express` preset:
 0. All features in `friendly` preset, AND:
-1. `shadowing_declaration` - `express` - Allows variable shadowing in same scope.
-2. `loop_transfer_with_count` - `express` - Allows `cont` and `break` statements with nesting count in loops.
-3. `switch_fallthrough` - `express` - Allows fallthrough behavior in switch-case statements.
-4. `silent_try` - `express` - Allows silent `try` blocks without `catch` blocks that suppress exceptions.
-5. `label_goto` - `express` - Allows `label` and `goto` statements.
-6. `implicit_return` - `express` - Allows functions to implicitly return in a non-void. function if the last expression matches the return type.
-7. `function_overloading_by_name` - `express` - Allows function overloading resolution by name only.
-8. `impure_function` - `express` - Allows defining fake pure functions.
-9. `constructor_as_first_class_function` - `express` - Allows constructors to be treated as first-class functions.
-10. `first_class_member_function` - `express` - Allows member functions to be treated as first-class citizens.
-11. `custom_type_modifier` - `express` - Allows defining custom type modifiers.
-12. `compile_time_side_effects` - `express` - Allows side effects during compile-time evaluation.
+1. `shadowing_declaration` - Allows variable shadowing in same scope.
+2. `loop_transfer_with_count` - Allows `cont` and `break` statements with nesting count in loops.
+3. `switch_fallthrough` - Allows fallthrough behavior in switch-case statements.
+4. `silent_try` - Allows silent `try` blocks without `catch` blocks that suppress exceptions.
+5. `label_goto` - Allows `label` and `goto` statements.
+6. `implicit_return` - Allows functions to implicitly return in a non-void. function if the last expression matches the return type.
+7. `function_overloading_by_name` - Allows function overloading resolution by name only.
+8. `impure_function` - Allows defining fake pure functions.
+9. `constructor_as_first_class_function` - Allows constructors to be treated as first-class functions.
+10. `first_class_member_function` - Allows member functions to be treated as first-class citizens.
+11. `custom_type_modifier` - Allows defining custom type modifiers.
+12. `compile_time_side_effects` - Allows side effects during compile-time evaluation.
