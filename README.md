@@ -148,9 +148,11 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [7.17. Sealed Classes](#717-sealed-classes)
   - [7.18. Retaining Instance Variables](#718-retaining-instance-variables)
   - [7.19. Member Functions as First-Class Citizens](#719-member-functions-as-first-class-citizens)
-  - [7.20. Mutable Constant Instances](#720-mutable-constant-instances)
-  - [7.21. Class Unpacking](#721-class-unpacking)
-  - [7.22. Anonymous Class Declaration](#722-anonymous-class-declaration)
+  - [7.20. Member Functions as Free-Standing Functions](#720-member-functions-as-free-standing-functions)
+  - [7.21. Mutable Constant Instances](#721-mutable-constant-instances)
+  - [7.22. Class Unpacking](#722-class-unpacking)
+  - [7.23. Class Destructuring](#723-class-destructuring)
+  - [7.24. Anonymous Class Declaration](#724-anonymous-class-declaration)
 - [8. Namespaces](#8-namespaces)
   - [8.1. Dotted Declaration](#81-dotted-declaration)
   - [8.2. Extension](#82-extension)
@@ -165,122 +167,123 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [10.4. Default Value](#104-default-value)
   - [10.5. Member Generation](#105-member-generation)
   - [10.6. Member Iteration](#106-member-iteration)
-  - [10.7. Enums as Sum Types](#107-enums-as-sum-types)
-- [11. Properties](#11-properties)
-  - [11.1. Properties as Class](#111-properties-as-class)
-  - [11.2. Read-Only And Write-Only Properties](#112-read-only-and-write-only-properties)
-- [12. Operator Overloading](#12-operator-overloading)
-  - [12.1. Operator Types](#121-operator-types)
-  - [12.2. Custom Operators](#122-custom-operators)
-  - [12.3. Auto Generation](#123-auto-generation)
-  - [12.4. Overloading with Type Conversion](#124-overloading-with-type-conversion)
-- [13. Literal Typing](#13-literal-typing)
-- [14. Custom Type Modifiers](#14-custom-type-modifiers)
-- [15. Macros](#15-macros)
-  - [15.1. Declarative Macros](#151-declarative-macros)
-  - [15.2. Attribute Macros](#152-attribute-macros)
-  - [15.3. Engine Macros](#153-engine-macros)
-- [16. Coroutines](#16-coroutines)
-  - [16.1. Cooperative Usage](#161-cooperative-usage)
-  - [16.2. Multiple Coroutine Tasks](#162-multiple-coroutine-tasks)
-  - [16.3. Cancelling Coroutines](#163-cancelling-coroutines)
-  - [16.4. Calling Non-Coroutine Functions Concurrently](#164-calling-non-coroutine-functions-concurrently)
-- [17. Multi-threading](#17-multi-threading)
-  - [17.1. Creating Threads](#171-creating-threads)
-  - [17.2. Shared Memory](#172-shared-memory)
-  - [17.3. Atomic Types](#173-atomic-types)
-  - [17.4. Semaphores](#174-semaphores)
-  - [17.5. Condition Variables](#175-condition-variables)
-  - [17.6. Memory Ordering](#176-memory-ordering)
-  - [17.7. Thread-Local Storage](#177-thread-local-storage)
-  - [17.8. Barriers](#178-barriers)
-  - [17.9. Latches](#179-latches)
-  - [17.10. Thread Pools](#1710-thread-pools)
-  - [17.11. Futures and Promises](#1711-futures-and-promises)
-  - [17.12. Parallel Loops](#1712-parallel-loops)
-- [18. Generics and Concepts](#18-generics-and-concepts)
-  - [18.1. Generics](#181-generics)
-  - [18.2. Concepts](#182-concepts)
-  - [18.3. Concepts on Classes](#183-concepts-on-classes)
-  - [18.4. `auto` and Constrained `auto`](#184-auto-and-constrained-auto)
-  - [18.5. Concepts as Polymorphic Interfaces](#185-concepts-as-polymorphic-interfaces)
-  - [18.6. Arbitrary Constraints](#186-arbitrary-constraints)
-- [19. Array Operations](#19-array-operations)
-  - [19.1. Element-wise Operations](#191-element-wise-operations)
-  - [19.2. Array Pipeline](#192-array-pipeline)
-  - [19.3. Placeholder Pipeline](#193-placeholder-pipeline)
-  - [19.4. Custom Combinators](#194-custom-combinators)
-  - [19.5. Cartesian Iteration](#195-cartesian-iteration)
-- [20. Undefining Entities](#20-undefining-entities)
-- [21. Interoperability with C](#21-interoperability-with-c)
-- [22. Manual Memory Management](#22-manual-memory-management)
-- [23. Reflection](#23-reflection)
-  - [23.1. Type Introspection](#231-type-introspection)
-  - [23.2. Dynamic Invocation](#232-dynamic-invocation)
-  - [23.3. Reflecting Enum Types](#233-reflecting-enum-types)
-- [24. Compile-time Evaluation](#24-compile-time-evaluation)
-- [25. Tooling](#25-tooling)
-  - [25.1. Architecture](#251-architecture)
-  - [25.2. CLI Usage](#252-cli-usage)
-    - [25.2.1. Create a Project](#2521-create-a-project)
-    - [25.2.2. Build the project](#2522-build-the-project)
-    - [25.2.3. Use toolchain without a Project](#2523-use-toolchain-without-a-project)
-  - [25.3. Project Configuration](#253-project-configuration)
-    - [25.3.1. Project Metadata](#2531-project-metadata)
-    - [25.3.2. Build Targets](#2532-build-targets)
-    - [25.3.3. Dependencies](#2533-dependencies)
-    - [25.3.4. Configuring Dependencies](#2534-configuring-dependencies)
-    - [25.3.5. Packaging and Publishing](#2535-packaging-and-publishing)
-    - [25.3.6. Custom Repository](#2536-custom-repository)
-    - [25.3.7. Language Presets](#2537-language-presets)
-    - [25.3.8. Presets as Language Constructs](#2538-presets-as-language-constructs)
-- [26. Plugin System](#26-plugin-system)
-  - [26.1. Example Plugins](#261-example-plugins)
-- [27. Example Programs](#27-example-programs)
-  - [27.1. Hello World](#271-hello-world)
-  - [27.2. Fibonacci Sequence](#272-fibonacci-sequence)
-  - [27.3. Factorial Calculation](#273-factorial-calculation)
-  - [27.4. Prime Number Checker](#274-prime-number-checker)
-  - [27.5. Palindrome Checker](#275-palindrome-checker)
-  - [27.6. Word Count](#276-word-count)
-  - [27.7. Guess the Number](#277-guess-the-number)
-  - [27.8. Simple Calculator](#278-simple-calculator)
-  - [27.9. Sum and Average](#279-sum-and-average)
-  - [27.10. Multiplication Table](#2710-multiplication-table)
-  - [27.11. GCD and LCM](#2711-gcd-and-lcm)
-  - [27.12. Password Validator](#2712-password-validator)
-  - [27.13. Sorting Algorithms](#2713-sorting-algorithms)
-  - [27.14. Search Algorithms](#2714-search-algorithms)
-  - [27.15. Rock-Paper-Scissors](#2715-rock-paper-scissors)
-  - [27.16. File Manager](#2716-file-manager)
-  - [27.17. FizzBuzz](#2717-fizzbuzz)
-  - [27.18. Countdown Timer](#2718-countdown-timer)
-  - [27.19. Histogram Generator](#2719-histogram-generator)
-  - [27.20. Unique Elements](#2720-unique-elements)
-  - [27.21. Matrix Operations](#2721-matrix-operations)
-  - [27.22. CSV Address Book Reader](#2722-csv-address-book-reader)
-  - [27.23. Directory Size Calculator](#2723-directory-size-calculator)
-  - [27.24. Caesar Cipher](#2724-caesar-cipher)
-  - [27.25. Sudoku Verifier](#2725-sudoku-verifier)
-  - [27.26. Grid Pathfinding (A\* Algorithm)](#2726-grid-pathfinding-a-algorithm)
-  - [27.27. Expression Evaluator](#2727-expression-evaluator)
-  - [27.28. Random Password Generator](#2728-random-password-generator)
-  - [27.29. Book Borrowing Library](#2729-book-borrowing-library)
-  - [27.30. Shape Area Calculator](#2730-shape-area-calculator)
-  - [27.31. Bank Account Management](#2731-bank-account-management)
-  - [27.32. Logger](#2732-logger)
-  - [27.33. Chat Application](#2733-chat-application)
-  - [27.34. Two Player Tic-Tac-Toe](#2734-two-player-tic-tac-toe)
-  - [27.35. Game of Life](#2735-game-of-life)
-  - [27.36. Sushi For Two](#2736-sushi-for-two)
-- [28. Appendix A - List of Keywords](#28-appendix-a---list-of-keywords)
-- [29. Appendix B - List of Built-in Operators](#29-appendix-b---list-of-built-in-operators)
-- [30. Appendix C - Language Presets](#30-appendix-c---language-presets)
-  - [30.1. `hostile` Presets Features](#301-hostile-presets-features)
-  - [30.2. `strict` Presets Features](#302-strict-presets-features)
-  - [30.3. `balanced` Presets Features](#303-balanced-presets-features)
-  - [30.4. `friendly` Presets Features](#304-friendly-presets-features)
-  - [30.5. `express` Presets Features](#305-express-presets-features)
+- [11. Unions](#11-unions)
+  - [11.1. Union as Classes](#111-union-as-classes)
+- [12. Properties](#12-properties)
+  - [12.1. Properties as Class](#121-properties-as-class)
+  - [12.2. Read-Only And Write-Only Properties](#122-read-only-and-write-only-properties)
+- [13. Operator Overloading](#13-operator-overloading)
+  - [13.1. Operator Types](#131-operator-types)
+  - [13.2. Custom Operators](#132-custom-operators)
+  - [13.3. Auto Generation](#133-auto-generation)
+  - [13.4. Overloading with Type Conversion](#134-overloading-with-type-conversion)
+- [14. Literal Typing](#14-literal-typing)
+- [15. Custom Type Modifiers](#15-custom-type-modifiers)
+- [16. Macros](#16-macros)
+  - [16.1. Declarative Macros](#161-declarative-macros)
+  - [16.2. Attribute Macros](#162-attribute-macros)
+  - [16.3. Engine Macros](#163-engine-macros)
+- [17. Coroutines](#17-coroutines)
+  - [17.1. Cooperative Usage](#171-cooperative-usage)
+  - [17.2. Multiple Coroutine Tasks](#172-multiple-coroutine-tasks)
+  - [17.3. Cancelling Coroutines](#173-cancelling-coroutines)
+  - [17.4. Calling Non-Coroutine Functions Concurrently](#174-calling-non-coroutine-functions-concurrently)
+- [18. Multi-threading](#18-multi-threading)
+  - [18.1. Creating Threads](#181-creating-threads)
+  - [18.2. Shared Memory](#182-shared-memory)
+  - [18.3. Atomic Types](#183-atomic-types)
+  - [18.4. Semaphores](#184-semaphores)
+  - [18.5. Condition Variables](#185-condition-variables)
+  - [18.6. Memory Ordering](#186-memory-ordering)
+  - [18.7. Thread-Local Storage](#187-thread-local-storage)
+  - [18.8. Barriers](#188-barriers)
+  - [18.9. Latches](#189-latches)
+  - [18.10. Thread Pools](#1810-thread-pools)
+  - [18.11. Futures and Promises](#1811-futures-and-promises)
+  - [18.12. Parallel Loops](#1812-parallel-loops)
+- [19. Generics and Concepts](#19-generics-and-concepts)
+  - [19.1. Generics](#191-generics)
+  - [19.2. Concepts](#192-concepts)
+  - [19.3. Concepts on Classes](#193-concepts-on-classes)
+  - [19.4. `auto` and Constrained `auto`](#194-auto-and-constrained-auto)
+  - [19.5. Concepts as Polymorphic Interfaces](#195-concepts-as-polymorphic-interfaces)
+  - [19.6. Arbitrary Constraints](#196-arbitrary-constraints)
+- [20. Array Operations](#20-array-operations)
+  - [20.1. Element-wise Operations](#201-element-wise-operations)
+  - [20.2. Array Pipeline](#202-array-pipeline)
+  - [20.3. Placeholder Pipeline](#203-placeholder-pipeline)
+  - [20.4. Custom Combinators](#204-custom-combinators)
+  - [20.5. Cartesian Iteration](#205-cartesian-iteration)
+- [21. Undefining Entities](#21-undefining-entities)
+- [22. Interoperability with C](#22-interoperability-with-c)
+- [23. Manual Memory Management](#23-manual-memory-management)
+- [24. Reflection](#24-reflection)
+  - [24.1. Type Introspection](#241-type-introspection)
+  - [24.2. Dynamic Invocation](#242-dynamic-invocation)
+  - [24.3. Reflecting Enum Types](#243-reflecting-enum-types)
+- [25. Compile-time Evaluation](#25-compile-time-evaluation)
+- [26. Tooling](#26-tooling)
+  - [26.1. Architecture](#261-architecture)
+  - [26.2. CLI Usage](#262-cli-usage)
+    - [26.2.1. Create a Project](#2621-create-a-project)
+    - [26.2.2. Build the project](#2622-build-the-project)
+    - [26.2.3. Use toolchain without a Project](#2623-use-toolchain-without-a-project)
+  - [26.3. Project Configuration](#263-project-configuration)
+    - [26.3.1. Project Metadata](#2631-project-metadata)
+    - [26.3.2. Build Targets](#2632-build-targets)
+    - [26.3.3. Dependencies](#2633-dependencies)
+    - [26.3.4. Configuring Dependencies](#2634-configuring-dependencies)
+    - [26.3.5. Packaging and Publishing](#2635-packaging-and-publishing)
+    - [26.3.6. Custom Repository](#2636-custom-repository)
+    - [26.3.7. Language Presets](#2637-language-presets)
+    - [26.3.8. Presets as Language Constructs](#2638-presets-as-language-constructs)
+- [27. Plugin System](#27-plugin-system)
+  - [27.1. Example Plugins](#271-example-plugins)
+- [28. Example Programs](#28-example-programs)
+  - [28.1. Hello World](#281-hello-world)
+  - [28.2. Fibonacci Sequence](#282-fibonacci-sequence)
+  - [28.3. Factorial Calculation](#283-factorial-calculation)
+  - [28.4. Prime Number Checker](#284-prime-number-checker)
+  - [28.5. Palindrome Checker](#285-palindrome-checker)
+  - [28.6. Word Count](#286-word-count)
+  - [28.7. Guess the Number](#287-guess-the-number)
+  - [28.8. Simple Calculator](#288-simple-calculator)
+  - [28.9. Sum and Average](#289-sum-and-average)
+  - [28.10. Multiplication Table](#2810-multiplication-table)
+  - [28.11. GCD and LCM](#2811-gcd-and-lcm)
+  - [28.12. Password Validator](#2812-password-validator)
+  - [28.13. Sorting Algorithms](#2813-sorting-algorithms)
+  - [28.14. Search Algorithms](#2814-search-algorithms)
+  - [28.15. Rock-Paper-Scissors](#2815-rock-paper-scissors)
+  - [28.16. File Manager](#2816-file-manager)
+  - [28.17. FizzBuzz](#2817-fizzbuzz)
+  - [28.18. Countdown Timer](#2818-countdown-timer)
+  - [28.19. Histogram Generator](#2819-histogram-generator)
+  - [28.20. Unique Elements](#2820-unique-elements)
+  - [28.21. Matrix Operations](#2821-matrix-operations)
+  - [28.22. CSV Address Book Reader](#2822-csv-address-book-reader)
+  - [28.23. Directory Size Calculator](#2823-directory-size-calculator)
+  - [28.24. Caesar Cipher](#2824-caesar-cipher)
+  - [28.25. Sudoku Verifier](#2825-sudoku-verifier)
+  - [28.26. Grid Pathfinding (A\* Algorithm)](#2826-grid-pathfinding-a-algorithm)
+  - [28.27. Expression Evaluator](#2827-expression-evaluator)
+  - [28.28. Random Password Generator](#2828-random-password-generator)
+  - [28.29. Book Borrowing Library](#2829-book-borrowing-library)
+  - [28.30. Shape Area Calculator](#2830-shape-area-calculator)
+  - [28.31. Bank Account Management](#2831-bank-account-management)
+  - [28.32. Logger](#2832-logger)
+  - [28.33. Chat Application](#2833-chat-application)
+  - [28.34. Two Player Tic-Tac-Toe](#2834-two-player-tic-tac-toe)
+  - [28.35. Game of Life](#2835-game-of-life)
+  - [28.36. Sushi For Two](#2836-sushi-for-two)
+- [29. Appendix A - List of Keywords](#29-appendix-a---list-of-keywords)
+- [30. Appendix B - List of Built-in Operators](#30-appendix-b---list-of-built-in-operators)
+- [31. Appendix C - Language Presets](#31-appendix-c---language-presets)
+  - [31.1. `hostile` Presets Features](#311-hostile-presets-features)
+  - [31.2. `strict` Presets Features](#312-strict-presets-features)
+  - [31.3. `balanced` Presets Features](#313-balanced-presets-features)
+  - [31.4. `friendly` Presets Features](#314-friendly-presets-features)
+  - [31.5. `express` Presets Features](#315-express-presets-features)
 
 ## 1. Overview
 
@@ -3983,7 +3986,33 @@ let add_func = calc.add;
 let result = add_func(2, 3); # Calls calc.add(2, 3)
 ```
 
-### 7.20. Mutable Constant Instances
+### 7.20. Member Functions as Free-Standing Functions
+
+Member functions can also be used as free-standing functions, meaning they can be called with the class instance as the first argument (or passed to the `this` argument).
+
+```eng
+class point {
+    let x: float;
+    let y: float;
+
+    fn distance_to(other: point) -> float {
+        return sqrt((this.x - other.x) ** 2 + (this.y - other.y) ** 2);
+    };
+};
+
+fn main() {
+    let p1 = point(.x = 1, .y = 2);
+    let p2 = point(.x = 4, .y = 6);
+
+    let distance = point.distance_to(p1, p2);
+    io.println("Distance: ${distance}"); # Prints "Distance: 5.0"
+
+    let distance = point.distance_to(.other = p1, .this = p2);
+    io.println("Distance: ${distance}"); # Prints "Distance: 5.0"
+};
+```
+
+### 7.21. Mutable Constant Instances
 
 Mutable members can mutate its value even if an instance of the class is a constant.
 
@@ -4043,7 +4072,7 @@ fn main() {
 };
 ```
 
-### 7.21. Class Unpacking
+### 7.22. Class Unpacking
 
 Accessible members of a class can be destructured into variables when using multi-variable declaration.
 
@@ -4083,7 +4112,24 @@ fn main() {
 };
 ```
 
-### 7.22. Anonymous Class Declaration
+### 7.23. Class Destructuring
+
+Classes can also be destructured into variables, just like in match expression.
+
+```eng
+class point {
+    let x: float;
+    let y: float;
+};
+
+fn main() {
+    let p = point(.x = 10, .y = 20);
+    point(let x) = p; # Destructures p.x into variable x
+    point(let z = .y) = p; # Destructures p.y into variable z
+};
+```
+
+### 7.24. Anonymous Class Declaration
 
 Classes can be used without providing a name for the class by using them anonymously in the code.
 
@@ -4587,12 +4633,12 @@ fn main() {
 };
 ```
 
-### 10.7. Enums as Sum Types
+## 11. Unions
 
-Enums can also be used as sum types by defining members with associated data.
+Unions allow defining a type that can hold one of several different types. Unlike C, unions also contains the currently active type, allowing to safely access the value without worrying about which type is currently stored.
 
 ```eng
-enum shape {
+union shape {
     circle {
         let radius: float;
     },
@@ -4621,7 +4667,55 @@ fn area(s: shape) {
 }
 ```
 
-## 11. Properties
+### 11.1. Union as Classes
+
+Unions can also be used as classes, allowing to define methods and properties on them.
+
+```eng
+union shape {
+    circle {
+        let radius: float;
+
+        fn area() -> float {
+            return 3.14159 * radius * radius;
+        };
+    },
+    rectangle {
+        let width: float;
+        let height: float;
+
+        fn area() -> float {
+            return width * height;
+        };
+    },
+    triangle {
+        let base: float;
+        let height: float;
+
+        fn area() -> float {
+            return 0.5 * base * height;
+        };
+    };
+
+    let multiplier: float = 1.0;
+
+    fn area() -> float {
+        switch this {
+            case $ match circle(let r = .radius) {
+                return ($ as circle).area() * multiplier;
+            }
+            case $ match rectangle(let w = .width, let h = .height) {
+                return ($ as rectangle).area() * multiplier;
+            }
+            case $ match triangle(let b = .base, let h = .height) {
+                return ($ as triangle).area() * multiplier;
+            }
+        }
+    };
+};
+```
+
+## 12. Properties
 
 Properties allows using getter/setter as if they were variables. They provide a way to express intent seamlessly.
 
@@ -4664,7 +4758,7 @@ fn main() {
 };
 ```
 
-### 11.1. Properties as Class
+### 12.1. Properties as Class
 
 Properties are a special type of class that overloads all operators to go through getters and setters. They allow adding members to the type as well, support inheritance and polymorphism.
 
@@ -4679,7 +4773,7 @@ prop age_type {
 let age: age_type;
 ```
 
-### 11.2. Read-Only And Write-Only Properties
+### 12.2. Read-Only And Write-Only Properties
 
 Properties can be made read-only by removing the setter, and write-only by removing the getter.
 
@@ -4699,7 +4793,7 @@ let current_password: prop { # Cannot get password, it is write-only.
 };
 ```
 
-## 12. Operator Overloading
+## 13. Operator Overloading
 
 Operator Overloading provides a way to overload existing operator with custom behavior or define new operators.
 
@@ -4720,7 +4814,7 @@ op sub(a: vec2 "-" b: vec2) -> vec2 {
 
 This overloads existing infix operators `+` and `-`.
 
-### 12.1. Operator Types
+### 13.1. Operator Types
 
 There are 4 types of operators:
 
@@ -4760,7 +4854,7 @@ There are 4 types of operators:
     };
     ```
 
-### 12.2. Custom Operators
+### 13.2. Custom Operators
 
 Defining custom operators requires specifying precedence as relative to other operator. And in case of infix operator, specifying associativity is also required. Only the valid operator symbols are allowed to be used when defining a custom operator.
 
@@ -4774,7 +4868,7 @@ operator > titration > eng.lang.op.exponentiation (a: float "^^" b: float) {
 
 This defines a custom operator `^^` that performs titration (repeated exponentiation) of first operand with second operand. This new operator is higher precedence than exponential operator `**`, and is right-associative.
 
-### 12.3. Auto Generation
+### 13.3. Auto Generation
 
 Operators are not automatically generated. Meaning, defining `<` and `==` does not automatically generate `!=`, `>=`, `>` or `<=`. To make it ease to define operators, use the `comparison` macro.
 
@@ -4792,7 +4886,7 @@ If the return value is equal to 0, the operators `==`, `<=` and `>=` will result
 
 If the return value is less than 0, the operators `<` and `!=` will result in truth.
 
-### 12.4. Overloading with Type Conversion
+### 13.4. Overloading with Type Conversion
 
 When implicit conversion is defined, operator overloading automatically considers the conversions when resolving overloads.
 
@@ -4823,7 +4917,7 @@ fn main() {
 };
 ```
 
-## 13. Literal Typing
+## 14. Literal Typing
 
 Literal typing allows customizing the type of the literal in code.
 
@@ -4868,7 +4962,7 @@ fn main() {
 };
 ```
 
-## 14. Custom Type Modifiers
+## 15. Custom Type Modifiers
 
 Custom modifiers can be defined using the `mod` keyword. This allows defining new behaviors for types.
 
@@ -4944,11 +5038,11 @@ fn main() {
 };
 ```
 
-## 15. Macros
+## 16. Macros
 
 There are three types of macros:
 
-### 15.1. Declarative Macros
+### 16.1. Declarative Macros
 
 Macros that are declared using pattern matching to generate code based on input patterns.
 
@@ -4971,7 +5065,7 @@ fn main() {
 };
 ```
 
-### 15.2. Attribute Macros
+### 16.2. Attribute Macros
 
 Macros that are applied to code entities to modify their behavior or add additional functionality.
 
@@ -4999,7 +5093,7 @@ fn main() {
 };
 ```
 
-### 15.3. Engine Macros
+### 16.3. Engine Macros
 
 Macros that take raw source code as input and generate code based on it.
 
@@ -5132,9 +5226,9 @@ fn main() {
 };
 ```
 
-## 16. Coroutines
+## 17. Coroutines
 
-### 16.1. Cooperative Usage
+### 17.1. Cooperative Usage
 
 Coroutines are functions that can pause and resume their execution, allowing for cooperative multitasking and asynchronous programming.
 
@@ -5171,7 +5265,7 @@ fn main() {
 
 Note: Exceptions propagate through `await` points, allowing error handling in asynchronous code, even though coroutine functions are stackless.
 
-### 16.2. Multiple Coroutine Tasks
+### 17.2. Multiple Coroutine Tasks
 
 Coroutine tasks are concurrent, and blocking only occurs at `await` points. Multiple coroutine tasks can be awaited simultaneously using `await (task1 || task2 || ...)` and `await (task1 && task2 && ...)` for awaiting any or all, along with `probe (task1 || task2 || ...)` and `probe (task1 && task2 && ...)` for probing any or all.
 
@@ -5194,7 +5288,7 @@ fn main() {
 };
 ```
 
-### 16.3. Cancelling Coroutines
+### 17.3. Cancelling Coroutines
 
 Coroutine functions can also be cancelled using `cease` keyword.
 
@@ -5214,7 +5308,7 @@ fn main() {
 };
 ```
 
-### 16.4. Calling Non-Coroutine Functions Concurrently
+### 17.4. Calling Non-Coroutine Functions Concurrently
 
 Non-coroutine functions can be called concurrently using `async` keyword.
 
@@ -5236,9 +5330,9 @@ fn main() {
 };
 ```
 
-## 17. Multi-threading
+## 18. Multi-threading
 
-### 17.1. Creating Threads
+### 18.1. Creating Threads
 
 Threads can be created using `fork` keyword, which runs the code in a separate thread. The `join` keyword is used to wait for the thread to finish.
 
@@ -5310,7 +5404,7 @@ fn main() {
 };
 ```
 
-### 17.2. Shared Memory
+### 18.2. Shared Memory
 
 Shared memory between threads can be achieved using two mechanisms: `mutex` and `atomic` types.
 
@@ -5359,7 +5453,7 @@ counter_mutex: fn {
 };
 ```
 
-### 17.3. Atomic Types
+### 18.3. Atomic Types
 
 Atomic types provide lock-free shared memory access for basic types.
 
@@ -5451,7 +5545,7 @@ fn main() {
 };
 ```
 
-### 17.4. Semaphores
+### 18.4. Semaphores
 
 Semaphores can be created using `sem` keyword to control access to a shared resource.
 
@@ -5477,7 +5571,7 @@ fn main() {
 };
 ```
 
-### 17.5. Condition Variables
+### 18.5. Condition Variables
 
 Condition variables can be created using `cv` keyword to synchronize threads based on certain conditions. Use `cvn` to notify waiting threads.
 
@@ -5561,7 +5655,7 @@ fn main() {
 };
 ```
 
-### 17.6. Memory Ordering
+### 18.6. Memory Ordering
 
 Atomic operations support memory ordering to control visibility of memory operations across threads.
 
@@ -5592,7 +5686,7 @@ fn main() {
 
 Other ordering includes `rlx` (relaxed), `seq` (sequentially consistent) and `ar` (acquire-release).
 
-### 17.7. Thread-Local Storage
+### 18.7. Thread-Local Storage
 
 Thread-local storage allows defining variables that are unique to each thread using `par` keyword.
 
@@ -5615,7 +5709,7 @@ fn main() {
 };
 ```
 
-### 17.8. Barriers
+### 18.8. Barriers
 
 Barriers can be created using `eng.std.barrier` to synchronize a group of threads at a certain point.
 
@@ -5671,7 +5765,7 @@ fn main() {
 };
 ```
 
-### 17.9. Latches
+### 18.9. Latches
 
 Latches can be created using `eng.std.latch` to allow threads to wait until a certain number of events have occurred.
 
@@ -5703,7 +5797,7 @@ fn main() {
 };
 ```
 
-### 17.10. Thread Pools
+### 18.10. Thread Pools
 
 Thread pools can be created using `eng.std.thread_pool` to manage a pool of worker threads for executing tasks.
 
@@ -5724,7 +5818,7 @@ fn main() {
 };
 ```
 
-### 17.11. Futures and Promises
+### 18.11. Futures and Promises
 
 Futures and promises can be used for asynchronous programming, allowing tasks to return values that will be available in the future.
 
@@ -5816,7 +5910,7 @@ fn main() {
 };
 ```
 
-### 17.12. Parallel Loops
+### 18.12. Parallel Loops
 
 Parallel loops can be created using `par` keyword to execute iterations concurrently across multiple threads.
 
@@ -5863,9 +5957,9 @@ fn main() {
 };
 ```
 
-## 18. Generics and Concepts
+## 19. Generics and Concepts
 
-### 18.1. Generics
+### 19.1. Generics
 
 Generics allows defining functions, classes and other entities that can operate on different types without being tied to a specific type.
 
@@ -5900,7 +5994,7 @@ fn main() {
 };
 ```
 
-### 18.2. Concepts
+### 19.2. Concepts
 
 Generics can also be constrained using concepts to restrict the types that can be used with the generic entity.
 
@@ -5940,7 +6034,7 @@ fn main() {
 };
 ```
 
-### 18.3. Concepts on Classes
+### 19.3. Concepts on Classes
 
 Constraints can also be applied to class definitions.
 
@@ -5960,7 +6054,7 @@ class pair: comparable {
 };
 ```
 
-### 18.4. `auto` and Constrained `auto`
+### 19.4. `auto` and Constrained `auto`
 
 Use of `auto` keyword allows a concept to define a weaker constraint that can be satisfied by any type that has the required members.
 
@@ -6027,7 +6121,7 @@ class my_float {
 };
 ```
 
-### 18.5. Concepts as Polymorphic Interfaces
+### 19.5. Concepts as Polymorphic Interfaces
 
 Concepts can also be used outside of generics to become polymorphic interfaces.
 
@@ -6063,7 +6157,7 @@ fn main() {
 };
 ```
 
-### 18.6. Arbitrary Constraints
+### 19.6. Arbitrary Constraints
 
 Concepts can also define arbitrary constraints using `where` clause.
 
@@ -6083,9 +6177,9 @@ concept triangular_matrix {
 };
 ```
 
-## 19. Array Operations
+## 20. Array Operations
 
-### 19.1. Element-wise Operations
+### 20.1. Element-wise Operations
 
 Arrays support advanced array-programming operations such as element-wise arithmetic, comparison and logical operations. They work only on arrays of same size.
 
@@ -6109,7 +6203,7 @@ let e = a [*> b;   # e is [4, 10, 3]
 let f = a <*] b;   # f is [4, 10]
 ```
 
-### 19.2. Array Pipeline
+### 20.2. Array Pipeline
 
 Array pipeline provides a way to chain multiple array operations (combinators) together in a readable manner. Each combinator takes the array from the previous step as input and produces a new array as output.
 
@@ -6160,7 +6254,7 @@ Note: Several combinators can also take optional addition parameters:
 
 These combinators are non-exhaustive. There are several other combinators such as `differ`, `indices_of`, `deltas`, `singles`, `keys` (first in pair), `values` (last in pair), etc. in the standard library. Several combinators are also parallelized for performance. They all work with lazy arrays and produce lazy arrays where applicable.
 
-### 19.3. Placeholder Pipeline
+### 20.3. Placeholder Pipeline
 
 An alternative pipeline operator `|>` can be used with a placeholder `$` to indicate the input array. In case of an array of tuples, the `$0`, `$1`, ... can be used to indicate an array of first, second, ... elements of the tuples respectively.
 
@@ -6174,7 +6268,7 @@ let crazy = values
     -> max();           # 60
 ```
 
-### 19.4. Custom Combinators
+### 20.4. Custom Combinators
 
 Custom combinators can be defined by overloading the `->` or `|>` operators for combinators function.
 
@@ -6222,7 +6316,7 @@ fn filter_out_html_tags(input: string) -> string {
 };
 ```
 
-### 19.5. Cartesian Iteration
+### 20.5. Cartesian Iteration
 
 Engenide supports cartesian iteration over multiple arrays using `for let` syntax.
 
@@ -6243,7 +6337,7 @@ Pair: (2, a)
 Pair: (2, b)
 ```
 
-## 20. Undefining Entities
+## 21. Undefining Entities
 
 Every entity defined in Engenide can be undefined using `undef` keyword. This includes functions, classes, variables, namespaces, operators, macros, concepts, etc.
 
@@ -6281,7 +6375,7 @@ fn main() {
 };
 ```
 
-## 21. Interoperability with C
+## 22. Interoperability with C
 
 Engenide programs can be interoperated with C or external C-linkage functions as so:
 
@@ -6391,7 +6485,7 @@ int main(void) {
 }
 ```
 
-## 22. Manual Memory Management
+## 23. Manual Memory Management
 
 Engenide provides manual memory management capabilities through the `alloc`, `dealloc`, and `realloc` keywords. They can optionally take a pager to allocate memory from a specific memory allocator.
 
@@ -6437,9 +6531,9 @@ fn main() {
 };
 ```
 
-## 23. Reflection
+## 24. Reflection
 
-### 23.1. Type Introspection
+### 24.1. Type Introspection
 
 Type introspection allows inspecting type information at runtime.
 
@@ -6484,7 +6578,7 @@ fn main() {
 };
 ```
 
-### 23.2. Dynamic Invocation
+### 24.2. Dynamic Invocation
 
 Dynamic invocation allows invoking member function dynamically at runtime.
 
@@ -6532,7 +6626,7 @@ fn main() {
 };
 ```
 
-### 23.3. Reflecting Enum Types
+### 24.3. Reflecting Enum Types
 
 Reflecting enum types allows inspecting enum members at runtime.
 
@@ -6556,7 +6650,7 @@ fn main() {
 };
 ```
 
-## 24. Compile-time Evaluation
+## 25. Compile-time Evaluation
 
 `static` keyword allows defining compile-time constants and functions that must be fully evaluated at compile-time.
 
@@ -6625,9 +6719,9 @@ fn main() {
 };
 ```
 
-## 25. Tooling
+## 26. Tooling
 
-### 25.1. Architecture
+### 26.1. Architecture
 
 Engenide Engine is a composition of:
 
@@ -6637,9 +6731,9 @@ Engenide Engine is a composition of:
 4. **Engenide Assembler**: Both Compiler and Interpreter (JIT mode) uses the Assembler to convert bytecode into machine-level instructions.
 5. **Engenide Evaluator**: Engenide Processor and Interpreter (Live mode) uses Evaluator to evaluate bytecode. During processing, all code that are isolated from IO are evaluated during compile-time to allow minimal bytecode size. The runtime only needs to deal with IO related code.
 
-### 25.2. CLI Usage
+### 26.2. CLI Usage
 
-#### 25.2.1. Create a Project
+#### 26.2.1. Create a Project
 
 ```
 $ eng new my-awesome-project
@@ -6685,7 +6779,7 @@ fn main() {
 };
 ```
 
-#### 25.2.2. Build the project
+#### 26.2.2. Build the project
 
 1. Using compiler:
 
@@ -6713,7 +6807,7 @@ $ eng assemble hello_world.bc -o hello_world # Compile bytecode to native
 $ eng evaluate hello_world.bc # Interpret bytecode directly
 ```
 
-#### 25.2.3. Use toolchain without a Project
+#### 26.2.3. Use toolchain without a Project
 
 1. Using compiler:
 
@@ -6735,13 +6829,13 @@ $ eng assemble hello_world.bc -o hello_world # Compile bytecode to native
 $ eng evaluate hello_world.bc # Interpret bytecode directly
 ```
 
-### 25.3. Project Configuration
+### 26.3. Project Configuration
 
 The `project.eng` file is the main and only configuration file for an Engenide project. It is a full Engenide program that uses the `eng.project` module to define the project structure, build targets, dependencies, and other configurations.
 
 Note: The `project.eng` file is executed at build time, so it can include any valid Engenide code. The entire language is available for use in the `project.eng` file, including I/O. Use with care or break all CI/CD pipelines!
 
-#### 25.3.1. Project Metadata
+#### 26.3.1. Project Metadata
 
 Project metadata includes information about the project such as name, version, description, author, license, and other relevant details.
 
@@ -6752,7 +6846,7 @@ import project: eng.project;
 project.name = "My Awesome Project";
 ```
 
-#### 25.3.2. Build Targets
+#### 26.3.2. Build Targets
 
 Build targets define the output artifacts of the project, such as executables, libraries, or modules. Each target can have its own source files, dependencies, build options, and output settings.
 
@@ -6765,7 +6859,7 @@ my_executable.standard = "eng-25";
 my_executable.entry = "main()";
 ```
 
-#### 25.3.3. Dependencies
+#### 26.3.3. Dependencies
 
 Dependencies can be added to the project to include external libraries or modules.
 
@@ -6794,7 +6888,7 @@ let local_lib = project.add_local_dependency("local_lib", "./libs/local_lib.zip"
 
 Note for custom dependency types: Path/zip must contain a valid Engenide project with `project.eng` file.
 
-#### 25.3.4. Configuring Dependencies
+#### 26.3.4. Configuring Dependencies
 
 Dependencies can be expose certain configuration options to the consumers. These options can be set in the `project.eng` file of the consumer project.
 
@@ -6813,7 +6907,7 @@ let some_library = project.add_dependency("some_library", "1.2.3");
 some_library.configure(.feature_xyz = true);
 ```
 
-#### 25.3.5. Packaging and Publishing
+#### 26.3.5. Packaging and Publishing
 
 To publish a project, the project must be packaged first.
 
@@ -6826,7 +6920,7 @@ Warning: All the source files will be included in the package by default. Propri
 
 Note: The official Engenide Package Repository is reserved for already-popular open-source projects. For other projects, using a custom package repository is recommended and encouraged.
 
-#### 25.3.6. Custom Repository
+#### 26.3.6. Custom Repository
 
 Setting up and using a custom package repository is straightforward.
 
@@ -6854,7 +6948,7 @@ $ eng publish # Publishes to https://my.custom.repo.com
 let some_library = project.add_net_dependency("some_library", "https://my.custom.repo.com/some_library/1.0.0.zip");
 ```
 
-#### 25.3.7. Language Presets
+#### 26.3.7. Language Presets
 
 Engenide supports language presets to customize the language features and behaviors. Presets can be used to enable or disable specific features, set default behaviors, and configure language settings. It is helpful for teams to maintain consistent coding styles and practices across the project.
 
@@ -6892,7 +6986,7 @@ Using custom preset:
 project.preset = my_custom_preset;
 ```
 
-#### 25.3.8. Presets as Language Constructs
+#### 26.3.8. Presets as Language Constructs
 
 Presets can be used within the code itself selectively to enable or disable certain features in specific scopes. The `policy` keyword is used to apply a preset to a specific block of code.
 
@@ -6915,7 +7009,7 @@ fn main() {
 };
 ```
 
-## 26. Plugin System
+## 27. Plugin System
 
 Engenide supports a plugin system that allows extending the language capabilities by adding custom plugins. Plugins can be used to add new features, modify existing behaviors, or integrate with external tools, libraries or other languages.
 
@@ -6927,7 +7021,7 @@ Plugins are useful where macros are insufficient, such as adding new semantics o
 
 Plugin system is under development and will be documented in future versions.
 
-### 26.1. Example Plugins
+### 27.1. Example Plugins
 
 1. **Java Interop Plugin** - A plugin that allows interoperability with JVM code, enabling calling Java methods and using Java classes from Engenide.
 
@@ -7008,9 +7102,9 @@ fn main() {
 };
 ```
 
-## 27. Example Programs
+## 28. Example Programs
 
-### 27.1. Hello World
+### 28.1. Hello World
 
 ```eng
 import io: eng.std.io;
@@ -7021,7 +7115,7 @@ fn main() {
 };
 ```
 
-### 27.2. Fibonacci Sequence
+### 28.2. Fibonacci Sequence
 
 ```eng
 import io: eng.std.io;
@@ -7040,7 +7134,7 @@ fn main() {
 };
 ```
 
-### 27.3. Factorial Calculation
+### 28.3. Factorial Calculation
 
 ```eng
 import io: eng.std.io;
@@ -7062,7 +7156,7 @@ fn main() {
 
 Note: consider using `num!` (factorial operator).
 
-### 27.4. Prime Number Checker
+### 28.4. Prime Number Checker
 
 ```eng
 import io: eng.std.io;
@@ -7094,7 +7188,7 @@ fn main() {
 
 Note: consider using `math.is_prime`.
 
-### 27.5. Palindrome Checker
+### 28.5. Palindrome Checker
 
 ```eng
 import io: eng.std.io;
@@ -7114,7 +7208,7 @@ fn main() {
 };
 ```
 
-### 27.6. Word Count
+### 28.6. Word Count
 
 ```eng
 import io: eng.std.io;
@@ -7135,7 +7229,7 @@ fn main() {
 };
 ```
 
-### 27.7. Guess the Number
+### 28.7. Guess the Number
 
 ```eng
 import io: eng.std.io;
@@ -7166,7 +7260,7 @@ fn main() {
 };
 ```
 
-### 27.8. Simple Calculator
+### 28.8. Simple Calculator
 
 ```eng
 import io: eng.std.io;
@@ -7191,7 +7285,7 @@ fn main() {
 };
 ```
 
-### 27.9. Sum and Average
+### 28.9. Sum and Average
 
 ```eng
 import io: eng.std.io;
@@ -7216,7 +7310,7 @@ fn main() {
 };
 ```
 
-### 27.10. Multiplication Table
+### 28.10. Multiplication Table
 
 ```eng
 import io: eng.std.io;
@@ -7230,7 +7324,7 @@ fn main() {
 };
 ```
 
-### 27.11. GCD and LCM
+### 28.11. GCD and LCM
 
 ```eng
 import io: eng.std.io;
@@ -7259,7 +7353,7 @@ fn main() {
 
 Note: consider using `math.gcd` and `math.lcm`.
 
-### 27.12. Password Validator
+### 28.12. Password Validator
 
 ```eng
 import io: eng.std.io;
@@ -7301,7 +7395,7 @@ fn main() {
 };
 ```
 
-### 27.13. Sorting Algorithms
+### 28.13. Sorting Algorithms
 
 ```eng
 import io: eng.std.io;
@@ -7409,7 +7503,7 @@ fn main() {
 
 Note: consider using `arr.sort()`.
 
-### 27.14. Search Algorithms
+### 28.14. Search Algorithms
 
 ```eng
 import io: eng.std.io;
@@ -7463,7 +7557,7 @@ fn main() {
 
 Note: consider using `arr.index_of(target)`.
 
-### 27.15. Rock-Paper-Scissors
+### 28.15. Rock-Paper-Scissors
 
 ```eng
 import io: eng.std.io;
@@ -7515,7 +7609,7 @@ fn main() {
 };
 ```
 
-### 27.16. File Manager
+### 28.16. File Manager
 
 ```eng
 import io: eng.std.io;
@@ -7592,7 +7686,7 @@ fn main() {
 };
 ```
 
-### 27.17. FizzBuzz
+### 28.17. FizzBuzz
 
 ```eng
 import io: eng.std.io;
@@ -7612,7 +7706,7 @@ fn main() {
 };
 ```
 
-### 27.18. Countdown Timer
+### 28.18. Countdown Timer
 
 ```eng
 import io: eng.std.io;
@@ -7630,7 +7724,7 @@ fn main() {
 };
 ```
 
-### 27.19. Histogram Generator
+### 28.19. Histogram Generator
 
 ```eng
 import io: eng.std.io;
@@ -7654,7 +7748,7 @@ fn main() {
 };
 ```
 
-### 27.20. Unique Elements
+### 28.20. Unique Elements
 
 ```eng
 import io: eng.std.io;
@@ -7674,7 +7768,7 @@ fn main() {
 
 Note: consider using `arr.unique()`.
 
-### 27.21. Matrix Operations
+### 28.21. Matrix Operations
 
 ```eng
 import io: eng.std.io;
@@ -7714,7 +7808,7 @@ fn main() {
 
 Note: consider using `math.matrix`.
 
-### 27.22. CSV Address Book Reader
+### 28.22. CSV Address Book Reader
 
 ```eng
 import io: eng.std.io;
@@ -7747,7 +7841,7 @@ fn main() {
 };
 ```
 
-### 27.23. Directory Size Calculator
+### 28.23. Directory Size Calculator
 
 ```eng
 import io: eng.std.io;
@@ -7776,7 +7870,7 @@ fn main() {
 };
 ```
 
-### 27.24. Caesar Cipher
+### 28.24. Caesar Cipher
 
 ```eng
 import io: eng.std.io;
@@ -7800,7 +7894,7 @@ fn main() {
 };
 ```
 
-### 27.25. Sudoku Verifier
+### 28.25. Sudoku Verifier
 
 ```eng
 import io: eng.std.io;
@@ -7852,7 +7946,7 @@ fn main() {
 };
 ```
 
-### 27.26. Grid Pathfinding (A* Algorithm)
+### 28.26. Grid Pathfinding (A* Algorithm)
 
 ```eng
 import io: eng.std.io;
@@ -7939,7 +8033,7 @@ fn main() {
 };
 ```
 
-### 27.27. Expression Evaluator
+### 28.27. Expression Evaluator
 
 ```eng
 import io: eng.std.io;
@@ -8112,7 +8206,7 @@ fn main() {
 };
 ```
 
-### 27.28. Random Password Generator
+### 28.28. Random Password Generator
 
 ```eng
 import io: eng.std.io;
@@ -8169,7 +8263,7 @@ fn main() {
 };
 ```
 
-### 27.29. Book Borrowing Library
+### 28.29. Book Borrowing Library
 
 ```eng
 import io: eng.std.io;
@@ -8246,7 +8340,7 @@ fn main() {
 };
 ```
 
-### 27.30. Shape Area Calculator
+### 28.30. Shape Area Calculator
 
 ```eng
 import io: eng.std.io;
@@ -8296,7 +8390,7 @@ fn main() {
 };
 ```
 
-### 27.31. Bank Account Management
+### 28.31. Bank Account Management
 
 ```eng
 import io: eng.std.io;
@@ -8340,7 +8434,7 @@ fn main() {
 };
 ```
 
-### 27.32. Logger
+### 28.32. Logger
 
 ```eng
 import io: eng.std.io;
@@ -8482,7 +8576,7 @@ fn main() {
 };
 ```
 
-### 27.33. Chat Application
+### 28.33. Chat Application
 
 `server.eng`:
 ```eng
@@ -8557,7 +8651,7 @@ fn main() {
 };
 ```
 
-### 27.34. Two Player Tic-Tac-Toe
+### 28.34. Two Player Tic-Tac-Toe
 
 `server.eng`:
 ```eng
@@ -8749,7 +8843,7 @@ fn main() {
 };
 ```
 
-### 27.35. Game of Life
+### 28.35. Game of Life
 
 ```eng
 import io: eng.std.io;
@@ -8813,7 +8907,7 @@ fn main() {
 };
 ```
 
-### 27.36. Sushi For Two
+### 28.36. Sushi For Two
 
 ```eng
 import io: eng.std.io;
@@ -8833,7 +8927,7 @@ fn main() {
 };
 ```
 
-## 28. Appendix A - List of Keywords
+## 29. Appendix A - List of Keywords
 
 1. `acq` - Acquiring memory ordering for atomic operations.
 2. `alive` - Checks if a thread is running.
@@ -8939,7 +9033,7 @@ fn main() {
 102. `with` - Starts a `with`-`be` block.
 103. `yield` - Pauses execution of a coroutine and yields a value.
 
-## 29. Appendix B - List of Built-in Operators
+## 30. Appendix B - List of Built-in Operators
 
 These operators are ranked from highest precedence to lowest precedence (higher number = lower precedence).
 
@@ -9076,7 +9170,7 @@ Operator descriptions:
 50. `x = y` - Binary infix `=` operator (`assignment`) that:
     - Assigns the value of `y` to `x`.
 
-## 30. Appendix C - Language Presets
+## 31. Appendix C - Language Presets
 
 List of language presets (aka. the language difficulty modes):
 
@@ -9106,12 +9200,12 @@ List of language presets (aka. the language difficulty modes):
     - The "No fun allowed" mode.
     - This is preferable for nobody.
 
-### 30.1. `hostile` Presets Features
+### 31.1. `hostile` Presets Features
 
 List of all the features enabled in `hostile` preset:
 1. None lol
 
-### 30.2. `strict` Presets Features
+### 31.2. `strict` Presets Features
 
 List of all the features enabled in `strict` preset:
 1. `multi_line_comment` - Allows multi-line comments using `#{ ... }#`.
@@ -9169,7 +9263,7 @@ List of all the features enabled in `strict` preset:
 53. `enum_default_value` - Allows specifying default values for enum instances.
 54. `enum_value_generation` - Allows automatic generation of enum values.
 55. `enum_iteration` - Allows iteration over enum named values.
-56. `enum_sum_type` - Allows enums to be used as sum types.
+56. `union_type` - Allows union sum types.
 57. `property` - Allows defining properties with getter and setter methods.
 58. `property_class` - Allows properties to behave as classes (can have members, can inherit, support polymorphism, etc.).
 59. `property_outside_class` - Allows defining properties outside of classes.
@@ -9195,7 +9289,7 @@ List of all the features enabled in `strict` preset:
 79. `compile_time_evaluation` - Allows compile-time evaluation of expressions and functions.
 80. `policy_mutation` - Allows mutation of policies in source code.
 
-### 30.3. `balanced` Presets Features
+### 31.3. `balanced` Presets Features
 
 List of all the features enabled in `balanced` preset:
 0. All features in `strict` preset, AND:
@@ -9239,7 +9333,7 @@ List of all the features enabled in `balanced` preset:
 38. `engine_macro` - Allows defining engine macros.
 39. `concept_as_polymorphism` - Allows concepts to be used for polymorphism and dynamic dispatch.
 
-### 30.4. `friendly` Presets Features
+### 31.4. `friendly` Presets Features
 
 List of all the features enabled in `friendly` preset:
 0. All features in `balanced` preset, AND:
@@ -9253,7 +9347,7 @@ List of all the features enabled in `friendly` preset:
 8. `undefining_entity` - Allows undefining previously defined entities using `undef`.
 9. `manual_memory_management` - Allows manual memory management using `alloc`, `dealloc` and `realloc`, along with raw pointers.
 
-### 30.5. `express` Presets Features
+### 31.5. `express` Presets Features
 
 List of all the features enabled in `express` preset:
 0. All features in `friendly` preset, AND:
