@@ -9,6 +9,7 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [1.2. Features](#12-features)
   - [1.3. Philosophy](#13-philosophy)
   - [1.4. What isn't Engenide?](#14-what-isnt-engenide)
+  - [1.5. Who is Engenide for?](#15-who-is-engenide-for)
 - [2. Lexical Structure](#2-lexical-structure)
   - [2.1. Source Encoding](#21-source-encoding)
   - [2.2. Whitespace](#22-whitespace)
@@ -41,41 +42,47 @@ This is a sketch design document for the Engenide Programming Language, not a fo
 - [4. Types](#4-types)
   - [4.1. Integer Types](#41-integer-types)
   - [4.2. Floating-point Types](#42-floating-point-types)
-  - [4.3. Character Types](#43-character-types)
-  - [4.4. Boolean Types](#44-boolean-types)
-  - [4.5. String](#45-string)
-  - [4.6. Any Type](#46-any-type)
-  - [4.7. Variants](#47-variants)
-  - [4.8. Type Conversion](#48-type-conversion)
-    - [4.8.1. Conversion Types](#481-conversion-types)
-    - [4.8.2. Numeric Conversion](#482-numeric-conversion)
-    - [4.8.3. Automatic Multi-conversion](#483-automatic-multi-conversion)
-  - [4.9. Obtaining Size of Types](#49-obtaining-size-of-types)
-  - [4.10. Modifiers](#410-modifiers)
-    - [4.10.1. Constants](#4101-constants)
-    - [4.10.2. Pointers](#4102-pointers)
-    - [4.10.3. References](#4103-references)
-    - [4.10.4. Nullables](#4104-nullables)
-    - [4.10.5. Reference-Counting](#4105-reference-counting)
-    - [4.10.6. Moving Types](#4106-moving-types)
-    - [4.10.7. Unique Moving Types](#4107-unique-moving-types)
-    - [4.10.8. Swapping Types](#4108-swapping-types)
-    - [4.10.9. Polymorphic Types](#4109-polymorphic-types)
-    - [4.10.10. Combining Modifiers](#41010-combining-modifiers)
-  - [4.11. Arrays](#411-arrays)
-    - [4.11.1. Typed and Untyped](#4111-typed-and-untyped)
-    - [4.11.2. Static-Sized and Dynamic-Sized](#4112-static-sized-and-dynamic-sized)
-    - [4.11.3. Accessing Arrays](#4113-accessing-arrays)
-    - [4.11.4. Resizing Arrays](#4114-resizing-arrays)
-    - [4.11.5. Count](#4115-count)
-    - [4.11.6. Existance and Iteration](#4116-existance-and-iteration)
-    - [4.11.7. Array Range Generator](#4117-array-range-generator)
-    - [4.11.8. Array Repeat Generator](#4118-array-repeat-generator)
-    - [4.11.9. Array Generator Expression](#4119-array-generator-expression)
-    - [4.11.10. Array Packing and Unpacking](#41110-array-packing-and-unpacking)
-  - [4.12. Tuples](#412-tuples)
-  - [4.13. Maps](#413-maps)
-  - [4.14. Sets](#414-sets)
+  - [4.3. Decimal Types](#43-decimal-types)
+  - [4.4. Character Types](#44-character-types)
+  - [4.5. Boolean Types](#45-boolean-types)
+  - [4.6. String](#46-string)
+  - [4.7. Some Type](#47-some-type)
+  - [4.8. Variants](#48-variants)
+  - [4.9. None Type](#49-none-type)
+  - [4.10. Type Hierarchy](#410-type-hierarchy)
+  - [4.11. Type Conversion](#411-type-conversion)
+    - [4.11.1. Conversion Types](#4111-conversion-types)
+    - [4.11.2. Numeric Conversion](#4112-numeric-conversion)
+    - [4.11.3. Automatic Multi-conversion](#4113-automatic-multi-conversion)
+    - [4.11.4. Promotion Graph](#4114-promotion-graph)
+  - [4.12. Obtaining Size of Types](#412-obtaining-size-of-types)
+  - [4.13. Modifiers](#413-modifiers)
+    - [4.13.1. Constants](#4131-constants)
+    - [4.13.2. Pointers](#4132-pointers)
+    - [4.13.3. References](#4133-references)
+    - [4.13.4. Nullables](#4134-nullables)
+    - [4.13.5. Reference-Counting](#4135-reference-counting)
+    - [4.13.6. Moving Types](#4136-moving-types)
+    - [4.13.7. Unique Moving Types](#4137-unique-moving-types)
+    - [4.13.8. Swapping Types](#4138-swapping-types)
+    - [4.13.9. Polymorphic Types](#4139-polymorphic-types)
+    - [4.13.10. Combining Modifiers](#41310-combining-modifiers)
+  - [4.14. Arrays](#414-arrays)
+    - [4.14.1. Typed and Untyped](#4141-typed-and-untyped)
+    - [4.14.2. Static-Sized and Dynamic-Sized](#4142-static-sized-and-dynamic-sized)
+    - [4.14.3. Accessing Arrays](#4143-accessing-arrays)
+    - [4.14.4. Resizing Arrays](#4144-resizing-arrays)
+    - [4.14.5. Count](#4145-count)
+    - [4.14.6. Existance and Iteration](#4146-existance-and-iteration)
+    - [4.14.7. Array Range Generator](#4147-array-range-generator)
+    - [4.14.8. Array Repeat Generator](#4148-array-repeat-generator)
+    - [4.14.9. Array Generator Expression](#4149-array-generator-expression)
+    - [4.14.10. Array Packing and Unpacking](#41410-array-packing-and-unpacking)
+    - [4.14.11. Array Index Type](#41411-array-index-type)
+  - [4.15. Tuples](#415-tuples)
+  - [4.16. Maps](#416-maps)
+  - [4.17. Sets](#417-sets)
+  - [4.18. Type Aliasing](#418-type-aliasing)
 - [5. Statements](#5-statements)
   - [5.1. Expressions](#51-expressions)
     - [5.1.1. Primary Expression](#511-primary-expression)
@@ -101,7 +108,8 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [5.13. `with` and `emit`](#513-with-and-emit)
   - [5.14. `defer` Blocks](#514-defer-blocks)
   - [5.15. `label` and `goto`](#515-label-and-goto)
-  - [5.16. Omission](#516-omission)
+  - [5.16. Labeled Statements](#516-labeled-statements)
+  - [5.17. Omission](#517-omission)
 - [6. Functions](#6-functions)
   - [6.1. Multiple Returns](#61-multiple-returns)
   - [6.2. Naming Returns](#62-naming-returns)
@@ -159,6 +167,7 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [8.3. Access Specifiers](#83-access-specifiers)
   - [8.4. Implicit Contents](#84-implicit-contents)
   - [8.5. Spilling Content](#85-spilling-content)
+  - [8.6. Namespace Collision](#86-namespace-collision)
 - [9. Importing and Exporting](#9-importing-and-exporting)
 - [10. Enumerators](#10-enumerators)
   - [10.1. Enums as Classes](#101-enums-as-classes)
@@ -167,8 +176,8 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [10.4. Default Value](#104-default-value)
   - [10.5. Member Generation](#105-member-generation)
   - [10.6. Member Iteration](#106-member-iteration)
-- [11. Unions](#11-unions)
-  - [11.1. Union as Classes](#111-union-as-classes)
+- [11. Forms](#11-forms)
+  - [11.1. Form as Classes](#111-form-as-classes)
 - [12. Properties](#12-properties)
   - [12.1. Properties as Class](#121-properties-as-class)
   - [12.2. Read-Only And Write-Only Properties](#122-read-only-and-write-only-properties)
@@ -203,11 +212,12 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [18.12. Parallel Loops](#1812-parallel-loops)
 - [19. Generics and Concepts](#19-generics-and-concepts)
   - [19.1. Generics](#191-generics)
-  - [19.2. Concepts](#192-concepts)
-  - [19.3. Concepts on Classes](#193-concepts-on-classes)
-  - [19.4. `auto` and Constrained `auto`](#194-auto-and-constrained-auto)
-  - [19.5. Concepts as Polymorphic Interfaces](#195-concepts-as-polymorphic-interfaces)
-  - [19.6. Arbitrary Constraints](#196-arbitrary-constraints)
+  - [19.2. Generics on Namespaces](#192-generics-on-namespaces)
+  - [19.3. Concepts](#193-concepts)
+  - [19.4. Concepts on Classes](#194-concepts-on-classes)
+  - [19.5. `auto` and Constrained `auto`](#195-auto-and-constrained-auto)
+  - [19.6. Concepts as Polymorphic Interfaces](#196-concepts-as-polymorphic-interfaces)
+  - [19.7. Arbitrary Constraints](#197-arbitrary-constraints)
 - [20. Array Operations](#20-array-operations)
   - [20.1. Element-wise Operations](#201-element-wise-operations)
   - [20.2. Array Pipeline](#202-array-pipeline)
@@ -278,6 +288,7 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [28.36. Sushi For Two](#2836-sushi-for-two)
 - [29. Appendix A - List of Keywords](#29-appendix-a---list-of-keywords)
 - [30. Appendix B - List of Built-in Operators](#30-appendix-b---list-of-built-in-operators)
+  - [30.1. Non-numeric Types Operators](#301-non-numeric-types-operators)
 - [31. Appendix C - Language Presets](#31-appendix-c---language-presets)
   - [31.1. `hostile` Presets Features](#311-hostile-presets-features)
   - [31.2. `strict` Presets Features](#312-strict-presets-features)
@@ -301,7 +312,7 @@ The default, defacto implementation, also licensed under the terms of MIT licens
 
 ### 1.2. Features
 
-- **Statically Typed**: All values in Engenide has an associated type. Engenide does allow dynamic typing using `any`, or variants for controlled typing.
+- **Statically Typed**: All values in Engenide has an associated type. Engenide does allow dynamic typing using `some`, or variants for controlled typing.
 - **Omni Paradigm**: Multiple paradigms not only co-exist in Engenide, but also interact with each other in a seamless way. Supporting procedural, object-oriented, functional, generic, meta programming, collection-oriented, concurrent, DSL-oriented and many other paradigms.
 - **All Level**: Engenide is both high level which provides great developer ergonomics and also a low level which provides performance and control.
 - **Compiled**: Engenide source code can be compiled down to machine-level instructions, making it blazingly fast.
@@ -325,7 +336,17 @@ For teams, Engenide provides several language presets to limit the language's li
 
 ### 1.4. What isn't Engenide?
 
-...
+... Nothing ...
+
+### 1.5. Who is Engenide for?
+
+Engenide is for:
+
+- **Experienced Developers**: Engenide's flexibility and expressiveness is best utilized by experienced developers who can master the language's features and avoid pitfalls.
+- **Teams**: Engenide's language presets and configurability make it suitable for teams who want to enforce certain coding standards and practices while still benefiting from the language's features.
+- **Library Authors**: Engenide's ability to be used as a programmable configuration file and its C interoperability make it ideal for library authors who want to provide a powerful and flexible API for their users.
+- **DSL Creators**: Engenide's macro system and customizability make it a great choice for creating domain-specific languages (DSLs) that can be tailored to specific problem domains.
+- **Performance-Critical Applications**: Engenide's compiled nature and low-level features make it suitable for performance-critical applications where control over memory and execution is important.
 
 ## 2. Lexical Structure
 
@@ -424,20 +445,20 @@ This allows super quick comment-out of a block of code which alreacy contains a 
         ```eng
         # Basic usage with named returns
         let result = divide(29, 12);
-        # result.quotient -> 2
-        # result.remainder -> 5
+        # result.quotient is 2
+        # result.remainder is 5
 
         # Tuple unpacking
         let (q, r) = divide(17, 5);
-        # q -> 3
-        # r -> 2
+        # q is 3
+        # r is 2
 
         # Discarding remainder
         let (q, _) = divide(100, 9);
-        # q -> 11
+        # q is 11
         ```
 }#
-fn divide(numerator: int, denominator: int) -> quotient: int, remainder: int {
+fn divide(numerator: int, denominator: int): quotient: int, remainder: int {
     if denominator == 0 {
         throw eng.std.except.invalid_argument("Denominator cannot be zero.");
     }
@@ -532,7 +553,7 @@ Words may also contain Unicode characters. I.e., words may start with Unicode ch
 ```eng
 let 半径 = 5.3;
 
-fn वृत्त_का_क्षेत्रफल(त्रिज्या: float) -> float {
+fn वृत्त_का_क्षेत्रफल(त्रिज्या: float): float {
     return math.pi * त्रिज्या  2;
 };
 
@@ -593,8 +614,6 @@ Note: Emojis does not contain Unicode character class Math, hence, they cannot b
 
 This allows tighter parsing with the defined set, as well as opportunity to compose a custom operator for domain-specific use cases.
 
-Certain patterns for custom operators are not overloadable due to conflict with syntax markers, such as standalone `[x]` for an array declaration.
-
 ### 2.6. Punctuations
 
 Punctuations (aka Delimiters) are single-character tokens, specifically any of:
@@ -604,8 +623,6 @@ Punctuations (aka Delimiters) are single-character tokens, specifically any of:
 ```
 
 These symbols have a special meaning, just like keyword, and are not treated as operators. These serve as syntax markers.
-
-Several operator-like characters may also appear as punctuations, such as array (`[` and `]` for `[1, 2, 3]`), return arrow (`->` and `=>` for `fn function() -> return_type => expression;`), etc., but many don't overlap with operators in expression.
 
 ### 2.7. Literals
 
@@ -906,48 +923,78 @@ Signed integer types holds whole numbers, while unsigned integer types holds zer
 
 There are many forms of integer types that covers signed vs. unsigned and width of the integer.
 
-| Type     | Signedness | Width (bits)       |
-| -------- | ---------- | ------------------ |
-| `int`    | Signed     | 32                 |
-| `int8`   | Signed     | 8                  |
-| `int16`  | Signed     | 16                 |
-| `int32`  | Signed     | 32                 |
-| `int64`  | Signed     | 64                 |
-| `uint`   | Unsigned   | 32                 |
-| `uint8`  | Unsigned   | 8                  |
-| `uint16` | Unsigned   | 16                 |
-| `uint32` | Unsigned   | 32                 |
-| `uint64` | Unsigned   | 64                 |
-| `sint`   | Signed     | 32                 |
-| `sint8`  | Signed     | 8                  |
-| `sint16` | Signed     | 16                 |
-| `sint32` | Signed     | 32                 |
-| `sint64` | Signed     | 64                 |
-| `word`   | Signed     | Platform Dependent |
-| `uword`  | Unsigned   | Platform Dependent |
-| `sword`  | Signed     | Platform Dependent |
+| Type    | Signedness | Width (bits)       |
+| ------- | ---------- | ------------------ |
+| `int`   | Signed     | 32                 |
+| `int8`  | Signed     | 8                  |
+| `int16` | Signed     | 16                 |
+| `int32` | Signed     | 32                 |
+| `int64` | Signed     | 64                 |
+| `pd`    | Signed     | Platform Dependent |
 
 ```eng
 let position_x: int = 32;
 ```
 
-Fun fact: `int` == `int32` == `sint` == `sint32`. And in most platforms, `int` == `int32` == `sint` == `sint32` == `word` == `sword`.
+The unsigned variant of the above types are prefixed with `u`, such as `uint`, `uint64`, etc.
+
+```eng
+let position_y: uint64 = 64;
+```
+
+The explicitly signed variant of the above types are also provided and are prefixed with `s`, such as `sint`, `sint64`, etc.
+
+```eng
+let position_z: sint32 = 128;
+```
 
 ### 4.2. Floating-point Types
 
-Floating-point types holds real numbers.
+Float types are IEEE-754 binary floating-point types holds real numbers.
 
 There are many forms of floating-point types that cover various width, ranges and precisions.
 
 | Type       | Precision           | Width (bits) |
 | ---------- | ------------------- | ------------ |
-| `float`    | Double precision    | 64           |
+| `float`    | Single precision    | 32           |
 | `float16`  | Half precision      | 16           |
 | `float32`  | Single precision    | 32           |
 | `float64`  | Double precision    | 64           |
 | `float128` | Quadruple precision | 128          |
+| `float256` | Octuple precision   | 256          |
 
-### 4.3. Character Types
+Note: `float16`, `float128` and `float256` are not widely supported in hardware, so they may be implemented in software, which can be significantly slower than the hardware-supported floating-point types.
+
+The Engenide Extended Library supports arbitrary-precision floating-point type `eng.ext.exfloat.efloat<M, N>` where `M` is the number of bits for the significand and `N` is the number of bits for the exponent. An unsigned floating-point type `eng.ext.exfloat.uefloat<M, N>` is also provided.
+
+```eng
+import exf: eng.ext.exfloat;
+
+let big_float: exf.ufloat<128, 16> = 1.23456789012345678901234567890123456789;
+```
+
+### 4.3. Decimal Types
+
+Decimal types are IEEE-754 decimal floating-point types that holds real numbers with decimal precision. They are useful for financial calculations where precision is more important than range.
+
+| Type         | Precision         | Width (bits) |
+| ------------ | ----------------- | ------------ |
+| `decimal`    | 7 decimal digits  | 32           |
+| `decimal32`  | 7 decimal digits  | 32           |
+| `decimal64`  | 16 decimal digits | 64           |
+| `decimal128` | 34 decimal digits | 128          |
+
+Note: decimal formats are not widely supported in hardware, so they may be implemented in software, which can be significantly slower than the hardware-supported binary floating-point types.
+
+The Engenide Extended Library supports arbitrary-precision decimal type `eng.ext.exdecimal.edecimal<P>` where `P` is the number of decimal digits for the significand. An unsigned decimal type `eng.ext.exdecimal.uedecimal<P>` is also provided.
+
+```eng
+import exd: eng.ext.exdecimal;
+
+let big_decimal: exd.uedecimal<50> = 1.2345678901234567890123456789012345678901234567890;
+```
+
+### 4.4. Character Types
 
 The `char` type holds one Unicode scalar value. Its width is 32 bites and holds the Unicode codepoint directly.
 
@@ -956,7 +1003,7 @@ let ascii_character: char = 'a';
 let unicode_character: char = '💖';
 ```
 
-### 4.4. Boolean Types
+### 4.5. Boolean Types
 
 The `bool` type holds either `true` or `false`. Its width is 8 bits but it cannot sore any value other than those two states.
 
@@ -965,7 +1012,7 @@ let enabled: bool = true;
 let success: bool = false;
 ```
 
-### 4.5. String
+### 4.6. String
 
 Strings represents sequence of characters. They are encoded in UTF-8, and unlike an array of characters, they are packed to minimize memory usage from array of UTF-32 characters.
 
@@ -984,12 +1031,12 @@ for (let character in str) { # Iterate over characters
 }
 ```
 
-### 4.6. Any Type
+### 4.7. Some Type
 
-The `any` type is a type that can hold values of any data type. It dynamically stores the type information along with the value. The type can be compared dynamically to safely retrieve the value.
+The `some` type is a type that can hold values of any data type. It dynamically stores the type information along with the value. The type can be compared dynamically to safely retrieve the value.
 
 ```eng
-let value: any = 5;
+let value: some = 5;
 value = 11.5;
 value = 'a';
 value = false;
@@ -1006,7 +1053,7 @@ if (let integer as int = value) {
 }
 ```
 
-### 4.7. Variants
+### 4.8. Variants
 
 Variants can be defined by combining two types. A variant holds values of the specified types.
 
@@ -1026,9 +1073,35 @@ let value: (int | float) & (float | string); # value is of type float
 let value: (int | float) | (float | string); # value is of type int | float | string
 ```
 
-### 4.8. Type Conversion
+### 4.9. None Type
 
-#### 4.8.1. Conversion Types
+The `none` type is a type that has no value. It cannot be used to create a variable or return from a function. It is used to indicate the absence of a value, such as in the case of a function that cannot terminate normally with a value.
+
+```eng
+fn do_something(): none {
+    io.println("Doing something...");
+    while {} # Infinite loop to prevent returning from the function
+};
+```
+
+### 4.10. Type Hierarchy
+
+All types in Engenide are organized in a type hierarchy. The root of the type hierarchy is the `some` type, which can hold values of any type. All other types are subtypes of `some`.
+The leaf of the type hierarchy is the `none` type, which has no value and is a subtype of all types.
+The `void` type is a unit type that can hold `null`.
+Note however, `void` is not a subtype or supertype of any other type, as it is only used to indicate the absence of a value in specific contexts, such as in the return type of a function that does not return anything.
+
+```
+    some
+   /  |  \
+void int string
+   \  |  /
+    none
+```
+
+### 4.11. Type Conversion
+
+#### 4.11.1. Conversion Types
 
 There are two types of type conversion:
 
@@ -1045,7 +1118,7 @@ class complex {
     let imag: float;
 };
 
-cast(v: vector2d) -> complex {
+cast(v: vector2d): complex {
     return (.real = v.x, .imag = v.y);
 };
 
@@ -1068,7 +1141,7 @@ class complex {
     let imag: float;
 };
 
-into(v: vector2d) -> complex {
+into(v: vector2d): complex {
     return (.real = v.x, .imag = v.y);
 };
 
@@ -1080,7 +1153,7 @@ fn main() {
 
 Defining only `cast` function allows both implicit and explicit conversion. Defining only `into` function allows only explicit conversion.
 
-#### 4.8.2. Numeric Conversion
+#### 4.11.2. Numeric Conversion
 
 Integer to floating-point conversion is implicitly allowed. Floating-point to integer conversion is explicitly allowed.
 
@@ -1106,7 +1179,7 @@ let nan_float: float = nan;
 let zero_int: int = nan_float as int; # Results in 0
 ```
 
-#### 4.8.3. Automatic Multi-conversion
+#### 4.11.3. Automatic Multi-conversion
 
 When conversion from type a to type b is defined, and conversion from type b to type c is defined, conversion from type a to type c is automatically defined.
 
@@ -1123,17 +1196,17 @@ class type_c {
     let value: string;
 };
 
-cast(a: type_a) -> type_b {
+cast(a: type_a): type_b {
     return (.value = a.value as float);
 };
 
-cast(b: type_b) -> type_c {
+cast(b: type_b): type_c {
     return (.value = "Value: ${b.value}");
 };
 
 fn main() {
     let a = type_a(.value = 42);
-    let c: type_c = a; # Automatically converts type_a -> type_b -> type_c
+    let c: type_c = a; # Automatically converts type_a to type_b to type_c
 
     io.println(c.value); # Outputs: Value: 42.0
 };
@@ -1141,7 +1214,57 @@ fn main() {
 
 This is only applied for implicit cast conversion. Explicit conversion must be defined separately. For ambiguous conversions, explicit conversion must be used.
 
-### 4.9. Obtaining Size of Types
+#### 4.11.4. Promotion Graph
+
+The engine automatically promotes types in expressions based on a promotion graph. For example, when an `int` and a `float` are used in the same expression, the `int` is promoted to `float` to prevent loss of precision.
+
+```eng
+let integer_value: int = 10;
+let float_value: float = 5.5;
+let result = integer_value + float_value; # integer_value is promoted to float, result is of type float with value 15.5
+```
+
+Integer of different widths are promoted to the wider type.
+
+```eng
+let int8_value: int8 = 10;
+let int32_value: int32 = 20;
+let result = int8_value + int32_value; # int8_value is promoted to int32, result is of type int32 with value 30
+```
+
+Custom promotion graph can be defined by defining `promo` function.
+
+```eng
+class type_a {
+    let value: int;
+};
+
+class type_b {
+    let value: float;
+};
+
+class type_c {
+    let value: string;
+};
+
+promo(value: type_a): type_b {
+    return (.value = value.value as float);
+};
+
+promo(value: type_b): type_c {
+    return (.value = "Value: ${value.value}");
+};
+```
+
+The graph must not form a cycle, otherwise it will result in a compile-time error.
+
+```eng
+promo(value: type_c): type_a { # Error: Cycle detected in promotion graph
+    return (.value = int.parse(value.value));
+};
+```
+
+### 4.12. Obtaining Size of Types
 
 The `sizeof` keyword is used to obtain the size of a type in bytes.
 
@@ -1151,9 +1274,9 @@ let float64_size = sizeof float64; # 8
 let char_size = sizeof char;       # 4
 ```
 
-### 4.10. Modifiers
+### 4.13. Modifiers
 
-#### 4.10.1. Constants
+#### 4.13.1. Constants
 
 A constant type's value does not change after creation.
 
@@ -1169,7 +1292,7 @@ Reassignment is not allowed on constants.
 a = 3; # Errors out
 ```
 
-#### 4.10.2. Pointers
+#### 4.13.2. Pointers
 
 A pointer type holds an address of another variable or memory.
 
@@ -1205,7 +1328,7 @@ realloc pointer, 8; # or `realloc pointer, int64`
 *(pointer as int64*) = 7;
 ```
 
-#### 4.10.3. References
+#### 4.13.3. References
 
 A reference type refers to another variable or memory.
 
@@ -1217,7 +1340,7 @@ reference = 6; # Updates value
 
 References must always point to variable that is guaranteed to live longer than the reference itself, and they cannot be made to point other variables after declaration.
 
-#### 4.10.4. Nullables
+#### 4.13.4. Nullables
 
 A nullable type holds a state whether a value is held and the value it holds.
 
@@ -1225,6 +1348,13 @@ A nullable type holds a state whether a value is held and the value it holds.
 let a: int?;
 let b: int? = 20;
 let c: int? = null;
+```
+
+Null type is a variant of the base type and `void` type that can only hold `null` value.
+
+```
+let a: int? = null;
+let b: int | void = null; # Same as int?
 ```
 
 Accessing a nullable type that does not hold a value throws `null_access` exception.
@@ -1265,7 +1395,7 @@ It also works with chained member access.
 
 ```eng
 class calculator {
-    fn add(a: int, b: int) -> int {
+    fn add(a: int, b: int): int {
         return a + b;
     };
 };
@@ -1293,7 +1423,7 @@ Exception-to-null operator `!?` performs a conditional branch to convert an exce
 let result = calc?!.add(10, 20)!?; # result is of nullable type `int?`
 ```
 
-#### 4.10.5. Reference-Counting
+#### 4.13.5. Reference-Counting
 
 A reference-counting type automatically manages the memory of the value it holds by counting the number of references to it. When the reference count drops to zero, the memory is automatically deallocated.
 
@@ -1308,7 +1438,7 @@ A reference-counting type automatically manages the memory of the value it holds
 } # value goes out of scope here, memory is deallocated
 ```
 
-#### 4.10.6. Moving Types
+#### 4.13.6. Moving Types
 
 A moving type transfers the ownership of the value it holds when assigned or passed to a function. After the transfer, the original variable becomes inaccessible.
 
@@ -1324,7 +1454,7 @@ fn main() {
 };
 ```
 
-#### 4.10.7. Unique Moving Types
+#### 4.13.7. Unique Moving Types
 
 A unique moving type ensures that there is only one reference to the value it holds at any given time. This is useful for managing resources that should not be shared, or to ensure thread-safety.
 
@@ -1353,7 +1483,7 @@ fn main() {
 };
 ```
 
-#### 4.10.8. Swapping Types
+#### 4.13.8. Swapping Types
 
 One of a cleaver way to implement efficient resource management while still keeping invariants intact is to swap the resources. Using moving type allows this pattern to be implemented easily.
 
@@ -1369,25 +1499,25 @@ fn main() {
 };
 ```
 
-#### 4.10.9. Polymorphic Types
+#### 4.13.9. Polymorphic Types
 
 A polymorphic type allows a variable to hold values of different derived types from a common base type.
 
 ```eng
 class animal {
-    fn speak() -> string {
+    fn speak(): string {
         return "Some sound";
     };
 };
 
 class dog: animal {
-    fn speak() -> string {
+    fn speak(): string {
         return "Woof!";
     };
 };
 
 class cat: animal {
-    fn speak() -> string {
+    fn speak(): string {
         return "Meow!";
     };
 };
@@ -1401,7 +1531,7 @@ fn main() {
 };
 ```
 
-#### 4.10.10. Combining Modifiers
+#### 4.13.10. Combining Modifiers
 
 Modifiers can be combined to create complex behaviors for types.
 
@@ -1422,11 +1552,11 @@ let invalid_ref: int& ! = value; # Error: Cannot modify a reference type
 let invalid_unique: int^^ * = addr value; # Error: Cannot modify a unique moving type
 ```
 
-### 4.11. Arrays
+### 4.14. Arrays
 
 Array is a container for storing multiple values. Arrays are flexible as they can be dynamically resized if their size is not constant, and they can also store values of mixed data types.
 
-#### 4.11.1. Typed and Untyped
+#### 4.14.1. Typed and Untyped
 
 A typed array specifies exactly what type each element must be.
 An untyped array has no such restriction and can hold any mixture of types.
@@ -1436,9 +1566,9 @@ let scores: int[] = [10, 15, 20];    # typed, dynamic-sized
 let values: []    = [42, 3.14, 'z']; # untyped, dynamic-sized
 ```
 
-Note: Untyped array are equivalent to `any[]` as it uses the `any` type as default. This allows composition of different types in the array.
+Note: Untyped array are equivalent to `some[]` as it uses the `some` type as default. This allows composition of different types in the array.
 
-#### 4.11.2. Static-Sized and Dynamic-Sized
+#### 4.14.2. Static-Sized and Dynamic-Sized
 
 A static-sized array has a fixed number of elements.
 A dynamic-sized array can grow or shrink at runtime.
@@ -1452,7 +1582,7 @@ let list:  []       = [];            # untyped, dynamic-sized
 
 If a static-sized typed array is initialized with fewer elements than its size, the remaining elements are default-initialized.
 
-#### 4.11.3. Accessing Arrays
+#### 4.14.3. Accessing Arrays
 
 Elements of the array can be accessed using the subscript operator (`[]`) which takes a zero-index to locate the element. The index can be negative as well, where `-1` starts counting backwards from the last.
 
@@ -1472,7 +1602,7 @@ let mid = letters[[1, 2, 3]]; # ['b', 'c', 'd']
 
 Note: Invalid index throws `index_out_of_range` exception.
 
-#### 4.11.4. Resizing Arrays
+#### 4.14.4. Resizing Arrays
 
 If the array is dynamically-sized, they can be resized in runtime. There are a few functions, mainly:
 
@@ -1494,7 +1624,7 @@ values.remove(2);    # values is now [1, 2, 3, 4, 5]
 values.resize(10);   # values is now [1, 2, 3, 4, 5, 0, 0, 0, 0, 0]
 ```
 
-#### 4.11.5. Count
+#### 4.14.5. Count
 
 The size of the array can be obtained using `array.count`.
 
@@ -1503,7 +1633,7 @@ let values = [1, 2, 3, 4, 5];
 let values_count = values.count;
 ```
 
-#### 4.11.6. Existance and Iteration
+#### 4.14.6. Existance and Iteration
 
 The `in` keyword can be used to check of an element exists in the array.
 
@@ -1529,7 +1659,7 @@ for (let element in array) {
 }
 ```
 
-#### 4.11.7. Array Range Generator
+#### 4.14.7. Array Range Generator
 
 Range Generator allows generating array of incremental sequence.
 
@@ -1541,7 +1671,7 @@ begin:end:step
 - end: Stopping value (exclusive) for the sequence.
 - step: Incremental value added after each element.
 
-In case begin is greater than end, the range will be empty if step is positive, otherwise it will decrement.
+In case begin is more than end, the range will be empty if step is positive, otherwise it will decrement.
 
 The parameters are optional and can be omitted. The default values are:
 
@@ -1572,7 +1702,7 @@ let subvalues = values[1:4];  # [2, 3, 4]
 let reversed  = values[::-1]; # [5, 4, 3, 2, 1]
 ```
 
-#### 4.11.8. Array Repeat Generator
+#### 4.14.8. Array Repeat Generator
 
 Repeat Generator allows array to be repeated a fixed number of times.
 
@@ -1597,7 +1727,7 @@ In case of zero or negative value of `count`, the array will be empty.
 let repeats = [1, 2, 3] * -2; # []
 ```
 
-#### 4.11.9. Array Generator Expression
+#### 4.14.9. Array Generator Expression
 
 Generation expression allows custom generation of array using `emit`.
 
@@ -1623,7 +1753,7 @@ let values = [1, 2, with for i in 3:11 {
 }, 11, 12, 13]; # values is [1, 2, 3, 4, 6, 6, 8, 9, 10, 11, 12, 13], with 6 being emitted twice
 ```
 
-#### 4.11.10. Array Packing and Unpacking
+#### 4.14.10. Array Packing and Unpacking
 
 Array supports packing and unpacking of elements if the size of the array is fixed.
 
@@ -1646,7 +1776,7 @@ let (a, ...b, c) = (1, 2, 3, 4, 5); # a = 1, b = [2, 3, 4], c = 5
 This can be done in paramter lists as well.
 
 ```eng
-fn sum(first: int, ...rest: int[]) -> int {
+fn sum(first: int, ...rest: int[]): int {
     let total = first;
     for (let value in rest) {
         total += value;
@@ -1659,7 +1789,79 @@ fn main() {
 };
 ```
 
-### 4.12. Tuples
+#### 4.14.11. Array Index Type
+
+Array index type can be any enumerable type, not just integers.
+
+```eng
+enum colors {
+    red,
+    green,
+    blue
+};
+
+let color_values: float[colors] = {
+    colors.red:   0.0,
+    colors.green: 0.5,
+    colors.blue:  1.0
+};
+
+let color_codes: int[colors] = { 0xFF0000, 0x00FF00, 0x0000FF }; # Automatically uses enum values as keys
+```
+
+This is similar to a map, but with fixed keys defined by the enumerable type.
+
+An integer index type can also be specified with a range type.
+
+```
+range my_indices = 0:5; # 0, 1, 2, 3, 4
+
+let values: int[my_indices] = {
+    0: 10,
+    1: 20,
+    2: 30,
+    3: 40,
+    4: 50
+};
+
+let value = values[2 as my_indices]; # Requires explicit conversion to the range type
+let index: my_indices = 3; # Store index as range type to explicitly associate index to an array of that range type
+let value = values[index];
+```
+
+Index of range type can never be invalid, which guarantees in-bound access. Converting to and from range type and index is explicit.
+
+Range can be non-contiguous as well, and can be any hashable/equatable type.
+
+```eng
+range my_indices = 0:10:2; # 0, 2, 4, 6, 8
+let values: int[my_indices] = {
+    0: 10,
+    2: 20,
+    4: 30,
+    6: 40,
+    8: 50
+};
+
+let value = values[4 as my_indices]; # 30
+```
+
+Iterating over the range index type is possible as well.
+
+```eng
+for let index in my_indices {
+    io.println("Index: ${index}, Value: ${values[index]}");
+}
+```
+
+You can obtain the range of the array using `range array_name`.
+
+```eng
+let my_array = [10, 20, 30, 40, 50];
+alias my_range: range my_array; # my_range is of type range 0:5
+```
+
+### 4.15. Tuples
 
 A tuple is a fixed, ordered grouping of values of any data type.
 
@@ -1701,7 +1903,26 @@ Tuples members can also be named for easier access.
 let person: (name: string, age: int) = (.name = "Alice", .age = 30);
 let name = person.name;
 let age  = person.age;
+let person = (.address = "123 Main St", .phone = "555-1234"); # Implicitly name the members with the field names
 ```
+
+Named tuples supports ellipsis destructuring as well.
+
+```eng
+let tuple = (.u = 10, .v = 20, .w = 30, .x = 40, .y = 50, .z = 60);
+let (...) = tuple; # u = 10, v = 20, w = 30, x = 40, y = 50, z = 60
+let (a = .u, b = .v, ...) = tuple; # a = 10, b = 20, w = 30, x = 40, y = 50, z = 60
+let (., ., c = .w, d = .x, ...) = tuple; # u = 10, v = 20, c = 30, d = 40, y = 50, z = 60
+let (..., c = .w, d = .x, ., .) = tuple; # u = 10, v = 20, c = 30, d = 40, y = 50, z = 60
+let (.., c = .w, d = .x) = tuple; # u = 10, v = 20, c = 30, d = 40, y = 50, z = 60
+let (u, v, ...rest) = tuple; # u = 10, v = 20, rest = (.w = 30, .x = 40, .y = 50, .z = 60)
+let (...rest, y, z) = tuple; # y = 50, z = 60, rest = (.u = 10, .v = 20, .w = 30, .x = 40)
+```
+
+Here,
+- `.` unpack one
+- `..` unpack one or more
+- `...` unpack zero or more
 
 Tuple also supports unpacking into an array.
 
@@ -1718,7 +1939,7 @@ for (let value in tuple) { # value is of type variant of all possible types if t
 }
 ```
 
-### 4.13. Maps
+### 4.16. Maps
 
 A map is a collection of key-value pairs, where each key is unique.
 
@@ -1776,7 +1997,7 @@ for (let (key, value) in map) {
 }
 ```
 
-Map is a hash-map if the key type is convertible to `u8[]`.
+Map is a hash-map if the key type is convertible to `uint8[]`.
 Map is a binary-tree map if the key type is comparable.
 Map is a regular array of key-value pairs otherwise.
 
@@ -1788,7 +2009,7 @@ let btreemap: btree_map<string, int>;
 let arraymap: array_map<string, int>;
 ```
 
-### 4.14. Sets
+### 4.17. Sets
 
 A set is a collection of unique values.
 
@@ -1834,6 +2055,31 @@ Using different kind of set explicitly is possible by specifying the set type.
 let hashset: hash_set<int>;
 let btreeset: btree_set<int>;
 let arrayset: array_set<int>;
+```
+
+### 4.18. Type Aliasing
+
+Type aliasing allows creating a new alias name for an existing type.
+
+```eng
+alias integer: int;
+alias decimal: float;
+alias name: string;
+
+let a: integer = 10;
+let b: decimal = 3.14;
+let c: name    = "Alice";
+```
+
+Aliasing can also be used with complex types such as ones with modifiers, generics, namespace, etc.
+
+```eng
+alias vec2: float[2];
+alias level: int[] | float[] | char[];
+alias level2: (int | float | char)[]; # Not the same!
+alias wchar_str: cpp.string<cpp.wchar_t>;
+alias my_func: fn(int, float): string;
+alias my_namespace: some.long.namespace;
 ```
 
 ## 5. Statements
@@ -2112,6 +2358,14 @@ while (let decaration = value; condition) {
 }
 ```
 
+An empty condition can be used to create an infinite loop.
+
+```eng
+while {
+    # code to execute infinitely
+}
+```
+
 ### 5.5. `for` Statement
 
 `for` statement combines initialization, condition and update statement.
@@ -2235,7 +2489,7 @@ switch (value) {
         # code if value is equal to 2
     }
     case $ > 2 && $ < 20 {
-        # code if value is greater than 2 and less than 20
+        # code if value is more than 2 and less than 20
     }
     case $ in [20:30..., 40:50...] {
         # code if value is between 20 to 29, or 40 to 49
@@ -2256,8 +2510,8 @@ Switch cases can also contain statements before the condition to contain them in
 
 ```eng
 switch (shape) {
-    case let c as circle = $; c.radius > 10 {
-        # code if shape is a circle and its radius is greater than 10
+    case let c = $ as circle; c.radius > 10 {
+        # code if shape is a circle and its radius is more than 10
     }
 }
 ```
@@ -2269,7 +2523,7 @@ switch (shape) {
 ```eng
 switch (shape) {
     case $ match circle(radius) && radius > 10 {
-        # code if shape is a circle and its radius is greater than 10
+        # code if shape is a circle and its radius is more than 10
     }
     case $ match square(let w = .width, let h = .height, .position(let x, let y)) && w + h < 10 {
         # code if shape is a square and sum of its width and height is less than 10
@@ -2282,7 +2536,7 @@ switch (shape) {
 
 ```eng
 if shape match circle(let radius) && radius > 10 {
-    # code if shape is a circle and its radius is greater than 10
+    # code if shape is a circle and its radius is more than 10
 }
 ```
 
@@ -2291,7 +2545,7 @@ if shape match circle(let radius) && radius > 10 {
 ```eng
 switch (shape) {
     case $ match circle(let r > 10) {
-        # code if shape is a circle and its radius is greater than 10, can still use r
+        # code if shape is a circle and its radius is more than 10, can still use r
     }
     case $ match square(let w == 5, let h, .position(let x, let y)) && w + h < 10 {
         # code if shape is a square, its width is equal to 5 and sum of its width and height is less than 10, can still use w, h, x and y
@@ -2334,15 +2588,63 @@ try {
 }
 ```
 
+Catch can also use conditions to match an expression.
+
+```eng
+try {
+    risky_operation();
+} catch (e: int; e > 0) {
+    # handle positive integer error
+} catch (e: int; e <= 0) {
+    # handle non-positive integer error
+}
+```
+
+This allows catching different exceptions even if they are of the same type.
+
 ### 5.11. `require` and `comply`
 
 `require` constructs are used to execute tasks that the user must explicitly comply to. It represents a contract between the entity and the user.
 
 ```eng
-require "C" fn c_function() -> int;
+require "C" fn c_function(): int;
 
 fn main() {
-    let value = comply "C" c_function();
+    let value = with comply "C" be c_function();
+};
+```
+
+`require` can be applied to any entities, such as functions, classes, modules or even variables.
+
+`require` can be used with any value, not just string literals. Including integers, enums or even custom data types.
+
+```eng
+enum version {
+    v1,
+    v2,
+    v3;
+};
+
+require version::v2 fn new_feature(): int;
+
+fn main() {
+    let result = with comply version::v2 be new_feature();
+};
+```
+
+If a `require` precondition is a type rather than a value, any value of the type can be used to comply.
+
+```eng
+class non_negative {
+    let reason: string;
+};
+
+require non_negative fn sqrt(value: float): float;
+
+fn main() {
+    let result = with comply non_negative(.reason = "validated at runtime") {
+        be sqrt(25.0);
+    };
 };
 ```
 
@@ -2448,7 +2750,60 @@ fn main() {
 };
 ```
 
-### 5.16. Omission
+### 5.16. Labeled Statements
+
+Statements can be labeled to allow `break` and `cont` statements to target specific loops.
+
+```eng
+fn main() {
+    let outer_count = 0;
+
+    label outer_loop while (outer_count < 3) {
+        let inner_count = 0;
+
+        label inner_loop while (inner_count < 3) {
+            if (inner_count == 1) {
+                cont outer_loop; # Continue the outer loop when inner_count is 1
+            }
+            io.println("Outer: ${outer_count}, Inner: ${inner_count}");
+            inner_count += 1;
+        }
+
+        outer_count += 1;
+    }
+};
+```
+
+Even `if`, `switch`, `try` and other blocks can be labeled as well, though, it is equivalent to defining a label inside the block.
+
+```eng
+fn main() {
+    let value = 10;
+
+    label check_value if (value > 5) {
+        io.println("Value is more than 5.");
+    } else {
+        io.println("Value is 5 or less.");
+    }
+};
+```
+
+Same as
+
+```eng
+fn main() {
+    let value = 10;
+
+    if (value > 5) {
+        label check_value;
+        io.println("Value is more than 5.");
+    } else {
+        io.println("Value is 5 or less.");
+    }
+};
+```
+
+### 5.17. Omission
 
 Parenthesis or braces (but not both) can be omitted in all control statements to simplify raeding.
 
@@ -2491,7 +2846,7 @@ Functions defines reusable block of code that works on optional inputs (paramete
 Functions can be declared anywhere using `fn` keyword.
 
 ```eng
-fn function_name(parameters) -> returns {
+fn function_name(parameters): returns {
     # function body
 };
 ```
@@ -2499,7 +2854,7 @@ fn function_name(parameters) -> returns {
 Note: The semicolon after the closing brace is mandatory.
 
 ```eng
-fn add(a: int, b: int) -> int {
+fn add(a: int, b: int): int {
     return a + b;
 };
 ```
@@ -2509,7 +2864,7 @@ fn add(a: int, b: int) -> int {
 Multiple values can be returned from the function.
 
 ```eng
-fn add_sub(a: int, b: int) -> int, int {
+fn add_sub(a: int, b: int): int, int {
     return a + b, a - b;
 };
 
@@ -2523,7 +2878,7 @@ fn main() {
 Returned variables can be named just like parameters, and allows assignment to specify the return value before implicit return or devalued return.
 
 ```eng
-fn add_sub(a: int, b: int) -> sum: int, diff: int {
+fn add_sub(a: int, b: int): sum: int, diff: int {
     return sum = a + b, diff = a - b;
 };
 
@@ -2540,14 +2895,14 @@ fn main() {
 Functions without return statement will return default value of the type.
 
 ```eng
-fn square() -> int {
+fn square(): int {
 }; # Returns 0 implicitly
 ```
 
 Function with named return values will return the value held by the return value.
 
 ```eng
-fn square(x: int) -> y: int {
+fn square(x: int): y: int {
     y = x ** 2;
 }; # Returns x ** 2 for y
 ```
@@ -2555,7 +2910,7 @@ fn square(x: int) -> y: int {
 The expression for return statement is optional even for non-void functions.
 
 ```eng
-fn square(x: int) -> y: int {
+fn square(x: int): y: int {
     y = x ** 2;
     return; # Returns x ** 2 for y
 };
@@ -2633,8 +2988,8 @@ fn mul_div(x: int = 4, y: int) {
 };
 
 fn main() {
-    let (z, w) = mul_div(default, 2); # (z, w) = (8, 2)
-    (z, w) = mul_div(.x = default, .y = 2); # Same as before
+    let (z, w) = mul_div(, 2); # (z, w) = (8, 2)
+    (z, w) = mul_div(.x = , .y = 2); # Same as before
 };
 ```
 
@@ -2723,6 +3078,30 @@ fn main() {
 };
 ```
 
+A `.` is used to automatically select the overload without needing to specify all the parameter names and types.
+A `..` is used to automatically select one or more parameters.
+A `...` is used to automatically select zero or more parameters.
+
+```eng
+fn perimeter(length: float, width: float, multiplier: float) {
+    return 2 * (length + width) * multiplier;
+};
+
+fn perimeter(radius: float, multiplier: float) {
+    return 2 * math.pi * radius * multiplier;
+};
+
+fn perimeter(a: float, b: float, c: float, multiplier: float) {
+    return (a + b + c) * multiplier;
+};
+
+fn main() {
+    let rect_perimeter = perimeter[length, width, ..];  # Selects first overload
+    let circle_perimeter = perimeter[radius, ...];      # Selects second overload
+    let tri_perimeter = perimeter[., ., ., multiplier]; # Selects third overload
+};
+```
+
 #### 6.7.4. Dynamic Overload Dispatch
 
 A variant type can be used to dispatch overloads based on the contained type dynamically.
@@ -2737,7 +3116,7 @@ fn print_value(x: float) {
 };
 
 fn main() {
-    let value: int | float = 10; # Variant containing int
+    let value: int | float0; # Variant containing int
 
     print_value(value...); # Dispatches to print_value(int)
 
@@ -2786,7 +3165,7 @@ Note: This is only possible when all the combination of possible types are cover
 Functions can take a variable number of arguments using `...` syntax. This allows the function to accept any number of arguments of the specified type, or a mix of types. The arguments are collected into an array.
 
 ```eng
-fn sum(...args: int) -> int { # args is of type `int[]`
+fn sum(...args: int): int { # args is of type `int[]`
     let total = 0;
     for let arg in args {
         total += arg;
@@ -2804,7 +3183,7 @@ fn main() {
 Variadic arguments can also be used with named arguments, and not specifying the type make it an untyped variadic argument.
 
 ```eng
-fn log(message: string, ...args) { # args is of type `any[]` or `[]`
+fn log(message: string, ...args) { # args is of type `some[]` or `[]`
     io.print("${message} ");
     for let arg in args {
         io.print("${arg} ");
@@ -2864,7 +3243,7 @@ Functions are nullable by default to allow easier handling of missing functions.
 
 ```eng
 fn main() {
-    let op: fn (x: int, y: int) -> int = operation("mod"); # op is null
+    let op: fn (x: int, y: int): int = operation("mod"); # op is null
     let result = op?(10, 3); # result is null
 };
 ```
@@ -2874,18 +3253,18 @@ fn main() {
 Anonymous Function are functions without specified name. They are not a special type of function, but rather works the same way.
 
 ```eng
-let operation = fn (x: int, y: int) -> int { return x + y; };
+let operation = fn (x: int, y: int): int { return x + y; };
 ```
 
 The signature of function can be deduced when the signature is provided by the context (e.g., variable type is known before function usage).
 
 ```eng
-fn operate(op: fn (x: int, y: int) -> z: int) -> int {
+fn operate(op: fn (x: int, y: int): z: int): int {
     return op(2, 3);
 };
 
 fn main() {
-    let value = operate(fn { return z = x + y; }); # Signature of this function is `fn (x: int, y: int) -> z: int`, deduced from context
+    let value = operate(fn { return z = x + y; }); # Signature of this function is `fn (x: int, y: int): z: int`, deduced from context
 };
 ```
 
@@ -2893,7 +3272,7 @@ Parameters can also be picked individually with different name.
 
 ```eng
 fn main() {
-    let value = operate(fn (a = .a, .b) -> int { return a + b; });
+    let value = operate(fn (a = .a, .b): int { return a + b; });
 };
 ```
 
@@ -2909,7 +3288,7 @@ let function1 = fn [a, b&] () {};
 fn function2 [a!, b! &] () {};
 ```
 
-When a capture group is specified, all the other variables not mentioned in the capture group will not be captured, unless default capture is specified by specifying the capture type without any namee following it.
+When a capture group is specified, all the other variables not mentioned in the capture group will not be captured, unless default capture is specified by specifying the capture type without any name following it.
 
 ```eng
 let a, b, c = (9, 8, 7);
@@ -2921,7 +3300,7 @@ let function = fn [!, b&] () {}; # Capture all by constant, capture b by referen
 Passing an anonymous function to a function can be represented with a much cleaner syntax by using trailing function syntax.
 
 ```eng
-fn query(body: fn (db: database) -> commit: bool) {
+fn query(body: fn (db: database): commit: bool) {
     let db = connect("localhost", "testdb");
     let commit = body(db);
     if (commit) db.commit();
@@ -2951,7 +3330,7 @@ fn main() {
 Multiple scope blocks can also be used to chain blocks.
 
 ```eng
-fn layout(header: fn() -> void, body: fn() -> void, footer: fn() -> void) {
+fn layout(header: fn(): void, body: fn(): void, footer: fn(): void) {
     io.println("[Render: Layout]");
     io.println("  <header>");
     header();
@@ -2992,7 +3371,7 @@ fn main() {
 Trailing function can also contain expression without function body for returning function.
 
 ```eng
-fn calculate(calculator: fn (x: int) -> y: int) {
+fn calculate(calculator: fn (x: int): y: int) {
     return calculator(2);
 };
 
@@ -3006,13 +3385,13 @@ fn main() {
 Functions that consists of a single return statement can be declared as expression functions for conciseness.
 
 ```eng
-fn add(a: int, b: int) -> int => a + b;
+fn add(a: int, b: int): int = a + b;
 ```
 
 This can also be used with anonymous functions.
 
 ```eng
-let add = fn (a: int, b: int) -> int => a + b;
+let add = fn (a: int, b: int): int = a + b;
 ```
 
 ### 6.14. Retaining Local Variables
@@ -3037,7 +3416,7 @@ fn main() {
 Functions can be declared as `pure` to indicate that they have no side effects and their output depends only on their input parameters. This allows for certain optimizations about the function's behavior, such as compile-time evaluation and memoization.
 
 ```eng
-pure fn square(x: int) -> int {
+pure fn square(x: int): int {
     return x * x;
 };
 ```
@@ -3049,10 +3428,10 @@ Pure functions cannot contain any side-effecting operations, such as modifying g
 Functions can be declared as `impure` to falsely indicate that they are pure functions. This is useful when interfacing with external libraries or performing operations that are known to be side-effect free, but cannot be guaranteed by the compiler, or for the programmer to take responsibility for ensuring the function's purity (e.g., caching results). These functions can still be called from another pure function. Same performance optimizations can be applied to these functions as well.
 
 ```eng
-impure fn cached_fibonacci(n: int) -> int {
+impure fn cached_fibonacci(n: int): int {
     retain let cache: int => int;
 
-    if (cache.contains(n)) {
+    if (n in cache) {
         return cache[n];
     }
 
@@ -3098,16 +3477,16 @@ fn main() {
 A function with more return values can be assigned to a function type with fewer return values, but not the opposite.
 
 ```eng
-fn get_coordinates() -> a: int, b: int {
+fn get_coordinates(): a: int, b: int {
     return 10, 20;
 };
 
-fn get_color() -> a: int, b: int, c: int {
+fn get_color(): a: int, b: int, c: int {
     return 255, 0, 0;
 };
 
 fn main() {
-    let getter: fn () -> a: int, b: int = get_color; # Compatible, extra return value ignored
+    let getter: fn (): a: int, b: int = get_color; # Compatible, extra return value ignored
     let (x, y) = getter(); # Calls get_color(), x = 255, y = 0
 
     getter = get_coordinates;
@@ -3118,13 +3497,13 @@ fn main() {
 This also works with parameter picking with different names.
 
 ```eng
-fn operate(op: fn (x: int, y: int) -> z: int) -> int {
+fn operate(op: fn (x: int, y: int): z: int): int {
     return op(2, 3);
 };
 
 fn main() {
-    let value = operate(fn (x = .a) -> int { return x * 2; }); # Compatible, parameter names differ
-    let value = operate(fn (.a) -> int { return a ** a; });
+    let value = operate(fn (x = .a): int { return x * 2; }); # Compatible, parameter names differ
+    let value = operate(fn (.a): int { return a ** a; });
 };
 ```
 
@@ -3133,7 +3512,7 @@ fn main() {
 Functions can be bound to a variable with specific arguments to create a new function with fewer parameters.
 
 ```eng
-fn add(a: int, b: int) -> int {
+fn add(a: int, b: int): int {
     return a + b;
 };
 
@@ -3146,7 +3525,7 @@ fn main() {
 Using placeholder `$` or `$<name>`, parameters can be left unbound to create a new function with those parameters.
 
 ```eng
-fn quadratic(a: float, b: float, c: float, x: float) -> float {
+fn quadratic(a: float, b: float, c: float, x: float): float {
     return a * x ** 2 + b * x + c;
 };
 
@@ -3162,7 +3541,7 @@ fn main() {
 Using placeholder `$<index>` or `$<index>.<name>`, we can positionally select and rename parameter.
 
 ```eng
-fn quadratic(a: float, b: float, c: float, x: float) -> float {
+fn quadratic(a: float, b: float, c: float, x: float): float {
     return a * x ** 2 + b * x + c;
 };
 
@@ -3175,9 +3554,9 @@ fn main() {
 Binding also supports composition and arbitrary expression.
 
 ```eng
-fn square(x: float) => x ** 2;
+fn square(x: float) = x ** 2;
 
-fn quadratic(a: float, b: float, c: float, x: float) -> float {
+fn quadratic(a: float, b: float, c: float, x: float): float {
     return a * x ** 2 + b * x + c;
 };
 
@@ -3192,7 +3571,7 @@ fn main() {
 `ego` refers to the current function itself. It is useful for recursion or passing the current function as argument.
 
 ```eng
-fn factorial(n: int) -> int {
+fn factorial(n: int): int {
     if (n <= 1) {
         return 1;
     } else {
@@ -3208,7 +3587,7 @@ fn main() {
 It is also useful to recursively call anonymous functions.
 
 ```eng
-io.println("${fn (n: int) -> int {
+io.println("${fn (n: int): int {
     if (n <= 1) {
         return n;
     } else {
@@ -3308,7 +3687,7 @@ class point {
         this.y += dy;
     };
 
-    fn origin() -> point {
+    fn origin(): point {
         return self(.x = 0, .y = 0);
     };
 };
@@ -3332,7 +3711,7 @@ As `self` is the type of `this` class, `loft` refers to the type of the `base` c
 class point3d: point {
     let z: float;
 
-    fn to_2d() -> loft {
+    fn to_2d(): loft {
         return loft(.x, .y);
     };
 };
@@ -3446,6 +3825,40 @@ fn main() {
     let my_dev = device(); # Invalid
 };
 ```
+
+Only the default constructor can be deleted using `undef ctor[]`. This uses overload selection mechanism to delete only the default constructor.
+
+```eng
+class device {
+    let id: int;
+    let name: string;
+
+    undef ctor[];
+
+    ctor(name: string) {
+        this.id   = generate_random_id();
+        this.name = name;
+    };
+};
+```
+
+Only the member initialization constructor can be deleted using `undef ctor[..]`. This uses overload selection mechanism to delete only the member initialization constructor.
+
+```eng
+class device {
+    let id: int;
+    let name: string;
+
+    undef ctor[..];
+
+    ctor(name: string) {
+        this.id   = generate_random_id();
+        this.name = name;
+    };
+};
+```
+
+Note that deleting all default constructor using `undef ctor` is the same as writing `undef ctor[...]` which matches all constructor overloads.
 
 ### 7.6. Factory Constructors
 
@@ -3893,7 +4306,7 @@ Classes with virtual members without an implementation to fall back is considere
 
 ```eng
 class abstract_class {
-    virt fn virtual_function() -> void;
+    virt fn virtual_function(): void;
 };
 
 fn main() {
@@ -3906,7 +4319,7 @@ A polymorphic abstract class can be used, which resolves to concrete base with a
 
 ```eng
 class abstract_class {
-    virt fn virtual_function() -> void;
+    virt fn virtual_function(): void;
 };
 
 class concrete_class: abstract_class {
@@ -3975,7 +4388,7 @@ Example:
 
 ```eng
 class calculator {
-    fn add(a: int, b: int) -> int {
+    fn add(a: int, b: int): int {
         return a + b;
     };
 };
@@ -3995,7 +4408,7 @@ class point {
     let x: float;
     let y: float;
 
-    fn distance_to(other: point) -> float {
+    fn distance_to(other: point): float {
         return sqrt((this.x - other.x) ** 2 + (this.y - other.y) ** 2);
     };
 };
@@ -4204,7 +4617,7 @@ Using dotted declaration for anything is possible, not just namespaces.
 ```eng
 let outer.inner.value = 10;
 
-fn outer.inner.action() -> void {
+fn outer.inner.action(): void {
     io.println("Performing action...");
 };
 
@@ -4221,7 +4634,7 @@ ns outer {
     ns inner {
         let value = 10;
 
-        fn action() -> void {
+        fn action(): void {
             io.println("Performing action...");
         };
 
@@ -4329,6 +4742,39 @@ import io: eng.std.io;
 fn main() {
     ns: io; # Spill contents into main's scope
     println("Hello, World!"); # Same as io.println("Hello, World!")
+};
+```
+
+### 8.6. Namespace Collision
+
+Namespace name may collide with other non-namespace entities without a problem. Content of such namespace can be accessed using qualification, just like normal.
+
+```eng
+fn my_function() {
+    io.println("This is a function, not a namespace");
+};
+
+ns my_function {
+    fn nested_function() {
+        io.println("This is a function inside a namespace with same name as a function");
+    };
+};
+
+fn main() {
+    my_function(); # Calls the function
+    my_function.nested_function(); # Calls the function inside the namespace
+};
+```
+
+This is useful to add additional global properties to a type or function.
+
+```eng
+let int.max = 2147483647;
+let int.min = -2147483648;
+
+fn main() {
+    io.println("Max int: ${int.max}"); # Prints "Max int: 2147483647"
+    io.println("Min int: ${int.min}"); # Prints "Min int: -2147483648"
 };
 ```
 
@@ -4633,12 +5079,12 @@ fn main() {
 };
 ```
 
-## 11. Unions
+## 11. Forms
 
-Unions allow defining a type that can hold one of several different types. Unlike C, unions also contains the currently active type, allowing to safely access the value without worrying about which type is currently stored.
+Forms allow defining a type that can hold one of several different types. Forms also contains the currently active type, allowing to safely access the value without worrying about which type is currently stored.
 
 ```eng
-union shape {
+form shape {
     circle {
         let radius: float;
     },
@@ -4654,29 +5100,51 @@ union shape {
 
 fn area(s: shape) {
     switch s {
-        case $ match circle(let r = .radius) {
+        case $ match shape.circle(let r = .radius) {
             return 3.14159 * r * r;
         }
-        case $ match rectangle(let w = .width, let h = .height) {
+        case $ match shape.rectangle(let w = .width, let h = .height) {
             return w * h;
         }
-        case $ match triangle(let b = .base, let h = .height) {
+        case $ match shape.triangle(let b = .base, let h = .height) {
             return 0.5 * b * h;
         }
     }
-}
+};
+
+fn corners(r: shape.rectangle) {
+    return [(0, 0), (r.width, 0), (r.width, r.height), (0, r.height)];
+};
+
+fn corners(t: shape.triangle) {
+    return [(0, 0), (t.base, 0), (t.base / 2, t.height)];
+};
+
+fn main() {
+    let c = shape.circle(.radius = 5.0);
+    let r = shape.rectangle(.width = 4.0, .height = 6.0);
+    let t = shape.triangle(.base = 3.0, .height = 7.0);
+
+    io.println("Circle area: ${area(c)}");
+    io.println("Rectangle area: ${area(r)}");
+    io.println("Triangle area: ${area(t)}");
+
+    io.println("Rectangle corners: ${corners(r)}");
+    io.println("Triangle corners: ${corners(t)}");
+    # io.println("Circle corners: ${corners(c)}"); # No overload for circle
+};
 ```
 
-### 11.1. Union as Classes
+### 11.1. Form as Classes
 
-Unions can also be used as classes, allowing to define methods and properties on them.
+Forms can also be used as classes, allowing to define methods and properties on them.
 
 ```eng
-union shape {
+form shape {
     circle {
         let radius: float;
 
-        fn area() -> float {
+        fn area(): float {
             return 3.14159 * radius * radius;
         };
     },
@@ -4684,7 +5152,7 @@ union shape {
         let width: float;
         let height: float;
 
-        fn area() -> float {
+        fn area(): float {
             return width * height;
         };
     },
@@ -4692,14 +5160,14 @@ union shape {
         let base: float;
         let height: float;
 
-        fn area() -> float {
+        fn area(): float {
             return 0.5 * base * height;
         };
     };
 
-    let multiplier: float = 1.0;
+    let multiplier: float = 0;
 
-    fn area() -> float {
+    fn area(): float {
         switch this {
             case $ match circle(let r = .radius) {
                 return ($ as circle).area() * multiplier;
@@ -4713,6 +5181,24 @@ union shape {
         }
     };
 };
+
+fn main() {
+    let c = shape.circle(.radius = 5.0);
+    let r = shape.rectangle(.width = 4.0, .height = 6.0);
+    let t = shape.triangle(.base = 3.0, .height = 7.0);
+
+    io.println("Circle area: ${c.area()}");
+    io.println("Rectangle area: ${r.area()}");
+    io.println("Triangle area: ${t.area()}");
+
+    c.multiplier = 2.0;
+    r.multiplier = 2.0;
+    t.multiplier = 2.0;
+
+    io.println("Circle area with multiplier: ${c.area()}");
+    io.println("Rectangle area with multiplier: ${r.area()}");
+    io.println("Triangle area with multiplier: ${t.area()}");
+};
 ```
 
 ## 12. Properties
@@ -4725,11 +5211,11 @@ class vec2 {
     let y: float;
 };
 
-op add(a: vec2 "+" b: vec2) -> vec2 {
+op add(a: vec2 "+" b: vec2): vec2 {
     return vec2(.x = a.x + b.x, .y = a.y + b.y);
 };
 
-op sub(a: vec2 "-" b: vec2) -> vec2 {
+op sub(a: vec2 "-" b: vec2): vec2 {
     return vec2(.x = a.x - b.x, .y = a.y - b.y);
 };
 
@@ -4738,10 +5224,10 @@ fn main() {
     let end = vec2(4.0, 5.0);
 
     let dir: prop: vec2 {
-        get() -> vec2 {
+        get(): vec2 {
             return end - start;
         };
-        set(value: vec2) -> void {
+        set(value: vec2): void {
             end = start + value;
         };
     };
@@ -4803,11 +5289,11 @@ class vec2 {
     let y: float;
 };
 
-op add(a: vec2 "+" b: vec2) -> vec2 {
+op add(a: vec2 "+" b: vec2): vec2 {
     return vec2(.x = a.x + b.x, .y = a.y + b.y);
 };
 
-op sub(a: vec2 "-" b: vec2) -> vec2 {
+op sub(a: vec2 "-" b: vec2): vec2 {
     return vec2(.x = a.x - b.x, .y = a.y - b.y);
 };
 ```
@@ -4880,7 +5366,7 @@ eng.lang.gen.comparison!(): (a: float, b: float) {
 
 `eng.lang.gen.comparison` is a macro that takes a function (in this case, a trailing function) that generates operators using return value of the function as result of comparison.
 
-If the return value is greater than 0, the operator `>` and `!=` will result in truth.
+If the return value is more than 0, the operator `>` and `!=` will result in truth.
 
 If the return value is equal to 0, the operators `==`, `<=` and `>=` will result in truth.
 
@@ -4901,11 +5387,11 @@ class complex {
     let imag: float;
 };
 
-cast(v: vector2d) -> complex {
+cast(v: vector2d): complex {
     return (.real = v.x, .imag = v.y);
 };
 
-op add(a: complex "+" b: complex) -> complex {
+op add(a: complex "+" b: complex): complex {
     return complex(.real = a.real + b.real, .imag = a.imag + b.imag);
 };
 
@@ -5008,7 +5494,7 @@ mod logged<class type "/"> {
         other.value = temp;
     };
 
-    get() -> type {
+    get(): type {
         io.println("Accessing logged value: ${this.value}");
         return value;
     };
@@ -5070,10 +5556,10 @@ fn main() {
 Macros that are applied to code entities to modify their behavior or add additional functionality.
 
 ```eng
-macro @component:<component_type: fn (...children) -> element>() {
+macro @component:<component_type: fn (...children): element>() {
     let component_name = eng.meta.function_name(component_type);
     return component_type + eng.quote.quote! {
-        fn ${component_name}_wrapped(...children) -> element {
+        fn ${component_name}_wrapped(...children): element {
             let elem = $component_type(...children);
             elem.classes += " $component_name";
             return elem;
@@ -5082,7 +5568,7 @@ macro @component:<component_type: fn (...children) -> element>() {
 };
 
 @component # Also generates button_wrapped function
-fn button(on_click: fn -> void, ...children) -> element {
+fn button(on_click: fn: void, ...children): element {
     return element("button", .on_click = on_click, .children = children);
 };
 
@@ -5113,7 +5599,7 @@ class comprehension: eng.syn.parser, eng.quote.quoter {
     let mapping: mapping;
     let for_if_clause: for_if_clause;
 
-    fn parse(input: eng.syn.parse_stream) -> comprehension {
+    fn parse(input: eng.syn.parse_stream): comprehension {
         let mapping = input.parse:<mapping>();
         let for_if_clause = input.parse:<for_if_clause>();
         return comprehension(.mapping, .for_if_clause);
@@ -5135,7 +5621,7 @@ class comprehension: eng.syn.parser, eng.quote.quoter {
 class mapping: eng.syn.parser, eng.quote.quoter {
     let expression: eng.syn.expression;
 
-    fn parse(input: eng.syn.parse_stream) -> mapping {
+    fn parse(input: eng.syn.parse_stream): mapping {
         let expression = input.parse:<eng.syn.expression>();
         return mapping(.expression);
     };
@@ -5150,7 +5636,7 @@ class for_if_clause: eng.syn.parser {
     let iterable: eng.syn.expression;
     let conditions: condition[];
 
-    fn parse(input: eng.syn.parse_stream) -> for_if_clause {
+    fn parse(input: eng.syn.parse_stream): for_if_clause {
         let _ = input.parse:<eng.syn.token![for]>();
         let pattern = input.parse:<pattern>();
         let _ = input.parse:<eng.syn.token![in]>();
@@ -5160,7 +5646,7 @@ class for_if_clause: eng.syn.parser {
     };
 };
 
-fn parse_zero_or_more:<class parser: eng.syn.parser>(input: eng.syn.parse_stream, parser: eng.syn.parser) -> parser[] {
+fn parse_zero_or_more:<class parser: eng.syn.parser>(input: eng.syn.parse_stream, parser: eng.syn.parser): parser[] {
     let results: parser[] = [];
 
     while let result = input.parse:<parser>() {
@@ -5173,7 +5659,7 @@ fn parse_zero_or_more:<class parser: eng.syn.parser>(input: eng.syn.parse_stream
 class pattern: eng.syn.parser, eng.quote.quoter {
     let pattern: eng.syn.pattern;
 
-    fn parse(input: eng.syn.parse_stream) -> pattern {
+    fn parse(input: eng.syn.parse_stream): pattern {
         let pattern = input.parse(eng.syn.pattern.parse_single);
         return pattern(.pattern);
     };
@@ -5186,7 +5672,7 @@ class pattern: eng.syn.parser, eng.quote.quoter {
 class condition: eng.syn.parser, eng.quote.quoter {
     let expression: eng.syn.expression;
 
-    fn parse(input: eng.syn.parse_stream) -> condition {
+    fn parse(input: eng.syn.parse_stream): condition {
         let _ = input.parse:<eng.syn.token![if]>();
         let expression = input.parse:<eng.syn.expression>();
         return condition(.expression);
@@ -5313,7 +5799,7 @@ fn main() {
 Non-coroutine functions can be called concurrently using `async` keyword.
 
 ```eng
-fn heavy_computation(x: int) -> int {
+fn heavy_computation(x: int): int {
     time.sleep(2); # Simulate heavy computation
     return x * x;
 };
@@ -5355,7 +5841,7 @@ fn main() {
 Creating threads that resolve to a value can be done using `fork expression` syntax.
 
 ```eng
-fn compute_sum(start: int, end: int) -> int {
+fn compute_sum(start: int, end: int): int {
     let sum = 0;
     for let i + 1 in start:end {
         sum += i;
@@ -5514,11 +6000,11 @@ Atomic member functions can also be defined for custom atomic types.
 class counter_type {
     let value: int;
 
-    atomic fn increment() -> void { # Ensures atomicity of the function
+    atomic fn increment(): void { # Ensures atomicity of the function
         this.value += 1;
     };
 
-    atomic fn get() -> int {
+    atomic fn get(): int {
         return this.value;
     };
 };
@@ -5994,23 +6480,47 @@ fn main() {
 };
 ```
 
-### 19.2. Concepts
+### 19.2. Generics on Namespaces
+
+Generics can also be applied to namespaces to create generic modules.
+
+```eng
+ns utils:<class type> {
+    fn identity(value: type): type {
+        return value;
+    };
+
+    fn print(value: type): void {
+        io.println("Value: ${value}");
+    };
+};
+
+fn main() {
+    let int_value = utils:<int>.identity(42);
+    utils:<int>.print(int_value); # Prints: Value: 42
+
+    let str_value = utils:<string>.identity("Hello, Generics!");
+    utils:<string>.print(str_value); # Prints: Value: Hello, Generics!
+};
+```
+
+### 19.3. Concepts
 
 Generics can also be constrained using concepts to restrict the types that can be used with the generic entity.
 
 ```eng
 concept addable {
-    retain fn add(a: self, b: self) -> self;
+    retain fn add(a: self, b: self): self;
 };
 
-fn sum:<class type: addable>(a: type, b: type) -> type {
+fn sum:<class type: addable>(a: type, b: type): type {
     return type.add(a, b);
 };
 
 class my_number {
     let value: int;
 
-    retain fn add(a: my_number, b: my_number) -> my_number {
+    retain fn add(a: my_number, b: my_number): my_number {
         return my_number(.value = a.value + b.value);
     };
 };
@@ -6034,13 +6544,13 @@ fn main() {
 };
 ```
 
-### 19.3. Concepts on Classes
+### 19.4. Concepts on Classes
 
 Constraints can also be applied to class definitions.
 
 ```eng
 concept comparable {
-    fn less_than(a: self, b: self) -> bool;
+    fn less_than(a: self, b: self): bool;
 };
 
 class pair: comparable {
@@ -6048,19 +6558,19 @@ class pair: comparable {
     let second: int;
 
     # This will error if not implemented
-    retain fn less_than(a: pair, b: pair) -> bool {
+    retain fn less_than(a: pair, b: pair): bool {
         return a.first < b.first;
     };
 };
 ```
 
-### 19.4. `auto` and Constrained `auto`
+### 19.5. `auto` and Constrained `auto`
 
 Use of `auto` keyword allows a concept to define a weaker constraint that can be satisfied by any type that has the required members.
 
 ```eng
 concept has_length {
-    fn length() -> auto;
+    fn length(): auto;
 };
 
 fn print_length:<class type: has_length>(obj: type) {
@@ -6070,7 +6580,7 @@ fn print_length:<class type: has_length>(obj: type) {
 class my_string {
     let value: string;
 
-    fn length() -> int {
+    fn length(): int {
         return value.count;
     };
 };
@@ -6079,7 +6589,7 @@ class vector {
     let x: float;
     let y: float;
 
-    fn length() -> float {
+    fn length(): float {
         return math.sqrt(x ** 2 + y ** 2);
     };
 };
@@ -6097,17 +6607,17 @@ A constrained `auto (type1, type2, ...)` can also be used to define a concept th
 
 ```eng
 concept numeric {
-    fn add(a: self, b: self) -> auto (int, float);
+    fn add(a: self, b: self): auto (int, float);
 };
 
-fn sum:<class type: numeric>(a: type, b: type) -> auto (int, float) {
+fn sum:<class type: numeric>(a: type, b: type): auto (int, float) {
     return type.add(a, b);
 };
 
 class my_int {
     let value: int;
 
-    fn add(a: my_int, b: my_int) -> int {
+    fn add(a: my_int, b: my_int): int {
         return a.value + b.value;
     };
 };
@@ -6115,19 +6625,19 @@ class my_int {
 class my_float {
     let value: float;
 
-    fn add(a: my_float, b: my_float) -> float {
+    fn add(a: my_float, b: my_float): float {
         return a.value + b.value;
     };
 };
 ```
 
-### 19.5. Concepts as Polymorphic Interfaces
+### 19.6. Concepts as Polymorphic Interfaces
 
 Concepts can also be used outside of generics to become polymorphic interfaces.
 
 ```eng
 concept printable {
-    fn print() -> void;
+    fn print(): void;
 };
 
 fn print_if_printable(obj: printable%) {
@@ -6137,7 +6647,7 @@ fn print_if_printable(obj: printable%) {
 class my_printable {
     let value: string;
 
-    fn print() -> void {
+    fn print(): void {
         io.println(value);
     };
 };
@@ -6157,7 +6667,7 @@ fn main() {
 };
 ```
 
-### 19.6. Arbitrary Constraints
+### 19.7. Arbitrary Constraints
 
 Concepts can also define arbitrary constraints using `where` clause.
 
@@ -6220,30 +6730,30 @@ let str =           "arrays!";
 let str2 =          "are cool!";
 
 # Basic combinators
-let mapped =        nums1 -> map(): fn (x) => x * x;            # [1, 4, 9, 16, 25]
-let filtered =      nums1 -> filter(): fn (x) => x % 2 == 0;    # [2, 4]
+let mapped =        nums1 -> map(): fn (x) = x * x;            # [1, 4, 9, 16, 25]
+let filtered =      nums1 -> filter(): fn (x) = x % 2 == 0;    # [2, 4]
 let sorted =        orderless -> sort();                        # [1, 2, 3, 4, 5]
 let uniqued =       duplicates -> unique();                     # [3, 1, 4, 2, 5]
 
 # Advanced combinators
 let take_first_2 =  nums1 -> take_first(2);                     # [1, 2]
 let take_last_2 =   nums1 -> take_last(2);                      # [4, 5]
-let drop_first_2 =  nums1 -> drop_first(2);                     # [3, 4, 5]
-let drop_last_2 =   nums1 -> drop_last(2);                      # [1, 2, 3]
-let reduced_sum =   nums1 -> reduce(0): fn (a, b) => a + b;     # 15
+let drop_first_2 =  nums1: drop_first(2);                     # [3, 4, 5]
+let drop_last_2 =   nums1: drop_last(2);                      # [1, 2, 3]
+let reduced_sum =   nums1 -> reduce(0): fn (a, b) = a + b;     # 15
 let grouped =       nums3 -> group(2):                          # [[1, 2], [2, 3], [3, 3], [4, 4], [4, 4], [5, 5], [5, 5], [5]]
-let grouped_by =    nums3 -> group_by(): fn (a, b) => a == b;   # [[1], [2, 2], [3, 3, 3], [4, 4, 4, 4], [5, 5, 5, 5, 5]]
+let grouped_by =    nums3 -> group_by(): fn (a, b) = a == b;   # [[1], [2, 2], [3, 3, 3], [4, 4, 4, 4], [5, 5, 5, 5, 5]]
 let flattened =     grouped_by -> flatten();                    # [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5]
 let slided =        nums1 -> slide(3);                          # [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
 let nthed =         nums1 -> nth(2);                            # [1, 3, 5]
 let zipped =        (nums1, nums2) -> zip();                    # [(1, 6), (2, 7), (3, 8), (4, 9), (5, 10)]
-let adjacented =    nums1 -> adjacent(): fn (a, b) => a * b;    # [3, 5, 7, 9]
+let adjacented =    nums1 -> adjacent(): fn (a, b) = a * b;    # [3, 5, 7, 9]
 let enumerated =    str -> enumerate();                         # [(0, 'a'), (1, 'r'), (2, 'r'), (3, 'a'), (4, 'y'), (5, 's'), (6, '!')]
 let joined =        (str, str2) -> join(" ");                   # "arrays! are cool!"
 
 # Parallel combinators
 let sqr_n_sqrt =    (nums1, nums1)
-    -> (map(): fn (x) => x * x, map(): fn (x) => math.sqrt(x)); # ([1, 4, 9, 16, 25], [1.0, 1.4142135, 1.7320508, 2.0, 2.2360679])
+    -> (map(): fn (x) = x * x, map(): fn (x) = math.sqrt(x)); # ([1, 4, 9, 16, 25], [1.0, 1.4142135, 1.7320508, 2.0, 2.2360679])
 ```
 
 Note: Several combinators can also take optional addition parameters:
@@ -6273,7 +6783,7 @@ let crazy = values
 Custom combinators can be defined by overloading the `->` or `|>` operators for combinators function.
 
 ```eng
-fn double(value: int) => value * 2;
+fn double(value: int) = value * 2;
 
 op double_combinator(input: int "->" double) { # Automatically parallelizable
     return double(input);
@@ -6290,7 +6800,7 @@ fn main() {
 A more complex, unparallelizable combinator takes array as input, and parallelizing it is manual.
 
 ```eng
-fn scan_left(arr: bool[], target: bool, predicate: fn (bool, bool) -> bool) -> bool[] {
+fn scan_left(arr: bool[], target: bool, predicate: fn (bool, bool): bool): bool[] {
     let result = bool[];
     let accumulator = false;
 
@@ -6306,13 +6816,13 @@ op scan_left_combinator(input: bool[] "->" scan_left) {
     return scan_left:(input); # Bind input to first parameter, returning a function that takes remaining parameters.
 };
 
-fn filter_out_html_tags(input: string) -> string {
+fn filter_out_html_tags(input: string): string {
     return input
         -> map(): (x in "<>")
         |> adjacent($, $ -> scan_left(true): (x != y)): (x || y)
         |> zip($, input)
-        -> filter(): fn (pair) => !pair[0]
-        -> map(): fn (pair) => pair[1];
+        -> filter(): fn (pair) = !pair[0]
+        -> map(): fn (pair) = pair[1];
 };
 ```
 
@@ -6413,10 +6923,10 @@ int square(int value) {
 import io: eng.std.io;
 
 @c_import
-fn square(value: int) -> int;
+fn square(value: int): int;
 
 fn main() {
-	let squared_value = comply "C" square(10); # Calling C from Engenide requires complying to "C" requirement.
+	let squared_value = with comply "C" be square(10); # Calling C from Engenide requires complying to "C" requirement.
 	io.println("Squared value: ${squared_value}");
 };
 ```
@@ -6434,10 +6944,10 @@ class point {
 };
 
 @c_import
-fn translate_point(p1: point, p2: point) -> point;
+fn translate_point(p1: point, p2: point): point;
 
 @c_export
-fn scale_point(p: point, factor: float) -> point {
+fn scale_point(p: point, factor: float): point {
     return point(.x = p.x * factor, .y = p.y * factor);
 };
 
@@ -6446,7 +6956,7 @@ fn main() {
     let p1 = point(.x = 1.0, .y = 2.0);
     let p2 = point(.x = 3.0, .y = 4.0);
 
-    let translated_point = comply "C" translate_point(p1, p2);
+    let translated_point = with comply "C" be translate_point(p1, p2);
     io.println("Translated Point: (${translated_point.x}, ${translated_point.y})");
 
     let scaled_point = scale_point(p1, 2.0);
@@ -6509,7 +7019,7 @@ Custom pagers can be defined by implementing the `eng.memory.pager` concept.
 
 ```eng
 class my_pager: eng.memory.pager {
-    fn allocate(size: int) -> void* {
+    fn allocate(size: int): void* {
         # Custom allocation logic
     };
 
@@ -6517,7 +7027,7 @@ class my_pager: eng.memory.pager {
         # Custom deallocation logic
     };
 
-    fn reallocate(ptr: void*, new_size: int) -> void* {
+    fn reallocate(ptr: void*, new_size: int): void* {
         # Custom reallocation logic
     };
 };
@@ -6596,7 +7106,7 @@ Using dynamic invocation with member functions that take parameters and return v
 
 ```eng
 class calculator {
-    fn add(a: int, b: int) -> int {
+    fn add(a: int, b: int): int {
         return a + b;
     };
 };
@@ -6655,7 +7165,7 @@ fn main() {
 `static` keyword allows defining compile-time constants and functions that must be fully evaluated at compile-time.
 
 ```eng
-static fn factorial(n: int) -> int {
+static fn factorial(n: int): int {
     if n <= 1 {
         return 1;
     } else {
@@ -6673,7 +7183,7 @@ fn main() {
 Note: Constant functions may include side-effects, such as I/O operations, global mutation and even calling foreign C code. These side-effects are executed at compile-time when the constant function is evaluated.
 
 ```eng
-static fn greet() -> string {
+static fn greet(): string {
     io.print("Enter your name: ");
     let name = io.scanln();
     io.println("Hello, ${name} from compile-time!");
@@ -6701,7 +7211,7 @@ Note: If compile-time evaluation fails, it results in a compile-time error.
 Using `pure` and `static` together allows defining functions that are both pure and compile-time evaluable for guarantees that no side-effects occur in those functions.
 
 ```eng
-pure static fn square(n: int) -> int {
+pure static fn square(n: int): int {
     return n * n;
 };
 ```
@@ -6709,7 +7219,7 @@ pure static fn square(n: int) -> int {
 All entities code may be evaluated at compile-time regardless of whether they are marked `static` or not. To ensure an entity is not evaluated at compile-time, it can be marked with `dynamic` keyword.
 
 ```eng
-dynamic fn get_current_time() -> string {
+dynamic fn get_current_time(): string {
     return time.now().to_string();
 };
 
@@ -7029,12 +7539,12 @@ Plugin system is under development and will be documented in future versions.
 @java_import
 class MyJavaClass {
     let myJavaField: int;
-    fn myJavaMethod(param: int) -> int;
+    fn myJavaMethod(param: int): int;
 };
 
 fn main() {
-    let java_instance = comply "Java" MyJavaClass();
-    let result = comply "Java" java_instance.myJavaMethod(42);
+    let java_instance = with comply "Java" be MyJavaClass();
+    let result = with comply "Java" be java_instance.myJavaMethod(42);
     io.println("Result from Java: ${result}");
 };
 ```
@@ -7066,7 +7576,7 @@ public class Main {
 class my_eng_class {
     let my_eng_member_variable: int;
 
-    fn my_eng_member_function(param: int) -> int {
+    fn my_eng_member_function(param: int): int {
         return param + my_eng_member_variable;
     };
 };
@@ -7139,7 +7649,7 @@ fn main() {
 ```eng
 import io: eng.std.io;
 
-fn factorial(n: int) -> int {
+fn factorial(n: int): int {
     if n <= 1 {
         return 1;
     } else {
@@ -7162,7 +7672,7 @@ Note: consider using `num!` (factorial operator).
 import io: eng.std.io;
 import math: eng.std.math;
 
-fn is_prime(n: int) -> bool {
+fn is_prime(n: int): bool {
     if n <= 1 {
         return false;
     }
@@ -7193,9 +7703,8 @@ Note: consider using `math.is_prime`.
 ```eng
 import io: eng.std.io;
 
-fn is_palindrome(s: string) -> bool {
-    let reversed = s.reverse();
-    return s == reversed;
+fn is_palindrome(s: string): bool {
+    return s == s[::-1];
 };
 
 fn main() {
@@ -7214,7 +7723,7 @@ fn main() {
 import io: eng.std.io;
 import fs: eng.std.fs;
 
-fn word_count(file_path: string) -> words: int, lines: int, characters: int {
+fn word_count(file_path: string): words: int, lines: int, characters: int {
     let content = fs.read_file(file_path);
     words = content.split(" ").count;
     lines = content.split("\n").count;
@@ -7318,7 +7827,7 @@ import io: eng.std.io;
 fn main() {
     let number = int.parse(io.scanln("Enter a number to generate its multiplication table: "));
 
-    for let i in 1:10 {
+    for let i in 1:11 {
         io.println("$number x $i = ${number * i}");
     }
 };
@@ -7329,7 +7838,7 @@ fn main() {
 ```eng
 import io: eng.std.io;
 
-fn gcd(a: int, b: int) -> int {
+fn gcd(a: int, b: int): int {
     if b == 0 {
         return a;
     } else {
@@ -7337,7 +7846,7 @@ fn gcd(a: int, b: int) -> int {
     }
 };
 
-fn lcm(a: int, b: int) -> int {
+fn lcm(a: int, b: int): int {
     return a * b / gcd(a, b);
 };
 
@@ -7358,7 +7867,7 @@ Note: consider using `math.gcd` and `math.lcm`.
 ```eng
 import io: eng.std.io;
 
-fn is_valid_password(password: string) -> has_upper: bool, has_lower: bool, has_digit: bool, has_special: bool, is_valid: bool {
+fn is_valid_password(password: string): has_upper: bool, has_lower: bool, has_digit: bool, has_special: bool, is_valid: bool {
     if password.length < 8 {
         return; # All false by default
     }
@@ -7373,7 +7882,7 @@ fn is_valid_password(password: string) -> has_upper: bool, has_lower: bool, has_
 
 fn main() {
     let password = io.scanln("Enter a password to validate: ");
-    let (has_upper, has_lower, has_digit, has_special, is_valid) = is_valid_password(password);
+    let (...) = is_valid_password(password);
 
     if is_valid {
         io.println("Password is valid.");
@@ -7400,7 +7909,7 @@ fn main() {
 ```eng
 import io: eng.std.io;
 
-fn bubble_sort(arr: int[]) -> int[] {
+fn bubble_sort(arr: int[]): int[] {
     let n = arr.count;
     for (let i in 0:(n - 1), let j in 0:(n - i - 1)) {
         if arr[j] > arr[j + 1] {
@@ -7410,7 +7919,7 @@ fn bubble_sort(arr: int[]) -> int[] {
     return arr;
 };
 
-fn insertion_sort(arr: int[]) -> int[] {
+fn insertion_sort(arr: int[]): int[] {
     let n = arr.count;
     for let i in 1:n {
         let key = arr[i];
@@ -7425,19 +7934,39 @@ fn insertion_sort(arr: int[]) -> int[] {
     return arr;
 };
 
-fn merge_sort(arr: int[]) -> int[] {
+fn merge_sort(arr: int[]): int[] {
+    fn merge(left: int[], right: int[]): int[] {
+        let result = [];
+        let i, j = 0;
+
+        while i < left.count && j < right.count {
+            if left[i] < right[j] {
+                result.insert_back(left[i]);
+                i += 1;
+            } else {
+                result.insert_back(right[j]);
+                j += 1;
+            }
+        }
+
+        result.insert_back(left[i:]);
+        result.insert_back(right[j:]);
+
+        return result;
+    };
+
     if arr.count <= 1 {
         return arr;
     }
 
     let mid = arr.count / 2;
-    let left = merge_sort(arr[0:mid]);
-    let right = merge_sort(arr[mid:arr.count]);
+    let left = merge_sort(arr[:mid]);
+    let right = merge_sort(arr[mid:]);
 
-    return left + right;
+    return merge(left, right);
 };
 
-fn quick_sort(arr: int[]) -> int[] {
+fn quick_sort(arr: int[]): int[] {
     if arr.count <= 1 {
         return arr;
     }
@@ -7450,7 +7979,7 @@ fn quick_sort(arr: int[]) -> int[] {
     return quick_sort(left) + middle + quick_sort(right);
 };
 
-fn heap_sort(arr: int[]) -> int[] {
+fn heap_sort(arr: int[]): int[] {
     fn heapify(arr: int[], n: int, i: int) {
         let largest = i;
         let left = 2 * i + 1;
@@ -7469,10 +7998,10 @@ fn heap_sort(arr: int[]) -> int[] {
     };
 
     let n = arr.count;
-    for let i in (n / 2 - 1):-1:0 {
+    for let i in (n / 2 - 1):-1:-1 {
         heapify(arr, n, i);
     }
-    for let i in (n - 1):-1:1 {
+    for let i in (n - 1):0:-1 {
         (arr[0], arr[i]) = (arr[i], arr[0]);
         heapify(arr, i, 0);
     }
@@ -7508,7 +8037,7 @@ Note: consider using `arr.sort()`.
 ```eng
 import io: eng.std.io;
 
-fn linear_search(arr: int[], target: int) -> int? {
+fn linear_search(arr: int[], target: int): int? {
     for let i in 0:arr.count {
         if arr[i] == target {
             return i;
@@ -7518,7 +8047,7 @@ fn linear_search(arr: int[], target: int) -> int? {
 };
 
 # Note: Binary search requires a sorted array
-fn binary_search(arr: int[], target: int) -> int? {
+fn binary_search(arr: int[], target: int): int? {
     let (left, right) = (0, arr.count - 1);
 
     while left <= right {
@@ -7574,7 +8103,7 @@ enum winner {
     tie;
 };
 
-fn determine_winner(player1: choice, player2: choice) -> winner {
+fn determine_winner(player1: choice, player2: choice): winner {
     if player1 == player2 {
         return winner.tie;
     }
@@ -7617,7 +8146,7 @@ import fs: eng.std.fs;
 
 fn main() {
     io.println("Simple File Manager");
-    while true {
+    while {
         let command = io.scanln("fm> ");
         let parts = command.split(" ");
 
@@ -7692,7 +8221,7 @@ fn main() {
 import io: eng.std.io;
 
 fn main() {
-    for let i in 1:100 {
+    for let i in 1:101 {
         if i % 3 == 0 && i % 5 == 0 {
             io.println("FizzBuzz");
         } else if i % 3 == 0 {
@@ -7734,7 +8263,7 @@ fn main() {
     let frequency: int => int;
 
     for let number in numbers {
-        if frequency.contains_key(number) {
+        if number in frequency {
             frequency[number] += 1;
         } else {
             frequency.insert(number, 1);
@@ -7742,7 +8271,7 @@ fn main() {
     }
 
     io.println("Histogram:");
-    for let (number, count) in frequency.items().sort_by_key() {
+    for let (number, count) in frequency.sort_by_key() {
         io.println("$number: ${"*" * count}");
     }
 };
@@ -7757,7 +8286,7 @@ fn main() {
     let numbers = [1, 2, 2, 3, 4, 4, 5];
     let unique_numbers = [];
     for let num in numbers {
-        if !unique_numbers.contains(num) {
+        if num !in unique_numbers {
             unique_numbers += num;
         }
     }
@@ -7776,7 +8305,7 @@ import io: eng.std.io;
 class matrix {
     let rows: int;
     let cols: int;
-    let data: float[][];
+    let data: float[,];
 };
 
 fn main() {
@@ -7847,7 +8376,7 @@ fn main() {
 import io: eng.std.io;
 import fs: eng.std.fs;
 
-fn calculate_directory_size(path: string) -> int {
+fn calculate_directory_size(path: string): int {
     let total_size = 0;
 
     let entries = fs.list_directory(path);
@@ -7874,15 +8403,13 @@ fn main() {
 
 ```eng
 import io: eng.std.io;
+import aops: eng.std.array_ops;
 
-fn caesar_cipher(text: string, shift: int) -> string {
-    return text.map(): (with: char if !x.is_alpha() {
-        be x;
-    } else if x.is_upper() {
-        be (x - 'A' + shift) % 26 + 'A';
-    } else {
-        be (x - 'a' + shift) % 26 + 'a';
-    });
+fn caesar_cipher(text: string, shift: int): string {
+    let alphabets = string.ascii_lowercase;
+    let shifted = alphabets[shift %% 26:] + alphabets[:shift %% 26];
+    let replacements: char => char = aops.zip(alphabets + alphabets.to_upper(), shifted + shifted.to_upper());
+    return text.replace(replacements);
 };
 
 fn main() {
@@ -7899,7 +8426,7 @@ fn main() {
 ```eng
 import io: eng.std.io;
 
-fn is_valid_sudoku(board: int[9][9]) -> bool {
+fn is_valid_sudoku(board: int[9][9]): bool {
     let rows: int => int{};
     let cols: int => int{};
     let boxes: int => int{};
@@ -7909,16 +8436,17 @@ fn is_valid_sudoku(board: int[9][9]) -> bool {
         if num != 0 {
             let box_index = (i / 3) * 3 + (j / 3);
 
-            if !rows.contains_key(i) { rows.insert(i, int{}); }
-            if !cols.contains_key(j) { cols.insert(j, int{}); }
-            if !boxes.contains_key(box_index) { boxes.insert(box_index, int{}); }
+            rows.insert_cond(i, int{});
+            cols.insert_cond(j, int{});
+            boxes.insert_cond(box_index, int{});
 
-            if rows[i].contains(num) || cols[j].contains(num) || boxes[box_index].contains(num) {
+            if num in rows[i] || num in cols[j] || num in boxes[box_index] {
                 return false;
             }
-            rows[i].insert(num);
-            cols[j].insert(num);
-            boxes[box_index].insert(num);
+
+            rows[i] += num;
+            cols[j] += num;
+            boxes[box_index] += num;
         }
     }
 
@@ -7951,15 +8479,15 @@ fn main() {
 ```eng
 import io: eng.std.io;
 
-fn a_star(start: (int, int), goal: (int, int), grid: bool[][]) -> (int, int)[]? {
+fn a_star(start: (int, int), goal: (int, int), grid: bool[,]): (int, int)[]? {
     let rows = grid.count;
     let cols = grid[0].count;
 
-    fn heuristic(a: (int, int), b: (int, int)) -> int {
+    fn heuristic(a: (int, int), b: (int, int)): int {
         return |a[0] - b[0]| + |a[1] - b[1]|;
     };
 
-    fn neighbors(pos: (int, int)) -> (int, int)[] {
+    fn neighbors(pos: (int, int)): (int, int)[] {
         return [
             with for let (dr, dc) in [(-1, 0), (1, 0), (0, -1), (0, 1)] {
                 if 0 <= pos[0] + dr < rows && 0 <= pos[1] + dc < cols && grid[pos[0] + dr][pos[1] + dc] {
@@ -7976,7 +8504,7 @@ fn a_star(start: (int, int), goal: (int, int), grid: bool[][]) -> (int, int)[]? 
     let g_score: (int, int) => int = { start: 0 };
 
     while open_set.count > 0 {
-        let _, current = open_set.pop_min_by(): {
+        let _, current = open_set.pop_min_by(): fn {
             let (f_score, _) in x;
             return f_score;
         };
@@ -7985,7 +8513,7 @@ fn a_star(start: (int, int), goal: (int, int), grid: bool[][]) -> (int, int)[]? 
             cont;
         }
 
-        closed_set.insert(current);
+        closed_set += current;
 
         if current == goal {
             let path: (int, int)[] = [];
@@ -7994,7 +8522,7 @@ fn a_star(start: (int, int), goal: (int, int), grid: bool[][]) -> (int, int)[]? 
                 current = came_from[current];
             }
             path += start;
-            return path.reverse();
+            return path[::-1];
         }
 
         for let neighbor in neighbors(current) {
@@ -8004,7 +8532,7 @@ fn a_star(start: (int, int), goal: (int, int), grid: bool[][]) -> (int, int)[]? 
                 came_from[neighbor] = current;
                 g_score[neighbor] = tentative_g;
                 let f_score = tentative_g + heuristic(neighbor, goal);
-                open_set.insert((f_score, neighbor));
+                open_set += (f_score, neighbor);
             }
         }
     }
@@ -8065,11 +8593,11 @@ class binary_op_node: ast {
     let right: ast%;
 };
 
-fn lex(expr: string) -> token[] {
+fn lex(expr: string): token[] {
     let tokens: token[] = [];
     let i = 0;
 
-    fn peek() -> char? {
+    fn peek(): char? {
         if i < expr.length {
             be expr[i];
         } else {
@@ -8120,7 +8648,7 @@ fn lex(expr: string) -> token[] {
     return tokens;
 };
 
-fn parse_term(tokens: token[], pos: int) -> ast%, int {
+fn parse_term(tokens: token[], pos: int): ast%, int {
     let token = tokens[pos];
     if token.type == token.token_type.number {
         return number_node(token.value?!), pos + 1;
@@ -8136,7 +8664,7 @@ fn parse_term(tokens: token[], pos: int) -> ast%, int {
     }
 };
 
-fn parse_factor(tokens: token[], pos: int) -> ast%, int {
+fn parse_factor(tokens: token[], pos: int): ast%, int {
     let (left, new_pos) = parse_term(tokens, pos);
     let current_pos = new_pos;
 
@@ -8150,7 +8678,7 @@ fn parse_factor(tokens: token[], pos: int) -> ast%, int {
     return left, current_pos;
 };
 
-fn parse_expression(tokens: token[], pos: int) -> ast%, int {
+fn parse_expression(tokens: token[], pos: int): ast%, int {
     let (left, new_pos) = parse_factor(tokens, pos);
     let current_pos = new_pos;
 
@@ -8164,12 +8692,12 @@ fn parse_expression(tokens: token[], pos: int) -> ast%, int {
     return left, current_pos;
 };
 
-fn parse(tokens: token[]) -> ast% {
+fn parse(tokens: token[]): ast% {
     let (node, _) = parse_expression(tokens, 0);
     return node;
 };
 
-fn evaluate(node: ast%) -> float {
+fn evaluate(node: ast%): float {
     if node is number_node {
         return (node as number_node).value;
     } else if node is binary_op_node {
@@ -8192,7 +8720,7 @@ fn evaluate(node: ast%) -> float {
 fn main() {
     io.println("Welcome to the Expression Evaluator!");
     io.println("Enter an expression to evaluate or 'exit' to quit.");
-    while true {
+    while {
         let input = io.scanln(">> ");
         if input == "exit" {
             break;
@@ -8212,11 +8740,11 @@ fn main() {
 import io: eng.std.io;
 import rand: eng.std.rand;
 
-fn generate_password(length: int) -> string {
-    let lower = "abcdefghijklmnopqrstuvwxyz";
-    let upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    let digit = "0123456789";
-    let special = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
+fn generate_password(length: int): string {
+    let lower = string.ascii_lowercase;
+    let upper = string.ascii_uppercase;
+    let digit = string.ascii_digits;
+    let special = string.ascii_printable - string.ascii_lowercase - string.ascii_uppercase - string.ascii_digits - string.ascii_whitespace;
 
     let proportions = [
         rand.uniform_float(),
@@ -8233,10 +8761,10 @@ fn generate_password(length: int) -> string {
     ];
 
     let counts: int[] = [
-        min(proportions[0] * length, 1),
-        min(proportions[1] * length, 1),
-        min(proportions[2] * length, 1),
-        min(proportions[3] * length, 1),
+        max(proportions[0] * length, 1),
+        max(proportions[1] * length, 1),
+        max(proportions[2] * length, 1),
+        max(proportions[3] * length, 1),
     ];
 
     let lowers = rand.sample_multiple(lower, counts[0]);
@@ -8291,7 +8819,7 @@ class library {
         members += new_member;
     };
 
-    fn borrow_book(member_name: string, book_title: string) -> bool {
+    fn borrow_book(member_name: string, book_title: string): bool {
         let member = members.find(): (x.name == member_name);
         let book = books.find(): (x.title == book_title && !x.is_borrowed);
 
@@ -8303,7 +8831,7 @@ class library {
         return false;
     };
 
-    fn return_book(member_name: string, book_title: string) -> bool {
+    fn return_book(member_name: string, book_title: string): bool {
         let member = members.find(): (x.name == member_name);
         let book = member?.borrowed_books.find(): (x.title == book_title);
 
@@ -8346,15 +8874,13 @@ fn main() {
 import io: eng.std.io;
 
 class shape {
-    virt fn area() -> float {
-        return 0.0;
-    };
+    virt fn area(): float;
 };
 
 class circle: shape {
     let radius: float;
 
-    orid fn area() -> float {
+    orid fn area(): float {
         return 3.14159 * radius * radius;
     };
 };
@@ -8363,7 +8889,7 @@ class rectangle: shape {
     let width: float;
     let height: float;
 
-    orid fn area() -> float {
+    orid fn area(): float {
         return width * height;
     };
 };
@@ -8372,7 +8898,7 @@ class triangle: shape {
     let base: float;
     let height: float;
 
-    orid fn area() -> float {
+    orid fn area(): float {
         return 0.5 * base * height;
     };
 };
@@ -8398,27 +8924,27 @@ import io: eng.std.io;
 class bank_account {
     let account_number: string;
     let owner: string;
-    priv let _balance: float = 0.0;
+    priv let bal: decimal = 0.0;
 
-    let balance: prop: float {
+    let balance: prop: decimal {
         get {
-            return _balance;
+            return bal;
         };
     };
 
-    fn deposit(amount: float) {
+    fn deposit(amount: decimal) {
         if amount > 0.0 {
-            _balance += amount;
-            io.println("Deposited: $amount. New balance: $_balance");
+            bal += amount;
+            io.println("Deposited: $amount. New balance: $bal");
         } else {
             io.println("Deposit amount must be positive.");
         }
     };
 
-    fn withdraw(amount: float) {
-        if amount > 0.0 && amount <= _balance {
-            _balance -= amount;
-            io.println("Withdrew: $amount. New balance: $_balance");
+    fn withdraw(amount: decimal) {
+        if amount > 0.0 && amount <= bal {
+            bal -= amount;
+            io.println("Withdrew: $amount. New balance: $bal");
         } else {
             io.println("Insufficient funds or invalid amount.");
         }
@@ -8479,7 +9005,7 @@ class server_config {
     let timeout: int;
 };
 
-fn load_server_config(file_path: string, error: fn (message: string) -> void, warning: fn (message: string) -> void, info: fn (message: string) -> void) -> server_config? {
+fn load_server_config(file_path: string, error: fn (message: string): void, warning: fn (message: string): void, info: fn (message: string): void): server_config? {
     try {
         let content = fs.read_file(file_path);
         let lines = content.split("\n");
@@ -8595,7 +9121,7 @@ fn broadcast_message(message: string, sender: net.tcp_socket) {
 };
 
 fn handle_client(client: net.tcp_socket) {
-    while true {
+    while {
         let message = client.scanln();
         if message == null {
             io.println("Client disconnected.");
@@ -8611,7 +9137,7 @@ fn main() {
     let server = net.tcp_listener(8080);
     io.println("Chat server started on port 8080.");
 
-    while true {
+    while {
         let client = server.accept();
         io.println("New client connected.");
         clients_mutex: fn { clients += client; };
@@ -8630,7 +9156,7 @@ fn main() {
     io.println("Connected to chat server.");
 
     fork {
-        while true {
+        while {
             let message = client.scanln();
             if message == null {
                 io.println("Disconnected from server.");
@@ -8640,7 +9166,7 @@ fn main() {
         }
     };
 
-    while true {
+    while {
         let user_input = io.scanln();
         if user_input == "exit" {
             io.println("Exiting chat.");
@@ -8674,7 +9200,7 @@ class game {
     let players: player[2];
     let current_turn: int = 0;
 
-    fn display_board() -> string {
+    fn display_board(): string {
         let display = "";
         for let row in board {
             for let cell in row {
@@ -8689,11 +9215,11 @@ class game {
         return display;
     };
 
-    fn get_current_player() -> player {
+    fn get_current_player(): player {
         return players[current_turn];
     };
 
-    fn make_move(row: int, col: int) -> bool {
+    fn make_move(row: int, col: int): bool {
         if board[row][col] == cell.empty {
             board[row][col] = players[current_turn].symbol;
             current_turn = (current_turn + 1) % 2;
@@ -8702,7 +9228,7 @@ class game {
         return false;
     };
 
-    fn check_winner() -> player_id: int, is_draw: bool {
+    fn check_winner(): player_id: int, is_draw: bool {
         player_id = -1;
 
         for let i in 0:3 {
@@ -8756,7 +9282,7 @@ fn main() {
         player(player_2_socket, cell.o),
     ];
 
-    while true {
+    while {
         let current_player = game_instance.get_current_player();
 
         if current_player.socket.is_closed() {
@@ -8822,7 +9348,7 @@ fn main() {
     io.println("Connected to Tic-Tac-Toe server.");
 
     fork {
-        while true {
+        while {
             let message = client.scanln();
             if message == null {
                 io.println("Disconnected from server.");
@@ -8832,7 +9358,7 @@ fn main() {
         }
     };
 
-    while true {
+    while {
         let user_input = io.scanln();
         if user_input == "exit" {
             io.println("Exiting game.");
@@ -8852,12 +9378,12 @@ fn print_grid(grid: bool[][]) {
     io.print(grid.map(): (x.map(): (with if x { be "##" } else { be "  "; }).join()).join("\n"));
 };
 
-fn get_next_generation(current: bool[][]) -> bool[][] {
+fn get_next_generation(current: bool[][]): bool[][] {
     let rows = current.count;
     let cols = current[0].count;
     let next: bool[rows][cols] = [[false] * cols] * rows;
 
-    fn count_live_neighbors(r: int, c: int) -> int {
+    fn count_live_neighbors(r: int, c: int): int {
         let count = 0;
         for (let dr in -1:2, let dc in -1:2) {
             if dr == 0 && dc == 0 {
@@ -8911,6 +9437,7 @@ fn main() {
 
 ```eng
 import io: eng.std.io;
+import aops: eng.std.array_ops;
 
 fn main() {
     # https://codeforces.com/contest/1138/problem/A
@@ -8918,10 +9445,10 @@ fn main() {
     let sushi = [1, 2, 2, 1, 2, 2, 2, 1, 1];
 
     let solution = sushi
-        -> group_by(): (x == y)
-        -> map(): (x.count)
-        -> adjacent(): min
-        -> max() * 2; # 4
+        -> aops.group_by(): (x == y)
+        -> aops.map(): (x.count)
+        -> aops.adjacent(): min
+        -> aops.max() * 2; # 4
 
     io.println("Longest contiguous segment length: $solution");
 };
@@ -8930,108 +9457,111 @@ fn main() {
 ## 29. Appendix A - List of Keywords
 
 1. `acq` - Acquiring memory ordering for atomic operations.
-2. `alive` - Checks if a thread is running.
-3. `alloc` - Allocates a memory block on the heap.
-4. `ar` - Acquiring and releasing memory ordering for atomic operations.
-5. `as` - Converts a value to a different type; Obtains a value of a variant type.
-6. `async` - Declares a function as a coroutine.
-7. `atomic` - Declares an atomic variable for lock-free shared memory access.
-8. `auto` - Infers the type of a variable or return type of a function; Defines a weakly constrained concept.
-9. `await` - Pauses execution of a coroutine until the awaited coroutine terminates.
-10. `base` - Refers to the base class instance in inheritance; Refers to a variant value in multiple inheritance.
-11. `be` - Resolves a value in a `with`-`be` block.
-12. `break` - Exits from a loop or switch statement.
-13. `case` - Defines a case in a switch statement; Substitutes the value in a matching expression.
-14. `cast` - Defines an implicit or explicit casting function.
-15. `cata` - Catalyzes a grandbase class to facilitate base classes without duplication.
-16. `catch` - Defines an exception handler block.
-17. `cease` - Cancels a coroutine; Cancels a thread.
-18. `class` - Declares a class type.
-19. `comply` - Complies to a `require` requirement.
-20. `concept` - Declares a concept for generics constraints.
-21. `cont` - Continues to the next iteration of a loop.
-22. `copy` - Explicitly copies a value; Defines a copy constructor for a class.
-23. `ctor` - Defines a constructor for a class.
-24. `cv` - Declares a conditional variable for thread synchronization.
-25. `cvn` - Notifies `n` threads waiting on a conditional variable.
-26. `cvw` - Waits on a conditional variable.
-27. `dealloc` - Deallocates a memory block from the heap.
-28. `default` - Defines a default value for a type; Specifies the default value of an enum type.
-29. `defer` - Defers execution of a block until the surrounding scope exits.
-30. `detach` - Detaches a thread, allowing it to run independently.
-31. `do` - Starts a do-while loop.
-32. `dtor` - Defines a destructor for a class.
-33. `dynamic` - Declares an entity as non-compile-time evaluable.
-34. `ego` - Refers to the current function.
-35. `else` - Defines the else block in an `if`-`else`, `while`-`else` or `for`-`else` statement; Defines a default case in a switch statement.
-36. `emit` - Emits a value in a `with`-`emit` generator expression.
-37. `enum` - Declares an enumeration type.
-38. `export` - Exports a function, class or variable or namespace.
-39. `first` - Defines a generator for first value in an enumerator member.
-40. `fn` - Declares a function.
-41. `for` - Starts a for loop.
-42. `fork` - Creates a thread to run a function parallelly.
-43. `friend` - Declares a friend function or class in a class or namespace.
-44. `get` - Defines a getter for a property.
-45. `goto` - Jumps to a label.
-46. `if` - Starts an if statement.
-47. `immut` - Declares a mutable member in a class that can only be mutated from immutable instance.
-48. `import` - Imports a function, class, variable or namespace.
-49. `impure` - Declares a function as fake pure.
-50. `in` - Checks if a value is in a collection; Iterates over elements in a for loop.
-51. `into` - Defines an explicit-only casting function.
-52. `is` - Checks if a value is of a specific type.
-53. `join` - Joins a thread, waiting for it to terminate.
-54. `label` - Declares a label for `goto` statement.
-55. `let` - Declares a variable, constant or a member.
-56. `lit` - Declares a literal typing function.
-57. `lock` - Locks a mutex for thread synchronization.
-58. `loft` - Refers to the base class type in inheritance; Refers to a variant type in multiple inheritance.
-59. `macro` - Declares a macro.
-60. `match` - Starts a match expression.
-61. `move` - Moves a value, transferring ownership; Defines a move constructor for a class.
-62. `mut` - Declares a mutable member in a class.
-63. `mutex` - Declares a mutex for thread synchronization.
-64. `next` - Defines a generator for next value in an enumerator member.
-65. `ns` - Declares a namespace.
-66. `once` - Defines a first-iteration block in a `for` or `while` loop.
-67. `onward` - Defines a subsequent-iteration block in a `for` or `while` loop.
-68. `op` - Declares an operator overload.
-69. `orid` - Overrides a virtual member function in a derived class.
-70. `pers` - Defines a personal-access (namespace-visible) member in a class.
-71. `policy` - Applies a language preset to a block. expression or entire file.
-72. `priv` - Defines a private-access (class-visible) member in a class.
-73. `probe` - Probes if a coroutine can be awaited without blocking.
-74. `prop` - Declares a property type.
-75. `prot` - Defines a protected-access (class and derived-visible) member in a class.
-76. `pub` - Defines a public-access (world-visible) member in a class.
-77. `pure` - Declares a function as side-effect-free.
-78. `realloc` - Reallocates a memory block on the heap.
-79. `rel` - Releasing memory ordering for atomic operations.
-80. `require` - Declares a requirement for `comply` statement.
-81. `retain` - Defines a static variable; Defines a static function defined in a class.
-82. `return` - Returns a value from a function.
-83. `rlx` - Relaxed memory ordering for atomic operations.
-84. `self` - Refers to the current class type in a class definition.
-85. `sem` - Declares a semaphore for thread synchronization.
-86. `semacq` - Acquiring memory ordering for semaphore operations.
-87. `semrel` - Releasing memory ordering for semaphore operations
-88. `set` - Defines a setter for a property.
-89. `seq` - Sequentially consistent memory ordering for atomic operations.
-90. `sizeof` - Obtains the size of a type in bytes.
-91. `static` - Declares a compile-time constant or function.
-92. `swap` - Swaps two values; Defines a swap constructor for a class.
-93. `switch` - Starts a switch statement.
-94. `this` - Refers to the current class instance in a class definition.
-95. `throw` - Throws an exception.
-96. `try` - Starts a try block for exception handling.
-97. `undef` - Undefines an entity.
-98. `unlock` - Unlocks a mutex for other threads to access.
-99. `virt` - Defines a virtual member function in a class.
-100. `where` - Defines arbitrary constraints in a concept definition.
-101. `while` - Starts a while loop.
-102. `with` - Starts a `with`-`be` block.
-103. `yield` - Pauses execution of a coroutine and yields a value.
+2. `alias` - Declares type alias.
+3. `alive` - Checks if a thread is running.
+4. `alloc` - Allocates a memory block on the heap.
+5. `ar` - Acquiring and releasing memory ordering for atomic operations.
+6. `as` - Converts a value to a different type; Obtains a value of a variant type.
+7. `async` - Declares a function as a coroutine.
+8. `atomic` - Declares an atomic variable for lock-free shared memory access.
+9. `auto` - Infers the type of a variable or return type of a function; Defines a weakly constrained concept.
+10. `await` - Pauses execution of a coroutine until the awaited coroutine terminates.
+11. `base` - Refers to the base class instance in inheritance; Refers to a variant value in multiple inheritance.
+12. `be` - Resolves a value in a `with`-`be` block.
+13. `break` - Exits from a loop or switch statement.
+14. `case` - Defines a case in a switch statement; Substitutes the value in a matching expression.
+15. `cast` - Defines an implicit or explicit casting function.
+16. `cata` - Catalyzes a grandbase class to facilitate base classes without duplication.
+17. `catch` - Defines an exception handler block.
+18. `cease` - Cancels a coroutine; Cancels a thread.
+19. `class` - Declares a class type.
+20. `comply` - Complies to a `require` requirement.
+21. `concept` - Declares a concept for generics constraints.
+22. `cont` - Continues to the next iteration of a loop.
+23. `copy` - Explicitly copies a value; Defines a copy constructor for a class.
+24. `ctor` - Defines a constructor for a class.
+25. `cv` - Declares a conditional variable for thread synchronization.
+26. `cvn` - Notifies `n` threads waiting on a conditional variable.
+27. `cvw` - Waits on a conditional variable.
+28. `dealloc` - Deallocates a memory block from the heap.
+29. `default` - Defines a default value for a type; Specifies the default value of an enum type.
+30. `defer` - Defers execution of a block until the surrounding scope exits.
+31. `detach` - Detaches a thread, allowing it to run independently.
+32. `do` - Starts a do-while loop.
+33. `dtor` - Defines a destructor for a class.
+34. `dynamic` - Declares an entity as non-compile-time evaluable.
+35. `ego` - Refers to the current function.
+36. `else` - Defines the else block in an `if`-`else`, `while`-`else` or `for`-`else` statement; Defines a default case in a switch statement.
+37. `emit` - Emits a value in a `with`-`emit` generator expression.
+38. `enum` - Declares an enumeration type.
+39. `export` - Exports a function, class or variable or namespace.
+40. `first` - Defines a generator for first value in an enumerator member.
+41. `fn` - Declares a function.
+42. `for` - Starts a for loop.
+43. `fork` - Creates a thread to run a function parallelly.
+44. `form` - Declares a form type.
+45. `friend` - Declares a friend function or class in a class or namespace.
+46. `get` - Defines a getter for a property.
+47. `goto` - Jumps to a label.
+48. `if` - Starts an if statement.
+49. `immut` - Declares a mutable member in a class that can only be mutated from immutable instance.
+50. `import` - Imports a function, class, variable or namespace.
+51. `impure` - Declares a function as fake pure.
+52. `in` - Checks if a value is in a collection; Iterates over elements in a for loop.
+53. `into` - Defines an explicit-only casting function.
+54. `is` - Checks if a value is of a specific type.
+55. `join` - Joins a thread, waiting for it to terminate.
+56. `label` - Declares a label for `goto` statement.
+57. `let` - Declares a variable, constant or a member.
+58. `lit` - Declares a literal typing function.
+59. `lock` - Locks a mutex for thread synchronization.
+60. `loft` - Refers to the base class type in inheritance; Refers to a variant type in multiple inheritance.
+61. `macro` - Declares a macro.
+62. `match` - Starts a match expression.
+63. `move` - Moves a value, transferring ownership; Defines a move constructor for a class.
+64. `mut` - Declares a mutable member in a class.
+65. `mutex` - Declares a mutex for thread synchronization.
+66. `next` - Defines a generator for next value in an enumerator member.
+67. `ns` - Declares a namespace.
+68. `once` - Defines a first-iteration block in a `for` or `while` loop.
+69. `onward` - Defines a subsequent-iteration block in a `for` or `while` loop.
+70. `op` - Declares an operator overload.
+71. `orid` - Overrides a virtual member function in a derived class.
+72. `pers` - Defines a personal-access (namespace-visible) member in a class.
+73. `policy` - Applies a language preset to a block. expression or entire file.
+74. `priv` - Defines a private-access (class-visible) member in a class.
+75. `probe` - Probes if a coroutine can be awaited without blocking.
+76. `prop` - Declares a property type.
+77. `prot` - Defines a protected-access (class and derived-visible) member in a class.
+78. `pub` - Defines a public-access (world-visible) member in a class.
+79. `pure` - Declares a function as side-effect-free.
+80. `range` - Defines a range index type.
+81. `realloc` - Reallocates a memory block on the heap.
+82. `rel` - Releasing memory ordering for atomic operations.
+83. `require` - Declares a requirement for `comply` statement.
+84. `retain` - Defines a static variable; Defines a static function defined in a class.
+85. `return` - Returns a value from a function.
+86. `rlx` - Relaxed memory ordering for atomic operations.
+87. `self` - Refers to the current class type in a class definition.
+88. `sem` - Declares a semaphore for thread synchronization.
+89. `semacq` - Acquiring memory ordering for semaphore operations.
+90. `semrel` - Releasing memory ordering for semaphore operations
+91. `set` - Defines a setter for a property.
+92. `seq` - Sequentially consistent memory ordering for atomic operations.
+93. `sizeof` - Obtains the size of a type in bytes.
+94. `static` - Declares a compile-time constant or function.
+95. `swap` - Swaps two values; Defines a swap constructor for a class.
+96. `switch` - Starts a switch statement.
+97. `this` - Refers to the current class instance in a class definition.
+98. `throw` - Throws an exception.
+99. `try` - Starts a try block for exception handling.
+100. `undef` - Undefines an entity.
+101. `unlock` - Unlocks a mutex for other threads to access.
+102. `virt` - Defines a virtual member function in a class.
+103. `where` - Defines arbitrary constraints in a concept definition.
+104. `while` - Starts a while loop.
+105. `with` - Starts a `with`-`be` block.
+106. `yield` - Pauses execution of a coroutine and yields a value.
 
 ## 30. Appendix B - List of Built-in Operators
 
@@ -9045,7 +9575,7 @@ These operators are ranked from highest precedence to lowest precedence (higher 
 6. `x++`, `x--`
 7. `x << y`, `x >> y`
 8. `x <<< y`, `x >>> y`
-9. `x <& y`, `x <| y`, `x >& y`, `x >| y`
+9. `x <<& y`, `x <<| y`, `x >>& y`, `x >>| y`
 10. `x ^ y`
 11. `x & y`, `x | y`
 12. `x <? y`, `x >? y`, `x <=? y`, `x >=? y`
@@ -9105,13 +9635,13 @@ Operator descriptions:
     - Rotates the bits of `x` to the left by `y` positions.
 18. `x >>> y` - Binary infix `>>>` operator (`right_rotate`) that:
     - Rotates the bits of `x` to the right by `y` positions.
-19. `x <& y` - Binary infix `<&` operator (`left_shift_zero`) that:
+19. `x <<& y` - Binary infix `<<&` operator (`left_shift_zero`) that:
     - Shifts the bits of `x` to the left by `y` positions, filling with zeros.
-20. `x <| y` - Binary infix `<|` operator (`left_shift_one`) that:
+20. `x <<| y` - Binary infix `<<|` operator (`left_shift_one`) that:
     - Shifts the bits of `x` to the left by `y` positions, filling with ones.
-21. `x >& y` - Binary infix `>&` operator (`right_shift_zero`) that:
+21. `x >>& y` - Binary infix `>>&` operator (`right_shift_zero`) that:
     - Shifts the bits of `x` to the right by `y` positions, filling with zeros.
-22. `x >| y` - Binary infix `>|` operator (`right_shift_one`) that:
+22. `x >>| y` - Binary infix `>>|` operator (`right_shift_one`) that:
     - Shifts the bits of `x` to the right by `y` positions, filling with ones.
 23. `x ^ y` - Binary infix `^` operator (`bitwise_xor`) that:
     - Performs bitwise XOR operation between `x` and `y`.
@@ -9154,11 +9684,11 @@ Operator descriptions:
 42. `x < y` - Binary infix `<` operator (`less_than`) that:
     - Checks if `x` is less than `y`.
 43. `x > y` - Binary infix `>` operator (`more_than`) that:
-    - Checks if `x` is greater than `y`.
+    - Checks if `x` is more than `y`.
 44. `x <= y` - Binary infix `<=` operator (`less_than_equals`) that:
     - Checks if `x` is less than or equal to `y`.
 45. `x >= y` - Binary infix `>=` operator (`more_than_equals`) that:
-    - Checks if `x` is greater than or equal to `y`.
+    - Checks if `x` is more than or equal to `y`.
 46. `x && y` - Binary infix `&&` operator (`logical_and`) that:
     - Performs logical AND operation between `x` and `y`.
 47. `x || y` - Binary infix `||` operator (`logical_or`) that:
@@ -9169,6 +9699,22 @@ Operator descriptions:
     - Performs placeholder pipeline operation, passing `x` to function `y` where `$` is used as placeholder.
 50. `x = y` - Binary infix `=` operator (`assignment`) that:
     - Assigns the value of `y` to `x`.
+
+### 30.1. Non-numeric Types Operators
+
+List of unique operators associated with non-numeric standard types:
+
+1. `vec2`, `vec3`, `vec4`
+    - `x <& y` - Checks if all elements in vector `x` are less than those in vector `y`.
+    - `x >& y` - Checks if all elements in vector `x` are more than those in vector `y`.
+    - `x <=& y` - Checks if all elements in vector `x` are less than or equal to those in vector `y`.
+    - `x >=& y` - Checks if all elements in vector `x` are more than or equal to those in vector `y`.
+    - `x <| y` - Checks if any element in vector `x` is less than those in vector `y`.
+    - `x >| y` - Checks if any element in vector `x` is more than those in vector `y`.
+    - `x <=| y` - Checks if any element in vector `x` is less than or equal to those in vector `y`.
+    - `x >=| y` - Checks if any element in vector `x` is more than or equal to those in vector `y`.
+    - `x ⋅ y` - Computes the dot product of vectors `x` and `y`.
+    - `x × y` - Computes the cross product of vectors `x` and `y`.
 
 ## 31. Appendix C - Language Presets
 
@@ -9299,11 +9845,11 @@ List of all the features enabled in `balanced` preset:
 4. `nesting_string_interop` - Allows nesting of string interpolation expressions within the format section of another string interpolation.
 5. `default_initialization` - Allows variables to be default-initialized if no explicit initializer is provided.
 6. `multiple_declaration` - Allows multiple declarations in a single `let` statement.
-7. `any_type` - Allows the use of `any` type.
+7. `some_type` - Allows the use of `some` type.
 8. `variant_intersection` - Allows variant intersection using `&`.
 9. `implicit_type_conversion` - Allows implicit type conversions definition and usage.
 10. `swap_semantics` - Allows swap semantics definition and usage.
-11. `untyped_array` - Allows untyped arrays (`any[]`).
+11. `untyped_array` - Allows untyped arrays (`some[]`).
 12. `automatic_map` - Allows automatically selecting between different map implementations based on key type.
 13. `automatic_set` - Allows automatically selecting between different set implementations based on element type.
 14. `operator_overloading` - Allows operator overloading definition and usage.
@@ -9353,13 +9899,12 @@ List of all the features enabled in `express` preset:
 0. All features in `friendly` preset, AND:
 1. `shadowing_declaration` - Allows variable shadowing in same scope.
 2. `loop_transfer_with_count` - Allows `cont` and `break` statements with nesting count in loops.
-3. `switch_fallthrough` - Allows fallthrough behavior in switch-case statements.
-4. `silent_try` - Allows silent `try` blocks without `catch` blocks that suppress exceptions.
-5. `label_goto` - Allows `label` and `goto` statements.
-6. `implicit_return` - Allows functions to implicitly return in a non-void. function if the last expression matches the return type.
-7. `function_overloading_by_name` - Allows function overloading resolution by name only.
-8. `impure_function` - Allows defining fake pure functions.
-9. `constructor_as_first_class_function` - Allows constructors to be treated as first-class functions.
-10. `first_class_member_function` - Allows member functions to be treated as first-class citizens.
-11. `custom_type_modifier` - Allows defining custom type modifiers.
-12. `compile_time_side_effects` - Allows side effects during compile-time evaluation.
+3. `silent_try` - Allows silent `try` blocks without `catch` blocks that suppress exceptions.
+4. `label_goto` - Allows `label` and `goto` statements.
+5. `implicit_return` - Allows functions to implicitly return in a non-void. function if the last expression matches the return type.
+6. `function_overloading_by_name` - Allows function overloading resolution by name only.
+7. `impure_function` - Allows defining fake pure functions.
+8. `constructor_as_first_class_function` - Allows constructors to be treated as first-class functions.
+9.  `first_class_member_function` - Allows member functions to be treated as first-class citizens.
+10. `custom_type_modifier` - Allows defining custom type modifiers.
+11. `compile_time_side_effects` - Allows side effects during compile-time evaluation.
