@@ -2,6 +2,18 @@
 
 This is a sketch design document for the Engenide Programming Language, not a formal specification. This does not include grammar or precise definitions. The purpose is to document my rough ideas before I forget them.
 
+## Confession <!-- omit from toc -->
+
+This is the most overengineered language design you might ever see. This programming language is the result of stacking feature ideas on top of each other with best effort to maintain consistency and interoperability with existing features. This is a language that I would personally want to use for all the projects I would make in the future. It does not mean that this is the best design for everyone. It is primarily made to fit my particular style of programming, and to solve the problems I have with existing languages. However, I also made sure to cover many usecases to allow anyone to use it with style. It does not force anyone into one particular style or principle, but rather allows everyone to use the style they want, and to even mix styles in the same codebase. It is a language that is designed around freedom of expression, and it is up to the user to use that freedom wisely.
+
+## Implementation <!-- omit from toc -->
+
+Currently, there are no Compiler or Interpreter (collectively known as Engine) for this programming language. This programming language demands high attention to implementation design, which makes it extremely difficult to program. I am slowly working on the implementation, but it will take a long time to finish. In the meantime, I will be using this document to further explore different language features and stack them further if I see fit.
+
+## Contribution <!-- omit from toc -->
+
+Don't.
+
 ## Table of Content <!-- omit from toc -->
 
 - [1. Overview](#1-overview)
@@ -17,6 +29,7 @@ This is a sketch design document for the Engenide Programming Language, not a fo
     - [2.3.1. Comment Evaluation](#231-comment-evaluation)
   - [2.4. Words](#24-words)
     - [2.4.1. Backtick Words](#241-backtick-words)
+    - [2.4.2. Raw Words](#242-raw-words)
   - [2.5. Operators](#25-operators)
   - [2.6. Punctuations](#26-punctuations)
   - [2.7. Literals](#27-literals)
@@ -33,7 +46,8 @@ This is a sketch design document for the Engenide Programming Language, not a fo
     - [2.9.1. Escape Sequence](#291-escape-sequence)
     - [2.9.2. Raw Segments](#292-raw-segments)
     - [2.9.3. Interpolation Segments](#293-interpolation-segments)
-    - [2.9.4. Implicit Concatenation](#294-implicit-concatenation)
+    - [2.9.4. Indent Segment](#294-indent-segment)
+    - [2.9.5. Implicit Concatenation](#295-implicit-concatenation)
 - [3. Variable Declaration](#3-variable-declaration)
   - [3.1. Multiple Declaration](#31-multiple-declaration)
   - [3.2. Shadowing](#32-shadowing)
@@ -46,8 +60,8 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [4.4. Character Types](#44-character-types)
   - [4.5. Boolean Types](#45-boolean-types)
   - [4.6. String](#46-string)
-  - [4.7. Some Type](#47-some-type)
-  - [4.8. Variants](#48-variants)
+  - [4.7. Variants](#47-variants)
+  - [4.8. Some Type](#48-some-type)
   - [4.9. None Type](#49-none-type)
   - [4.10. Type Hierarchy](#410-type-hierarchy)
   - [4.11. Type Conversion](#411-type-conversion)
@@ -63,10 +77,9 @@ This is a sketch design document for the Engenide Programming Language, not a fo
     - [4.13.4. Nullables](#4134-nullables)
     - [4.13.5. Reference-Counting](#4135-reference-counting)
     - [4.13.6. Moving Types](#4136-moving-types)
-    - [4.13.7. Unique Moving Types](#4137-unique-moving-types)
-    - [4.13.8. Swapping Types](#4138-swapping-types)
-    - [4.13.9. Polymorphic Types](#4139-polymorphic-types)
-    - [4.13.10. Combining Modifiers](#41310-combining-modifiers)
+    - [4.13.7. Swapping Types](#4137-swapping-types)
+    - [4.13.8. Polymorphic Types](#4138-polymorphic-types)
+    - [4.13.9. Combining Modifiers](#4139-combining-modifiers)
   - [4.14. Arrays](#414-arrays)
     - [4.14.1. Typed and Untyped](#4141-typed-and-untyped)
     - [4.14.2. Static-Sized and Dynamic-Sized](#4142-static-sized-and-dynamic-sized)
@@ -98,18 +111,19 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [5.3. `if` Statement](#53-if-statement)
   - [5.4. `while` Statement](#54-while-statement)
   - [5.5. `for` Statement](#55-for-statement)
-  - [5.6. `once` and `onward`](#56-once-and-onward)
+  - [5.6. `once`, `onward` and `atlast`](#56-once-onward-and-atlast)
   - [5.7. `break` and `cont`](#57-break-and-cont)
   - [5.8. `switch` Statement](#58-switch-statement)
   - [5.9. `match` And Pattern-Matching](#59-match-and-pattern-matching)
-  - [5.10. `throw` and `try`-`catch`](#510-throw-and-try-catch)
+  - [5.10. `throw`, `try`-`catch` and `except`](#510-throw-try-catch-and-except)
   - [5.11. `require` and `comply`](#511-require-and-comply)
-  - [5.12. `with` and `be`](#512-with-and-be)
-  - [5.13. `with` and `emit`](#513-with-and-emit)
-  - [5.14. `defer` Blocks](#514-defer-blocks)
-  - [5.15. `label` and `goto`](#515-label-and-goto)
-  - [5.16. Labeled Statements](#516-labeled-statements)
-  - [5.17. Omission](#517-omission)
+  - [5.12. `guard`](#512-guard)
+  - [5.13. `with` and `be`](#513-with-and-be)
+  - [5.14. `with` and `emit`](#514-with-and-emit)
+  - [5.15. `defer`, `defect` and `affirm` Blocks](#515-defer-defect-and-affirm-blocks)
+  - [5.16. `label` and `goto`](#516-label-and-goto)
+  - [5.17. Labeled Statements](#517-labeled-statements)
+  - [5.18. Omission](#518-omission)
 - [6. Functions](#6-functions)
   - [6.1. Multiple Returns](#61-multiple-returns)
   - [6.2. Naming Returns](#62-naming-returns)
@@ -122,6 +136,7 @@ This is a sketch design document for the Engenide Programming Language, not a fo
     - [6.7.2. Overloading with Named Parameters](#672-overloading-with-named-parameters)
     - [6.7.3. Overload Selection](#673-overload-selection)
     - [6.7.4. Dynamic Overload Dispatch](#674-dynamic-overload-dispatch)
+  - [6.8. Declaration and Implementation](#68-declaration-and-implementation)
   - [6.8. Variadic Arguments](#68-variadic-arguments)
   - [6.9. First-Class Functions](#69-first-class-functions)
   - [6.10. Anonymous Function](#610-anonymous-function)
@@ -149,18 +164,19 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [7.10. Swap Constructor](#710-swap-constructor)
   - [7.11. Access Modifiers](#711-access-modifiers)
   - [7.12. Friend Access](#712-friend-access)
-  - [7.13. Inheritance and Polymorphism](#713-inheritance-and-polymorphism)
-  - [7.14. Virtual and Override](#714-virtual-and-override)
-  - [7.15. Diamond Inheritance](#715-diamond-inheritance)
-  - [7.16. Abstract Classes](#716-abstract-classes)
-  - [7.17. Sealed Classes](#717-sealed-classes)
-  - [7.18. Retaining Instance Variables](#718-retaining-instance-variables)
-  - [7.19. Member Functions as First-Class Citizens](#719-member-functions-as-first-class-citizens)
-  - [7.20. Member Functions as Free-Standing Functions](#720-member-functions-as-free-standing-functions)
-  - [7.21. Mutable Constant Instances](#721-mutable-constant-instances)
-  - [7.22. Class Unpacking](#722-class-unpacking)
-  - [7.23. Class Destructuring](#723-class-destructuring)
-  - [7.24. Anonymous Class Declaration](#724-anonymous-class-declaration)
+  - [7.13. Breaking Access Control](#713-breaking-access-control)
+  - [7.14. Inheritance and Polymorphism](#714-inheritance-and-polymorphism)
+  - [7.15. Virtual and Override](#715-virtual-and-override)
+  - [7.16. Diamond Inheritance](#716-diamond-inheritance)
+  - [7.17. Abstract Classes](#717-abstract-classes)
+  - [7.18. Sealed Classes](#718-sealed-classes)
+  - [7.19. Retaining Instance Variables](#719-retaining-instance-variables)
+  - [7.20. Member Functions as First-Class Citizens](#720-member-functions-as-first-class-citizens)
+  - [7.21. Member Functions as Free-Standing Functions](#721-member-functions-as-free-standing-functions)
+  - [7.22. Mutable Constant Instances](#722-mutable-constant-instances)
+  - [7.23. Class Unpacking](#723-class-unpacking)
+  - [7.24. Class Reopening](#724-class-reopening)
+  - [7.25. Anonymous Class Declaration](#725-anonymous-class-declaration)
 - [8. Namespaces](#8-namespaces)
   - [8.1. Dotted Declaration](#81-dotted-declaration)
   - [8.2. Extension](#82-extension)
@@ -168,6 +184,7 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [8.4. Implicit Contents](#84-implicit-contents)
   - [8.5. Spilling Content](#85-spilling-content)
   - [8.6. Namespace Collision](#86-namespace-collision)
+  - [8.7. Global Namespace](#87-global-namespace)
 - [9. Importing and Exporting](#9-importing-and-exporting)
 - [10. Enumerators](#10-enumerators)
   - [10.1. Enums as Classes](#101-enums-as-classes)
@@ -176,16 +193,20 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [10.4. Default Value](#104-default-value)
   - [10.5. Member Generation](#105-member-generation)
   - [10.6. Member Iteration](#106-member-iteration)
+  - [10.7. Linking Enums](#107-linking-enums)
 - [11. Forms](#11-forms)
   - [11.1. Form as Classes](#111-form-as-classes)
+  - [11.2. Linking Forms and Enums](#112-linking-forms-and-enums)
 - [12. Properties](#12-properties)
   - [12.1. Properties as Class](#121-properties-as-class)
   - [12.2. Read-Only And Write-Only Properties](#122-read-only-and-write-only-properties)
 - [13. Operator Overloading](#13-operator-overloading)
   - [13.1. Operator Types](#131-operator-types)
-  - [13.2. Custom Operators](#132-custom-operators)
-  - [13.3. Auto Generation](#133-auto-generation)
-  - [13.4. Overloading with Type Conversion](#134-overloading-with-type-conversion)
+  - [13.2. Comparison and Chaining](#132-comparison-and-chaining)
+  - [13.3. Custom Operators](#133-custom-operators)
+  - [13.4. Auto Generation](#134-auto-generation)
+  - [13.5. Overloading with Type Conversion](#135-overloading-with-type-conversion)
+  - [13.6. Overloading with Type Promotion](#136-overloading-with-type-promotion)
 - [14. Literal Typing](#14-literal-typing)
 - [15. Custom Type Modifiers](#15-custom-type-modifiers)
 - [16. Macros](#16-macros)
@@ -212,12 +233,13 @@ This is a sketch design document for the Engenide Programming Language, not a fo
   - [18.12. Parallel Loops](#1812-parallel-loops)
 - [19. Generics and Concepts](#19-generics-and-concepts)
   - [19.1. Generics](#191-generics)
-  - [19.2. Generics on Namespaces](#192-generics-on-namespaces)
-  - [19.3. Concepts](#193-concepts)
-  - [19.4. Concepts on Classes](#194-concepts-on-classes)
-  - [19.5. `auto` and Constrained `auto`](#195-auto-and-constrained-auto)
-  - [19.6. Concepts as Polymorphic Interfaces](#196-concepts-as-polymorphic-interfaces)
-  - [19.7. Arbitrary Constraints](#197-arbitrary-constraints)
+  - [19.2. Implicit Generic Parameter](#192-implicit-generic-parameter)
+  - [19.3. Generics on Namespaces](#193-generics-on-namespaces)
+  - [19.4. Concepts](#194-concepts)
+  - [19.5. Concepts on Classes](#195-concepts-on-classes)
+  - [19.6. `auto` and Constrained `auto`](#196-auto-and-constrained-auto)
+  - [19.7. Concepts as Polymorphic Interfaces](#197-concepts-as-polymorphic-interfaces)
+  - [19.8. Arbitrary Constraints](#198-arbitrary-constraints)
 - [20. Array Operations](#20-array-operations)
   - [20.1. Element-wise Operations](#201-element-wise-operations)
   - [20.2. Array Pipeline](#202-array-pipeline)
@@ -227,74 +249,75 @@ This is a sketch design document for the Engenide Programming Language, not a fo
 - [21. Undefining Entities](#21-undefining-entities)
 - [22. Interoperability with C](#22-interoperability-with-c)
 - [23. Manual Memory Management](#23-manual-memory-management)
-- [24. Reflection](#24-reflection)
-  - [24.1. Type Introspection](#241-type-introspection)
-  - [24.2. Dynamic Invocation](#242-dynamic-invocation)
-  - [24.3. Reflecting Enum Types](#243-reflecting-enum-types)
-- [25. Compile-time Evaluation](#25-compile-time-evaluation)
-- [26. Tooling](#26-tooling)
-  - [26.1. Architecture](#261-architecture)
-  - [26.2. CLI Usage](#262-cli-usage)
-    - [26.2.1. Create a Project](#2621-create-a-project)
-    - [26.2.2. Build the project](#2622-build-the-project)
-    - [26.2.3. Use toolchain without a Project](#2623-use-toolchain-without-a-project)
-  - [26.3. Project Configuration](#263-project-configuration)
-    - [26.3.1. Project Metadata](#2631-project-metadata)
-    - [26.3.2. Build Targets](#2632-build-targets)
-    - [26.3.3. Dependencies](#2633-dependencies)
-    - [26.3.4. Configuring Dependencies](#2634-configuring-dependencies)
-    - [26.3.5. Packaging and Publishing](#2635-packaging-and-publishing)
-    - [26.3.6. Custom Repository](#2636-custom-repository)
-    - [26.3.7. Language Presets](#2637-language-presets)
-    - [26.3.8. Presets as Language Constructs](#2638-presets-as-language-constructs)
-- [27. Plugin System](#27-plugin-system)
-  - [27.1. Example Plugins](#271-example-plugins)
-- [28. Example Programs](#28-example-programs)
-  - [28.1. Hello World](#281-hello-world)
-  - [28.2. Fibonacci Sequence](#282-fibonacci-sequence)
-  - [28.3. Factorial Calculation](#283-factorial-calculation)
-  - [28.4. Prime Number Checker](#284-prime-number-checker)
-  - [28.5. Palindrome Checker](#285-palindrome-checker)
-  - [28.6. Word Count](#286-word-count)
-  - [28.7. Guess the Number](#287-guess-the-number)
-  - [28.8. Simple Calculator](#288-simple-calculator)
-  - [28.9. Sum and Average](#289-sum-and-average)
-  - [28.10. Multiplication Table](#2810-multiplication-table)
-  - [28.11. GCD and LCM](#2811-gcd-and-lcm)
-  - [28.12. Password Validator](#2812-password-validator)
-  - [28.13. Sorting Algorithms](#2813-sorting-algorithms)
-  - [28.14. Search Algorithms](#2814-search-algorithms)
-  - [28.15. Rock-Paper-Scissors](#2815-rock-paper-scissors)
-  - [28.16. File Manager](#2816-file-manager)
-  - [28.17. FizzBuzz](#2817-fizzbuzz)
-  - [28.18. Countdown Timer](#2818-countdown-timer)
-  - [28.19. Histogram Generator](#2819-histogram-generator)
-  - [28.20. Unique Elements](#2820-unique-elements)
-  - [28.21. Matrix Operations](#2821-matrix-operations)
-  - [28.22. CSV Address Book Reader](#2822-csv-address-book-reader)
-  - [28.23. Directory Size Calculator](#2823-directory-size-calculator)
-  - [28.24. Caesar Cipher](#2824-caesar-cipher)
-  - [28.25. Sudoku Verifier](#2825-sudoku-verifier)
-  - [28.26. Grid Pathfinding (A\* Algorithm)](#2826-grid-pathfinding-a-algorithm)
-  - [28.27. Expression Evaluator](#2827-expression-evaluator)
-  - [28.28. Random Password Generator](#2828-random-password-generator)
-  - [28.29. Book Borrowing Library](#2829-book-borrowing-library)
-  - [28.30. Shape Area Calculator](#2830-shape-area-calculator)
-  - [28.31. Bank Account Management](#2831-bank-account-management)
-  - [28.32. Logger](#2832-logger)
-  - [28.33. Chat Application](#2833-chat-application)
-  - [28.34. Two Player Tic-Tac-Toe](#2834-two-player-tic-tac-toe)
-  - [28.35. Game of Life](#2835-game-of-life)
-  - [28.36. Sushi For Two](#2836-sushi-for-two)
-- [29. Appendix A - List of Keywords](#29-appendix-a---list-of-keywords)
-- [30. Appendix B - List of Built-in Operators](#30-appendix-b---list-of-built-in-operators)
-  - [30.1. Non-numeric Types Operators](#301-non-numeric-types-operators)
-- [31. Appendix C - Language Presets](#31-appendix-c---language-presets)
-  - [31.1. `hostile` Presets Features](#311-hostile-presets-features)
-  - [31.2. `strict` Presets Features](#312-strict-presets-features)
-  - [31.3. `balanced` Presets Features](#313-balanced-presets-features)
-  - [31.4. `friendly` Presets Features](#314-friendly-presets-features)
-  - [31.5. `express` Presets Features](#315-express-presets-features)
+- [24. Lifetime and Ownership](#24-lifetime-and-ownership)
+- [25. Reflection](#25-reflection)
+  - [25.1. Type Introspection](#251-type-introspection)
+  - [25.2. Dynamic Invocation](#252-dynamic-invocation)
+  - [25.3. Reflecting Enum Types](#253-reflecting-enum-types)
+- [26. Compile-time Evaluation](#26-compile-time-evaluation)
+- [27. Tooling](#27-tooling)
+  - [27.1. Architecture](#271-architecture)
+  - [27.2. CLI Usage](#272-cli-usage)
+    - [27.2.1. Create a Project](#2721-create-a-project)
+    - [27.2.2. Build the project](#2722-build-the-project)
+    - [27.2.3. Use toolchain without a Project](#2723-use-toolchain-without-a-project)
+  - [27.3. Project Configuration](#273-project-configuration)
+    - [27.3.1. Project Metadata](#2731-project-metadata)
+    - [27.3.2. Build Targets](#2732-build-targets)
+    - [27.3.3. Dependencies](#2733-dependencies)
+    - [27.3.4. Configuring Dependencies](#2734-configuring-dependencies)
+    - [27.3.5. Packaging and Publishing](#2735-packaging-and-publishing)
+    - [27.3.6. Custom Repository](#2736-custom-repository)
+    - [27.3.7. Language Presets](#2737-language-presets)
+    - [27.3.8. Presets as Language Constructs](#2738-presets-as-language-constructs)
+- [28. Plugin System](#28-plugin-system)
+  - [28.1. Example Plugins](#281-example-plugins)
+- [29. Example Programs](#29-example-programs)
+  - [29.1. Hello World](#291-hello-world)
+  - [29.2. Fibonacci Sequence](#292-fibonacci-sequence)
+  - [29.3. Factorial Calculation](#293-factorial-calculation)
+  - [29.4. Prime Number Checker](#294-prime-number-checker)
+  - [29.5. Palindrome Checker](#295-palindrome-checker)
+  - [29.6. Word Count](#296-word-count)
+  - [29.7. Guess the Number](#297-guess-the-number)
+  - [29.8. Simple Calculator](#298-simple-calculator)
+  - [29.9. Sum and Average](#299-sum-and-average)
+  - [29.10. Multiplication Table](#2910-multiplication-table)
+  - [29.11. GCD and LCM](#2911-gcd-and-lcm)
+  - [29.12. Password Validator](#2912-password-validator)
+  - [29.13. Sorting Algorithms](#2913-sorting-algorithms)
+  - [29.14. Search Algorithms](#2914-search-algorithms)
+  - [29.15. Rock-Paper-Scissors](#2915-rock-paper-scissors)
+  - [29.16. File Manager](#2916-file-manager)
+  - [29.17. FizzBuzz](#2917-fizzbuzz)
+  - [29.18. Countdown Timer](#2918-countdown-timer)
+  - [29.19. Histogram Generator](#2919-histogram-generator)
+  - [29.20. Unique Elements](#2920-unique-elements)
+  - [29.21. Matrix Operations](#2921-matrix-operations)
+  - [29.22. CSV Address Book Reader](#2922-csv-address-book-reader)
+  - [29.23. Directory Size Calculator](#2923-directory-size-calculator)
+  - [29.24. Caesar Cipher](#2924-caesar-cipher)
+  - [29.25. Sudoku Verifier](#2925-sudoku-verifier)
+  - [29.26. Grid Pathfinding (A\* Algorithm)](#2926-grid-pathfinding-a-algorithm)
+  - [29.27. Expression Evaluator](#2927-expression-evaluator)
+  - [29.28. Random Password Generator](#2928-random-password-generator)
+  - [29.29. Book Borrowing Library](#2929-book-borrowing-library)
+  - [29.30. Shape Area Calculator](#2930-shape-area-calculator)
+  - [29.31. Bank Account Management](#2931-bank-account-management)
+  - [29.32. Logger](#2932-logger)
+  - [29.33. Chat Application](#2933-chat-application)
+  - [29.34. Two Player Tic-Tac-Toe](#2934-two-player-tic-tac-toe)
+  - [29.35. Game of Life](#2935-game-of-life)
+  - [29.36. Sushi For Two](#2936-sushi-for-two)
+- [30. Appendix A - List of Keywords](#30-appendix-a---list-of-keywords)
+- [31. Appendix B - List of Built-in Operators](#31-appendix-b---list-of-built-in-operators)
+  - [31.1. Non-numeric Types Operators](#311-non-numeric-types-operators)
+- [32. Appendix C - Language Presets](#32-appendix-c---language-presets)
+  - [32.1. `hostile` Presets Features](#321-hostile-presets-features)
+  - [32.2. `strict` Presets Features](#322-strict-presets-features)
+  - [32.3. `balanced` Presets Features](#323-balanced-presets-features)
+  - [32.4. `friendly` Presets Features](#324-friendly-presets-features)
+  - [32.5. `express` Presets Features](#325-express-presets-features)
 
 ## 1. Overview
 
@@ -302,7 +325,7 @@ This is a sketch design document for the Engenide Programming Language, not a fo
 
 Engenide is a statically-typed, RTTI-dynamics, compiled, interpreted, bytecode, omni-paradigm, fully-featured, systems-level, general-purpose, DSL-powering, versatile, flexible, customizable, configurable, adaptive programming language designed around freedom of expression. It deliberately removes arbitrary constraints to provide extensive flexibility to the language.
 
-Engenide derives a lot of its features from other languages that have solved key problems, such as C, C++, C#, Python, Rust, Java, JavaScript, TypeScript, Go, Kotlin, Vala, Zig, Swift, Scala, Dart, Haskell, OCaml, Lisp, and many, many others. It aims to bring greats of those worlds while maintaining interoperability between the features.
+Engenide derives a lot of its features from other languages that have solved key problems, such as C, C++, C#, D, Python, Rust, Java, JavaScript, TypeScript, Go, Kotlin, Vala, Zig, Swift, Scala, Dart, Haskell, OCaml, Lisp, and many, many others. It aims to bring greats of those worlds while maintaining interoperability between the features.
 
 Engenide also aims to provide flexibility and expressiveness by inventing consistent semantics where traditional programming lacks. It is useful for ease of use and developer ergonomics, and also helps eliminate arbitrary constraints.
 
@@ -458,7 +481,7 @@ This allows super quick comment-out of a block of code which alreacy contains a 
         # q is 11
         ```
 }#
-fn divide(numerator: int, denominator: int): quotient: int, remainder: int {
+except fn divide(numerator: int, denominator: int): quotient: int, remainder: int {
     if denominator == 0 {
         throw eng.std.except.invalid_argument("Denominator cannot be zero.");
     }
@@ -533,7 +556,7 @@ Errors can be treated as errors when `.strict = true` is used.
 Keywords and identifiers follow the same typing conventions:
 
 1. Case-sensitivity: Words are case-sensitive. E.g., `Hello` and `hello` are different words.
-2. Start characters: Words must start with `A`-`Z`, `a`-`z` or `_`.
+2. Start characters: Words must start with `A`-`Z`, `a`-`z`, `_`, `$`, `@`.
 3. Continuation characters: Words can continue with `A`-`Z`, `a`-`z`, `_` or `0`-`9`.
 
 Keywords are words that are reserved and have special meaning. They cannot be used as identifiers.
@@ -594,6 +617,17 @@ fn `Test whether square(2) returns 4.`() {
 fn main() {
     testing.run_tests();
 }
+```
+
+#### 2.4.2. Raw Words
+
+Starting a word with `@` allows it to be a raw word, which allows it to be the same as a keyword. This allows using keywords as identifiers for interoperability with other languages, such as C.
+
+```eng
+fn main() {
+    let @class = "This is a raw word that can be used as an identifier even though 'class' is a keyword.";
+    io.println(@class);
+};
 ```
 
 ### 2.5. Operators
@@ -827,7 +861,23 @@ Interpolated string segment can be escaped with a leading `\`.
 "This is \${not interpolated}"
 ```
 
-#### 2.9.4. Implicit Concatenation
+#### 2.9.4. Indent Segment
+
+Indent segment automatically preserves the relative indentation in the string literal. It removes the common leading whitespace from each line in the string literal, which allows writing multi-line string literals without worrying about the indentation.
+
+Indent segment starts with `@delimiter{` and ends with `}delimiter@` where delimiter is optional and can be empty.
+
+```eng
+let text = "@{
+    This is a multi-line string literal with preserved indentation.
+        This line is indented with 4 spaces.
+    This line is indented with 2 spaces.
+}@" # Results in "This is a multi-line string literal with preserved indentation.\n    This line is indented with 4 spaces.\n  This line is indented with 2 spaces.\n"
+```
+
+Note: Tabs are treated as a single character and are not converted to spaces.
+
+#### 2.9.5. Implicit Concatenation
 
 When two or more subsequent string literals are next to each other, they are implicitly concatenated into one.
 
@@ -1031,7 +1081,69 @@ for (let character in str) { # Iterate over characters
 }
 ```
 
-### 4.7. Some Type
+### 4.7. Variants
+
+Variants can be defined by combining two types. A variant holds values of the specified types.
+
+```eng
+let number: int | float = 20;
+if number is int {
+    io.println("Number is an integral value");
+} else {
+    io.println("Number is an floating-point value");
+}
+```
+
+Two variant types can be combined with set intersection operator `&` or set union operator `|`.
+
+```eng
+let value: (int | float) & (float | string); # value is of type float
+let value: (int | float) | (float | string); # value is of type int | float | string
+```
+
+Union of two class type with common member can be used to access the common member without type checking.
+
+```eng
+class type_a {
+    let x = 0;
+    let y = 0;
+    let z = 0;
+    let w = 0;
+};
+
+class type_b {
+    let x = 0;
+    let y = 0;
+};
+
+fn main() {
+    let value: type_a | type_b = type_a();
+    io.println("x: ${value.x}, y: ${value.y}"); # Access common members without type checking
+};
+```
+
+Intersection of two class type combines the class and their members into one class with both members. Common members with same type are merged into one member, while common members with different type are treated as having the type union of the two types.
+
+```eng
+class type_a {
+    let x = 0;
+    let y = 0;
+    let z = 0;
+    let w = 0;
+};
+
+class type_b {
+    let x = 0;
+    let y = 0.0; # float
+};
+
+fn main() {
+    let value: type_a & type_b = type_a(); # value is of type with members x: int, y: int | float, z: int, w: int
+    io.println("x: ${value.x}, y: ${value.y}, z: ${value.z}, w: ${value.w}");
+};
+```
+
+### 4.8. Some Type
 
 The `some` type is a type that can hold values of any data type. It dynamically stores the type information along with the value. The type can be compared dynamically to safely retrieve the value.
 
@@ -1051,26 +1163,6 @@ if (value is string) {
 if (let integer as int = value) {
     io.println("Integer: ${integer}");
 }
-```
-
-### 4.8. Variants
-
-Variants can be defined by combining two types. A variant holds values of the specified types.
-
-```eng
-let number: int | float = 20;
-if number is int {
-    io.println("Number is an integral value");
-} else {
-    io.println("Number is an floating-point value");
-}
-```
-
-Two variant types can be combined with set intersection operator `&` or set union operator `|`.
-
-```eng
-let value: (int | float) & (float | string); # value is of type float
-let value: (int | float) | (float | string); # value is of type int | float | string
 ```
 
 ### 4.9. None Type
@@ -1196,11 +1288,11 @@ class type_c {
     let value: string;
 };
 
-cast(a: type_a): type_b {
+cast (a: type_a): type_b {
     return (.value = a.value as float);
 };
 
-cast(b: type_b): type_c {
+cast (b: type_b): type_c {
     return (.value = "Value: ${b.value}");
 };
 
@@ -1247,20 +1339,44 @@ class type_c {
     let value: string;
 };
 
-promo(value: type_a): type_b {
-    return (.value = value.value as float);
+cast (a: type_a): type_b {
+    return (.value = a.value as float);
 };
 
-promo(value: type_b): type_c {
-    return (.value = "Value: ${value.value}");
+cast (b: type_b): type_c {
+    return (.value = "Value: ${b.value}");
 };
+
+cast (a: type_a): type_c {
+    return (.value = "Value: ${a.value}");
+};
+
+promo promo_type<
+    type_a: type_b,
+    type_b: type_c
+>;
 ```
 
 The graph must not form a cycle, otherwise it will result in a compile-time error.
 
 ```eng
-promo(value: type_c): type_a { # Error: Cycle detected in promotion graph
-    return (.value = int.parse(value.value));
+promo promo_type<
+    type_c: type_a # Error: Cycle detected in promotion graph
+>;
+```
+
+The promotion can then be used in functions or operators that takes the promoted type.
+
+```eng
+fn print_sum<promo_type value_type>(value_a: value_type, value_b: value_type) { # value_a and value_b are promoted to the same type if they are different
+    let sum = value_a + value_b;
+    io.println("Sum: ${sum}");
+};
+
+fn main() {
+    let a = type_a(.value = 10);
+    let b = type_b(.value = 5.5);
+    print_sum(a, b); # a is promoted to type_b, sum is of type type_b with value 15.5
 };
 ```
 
@@ -1350,13 +1466,6 @@ let b: int? = 20;
 let c: int? = null;
 ```
 
-Null type is a variant of the base type and `void` type that can only hold `null` value.
-
-```
-let a: int? = null;
-let b: int | void = null; # Same as int?
-```
-
 Accessing a nullable type that does not hold a value throws `null_access` exception.
 
 ```eng
@@ -1377,6 +1486,13 @@ if b == null {
 if c == null {
     c = 30;
 }
+```
+
+Null type is a variant of the base type and `void` type that can only hold `null` value.
+
+```
+let a: int? = null;
+let b: int | void = null; # Same as int?
 ```
 
 A not-null assertion operator `?!` is used to throw `null_access` exception if no value is present.
@@ -1454,36 +1570,7 @@ fn main() {
 };
 ```
 
-#### 4.13.7. Unique Moving Types
-
-A unique moving type ensures that there is only one reference to the value it holds at any given time. This is useful for managing resources that should not be shared, or to ensure thread-safety.
-
-```eng
-fn main() {
-    let resource: string^^ = "Unique Resource";
-
-    let another_resource = resource; # Ownership is transferred
-    # io.println("Resource: ${resource}"); # Error: resource is no longer accessible
-
-    io.println("Another Resource: ${another_resource}");
-
-    let borrowed_resource: string! & = another_resource; # Borrowing the resource as constant reference
-    io.println("Borrowed Resource: ${borrowed_resource}");
-
-    {
-        let inner_resource: string& = another_resource; # Borrowing the resource as mutable reference
-        io.println("Inner Resource before modification: ${inner_resource}");
-
-        # Cannot access another_resource while inner_resource is borrowed as mutable reference
-        # io.println("Another Resource: ${another_resource}"); # Error
-    }
-
-    # Now another_resource can be accessed again
-    io.println("Another Resource after inner scope: ${another_resource}");
-};
-```
-
-#### 4.13.8. Swapping Types
+#### 4.13.7. Swapping Types
 
 One of a cleaver way to implement efficient resource management while still keeping invariants intact is to swap the resources. Using moving type allows this pattern to be implemented easily.
 
@@ -1499,7 +1586,7 @@ fn main() {
 };
 ```
 
-#### 4.13.9. Polymorphic Types
+#### 4.13.8. Polymorphic Types
 
 A polymorphic type allows a variable to hold values of different derived types from a common base type.
 
@@ -1531,7 +1618,7 @@ fn main() {
 };
 ```
 
-#### 4.13.10. Combining Modifiers
+#### 4.13.9. Combining Modifiers
 
 Modifiers can be combined to create complex behaviors for types.
 
@@ -2210,6 +2297,8 @@ Variable assignment assigns a value to a variable.
 variable = value;
 ```
 
+Note: Overloading the `=` operator only overloads the assignment operation, not the variable initialization or copying. To customize the variable initialization, use `ctor` constructor. To customize the copying, use `copy` constructor.
+
 A compound assignment allows combining an operation with assignment.
 
 ```eng
@@ -2314,6 +2403,28 @@ if (let declaration = value; condition) {
 }
 ```
 
+The `endif` statement can be used to break the scope of nested `if` statement.
+
+```eng
+if (condition) {
+    if (other_condition) {
+        endif; # Breaks the scope of outer if statement
+    }
+}
+```
+
+The `endif` statement can optionally take an integer called nesting level to indicate the number of nested `if` statements to break.
+
+```eng
+if (condition) {
+    if (other_condition) {
+        if (another_condition) {
+            endif 2; # Breaks the scope of outermost if statement
+        }
+    }
+}
+```
+
 ### 5.4. `while` Statement
 
 `while` statement allows repeated execution based on the condition.
@@ -2394,9 +2505,17 @@ for (let element in array) {
 }
 ```
 
-### 5.6. `once` and `onward`
+And `forr` statement for reverse iteration.
 
-Inside loops, `once` executes only on the first iteration, and `onward` on all subsequent iteration.
+```eng
+forr (let element in array) {
+    # code for elements of array in reverse order
+}
+```
+
+### 5.6. `once`, `onward` and `atlast`
+
+Inside loops, `once` executes only on the first iteration. The `onward` executes on subsequent iterations, including the last iteration. The `atlast` executes after the last iteration if the loop executed at least once.
 
 ```eng
 while (condition) {
@@ -2404,25 +2523,20 @@ while (condition) {
         # code to be executed on first iteration
     }
     onward {
-        # code to be executed on subsequent iteration
+        # code to be executed on subsequent iteration (including last iteration)
+    }
+    atlast {
+        # code to be executed after last iteration if loop executed at least once
     }
 }
 ```
 
-Both can also have an `else` block attached for same semantics.
+The `once` and `atlast` block can be combined to execute code on the first and after the last iteration.
 
 ```eng
 while (condition) {
-    once {
-        # code to be executed on first iteration
-    } else {
-        # code to be executed on subsequent iteration
-    }
-
-    onward {
-        # code to be executed on subsequent iteration
-    } else {
-        # code to be executed on first iteration
+    once atlast {
+        # code to be executed on first and after last iteration if loop executed at least once
     }
 }
 ```
@@ -2442,7 +2556,7 @@ while (condition) {
 }
 ```
 
-They both can take an optional integer to indicate the number of nested loops to affect.
+They both can take an optional integer called nesting level to indicate the number of nested loops to affect.
 
 ```eng
 while (condition) {
@@ -2516,6 +2630,31 @@ switch (shape) {
 }
 ```
 
+`break` and `cont` can be used in `switch` statement as well. `break` would exit the switch statement, while `cont` fallsthrough to the next case.
+
+```eng
+switch (value) {
+    case 1 {
+        # code if value is equal to 1
+        cont; # Fallsthrough to the next case
+    }
+    case 2 {
+        # code if value is equal to 2 or value is equal to 1
+        break; # Exit the switch statement
+    }
+}
+```
+
+Multiple cases can be stacked to share the same code block.
+
+```eng
+switch (value) {
+    case 1; case 2 {
+        # code if value is equal to 1 or 2
+    }
+}
+```
+
 ### 5.9. `match` And Pattern-Matching
 
 `match` allows conditional destructuring by matching pattern.
@@ -2553,7 +2692,7 @@ switch (shape) {
 }
 ```
 
-### 5.10. `throw` and `try`-`catch`
+### 5.10. `throw`, `try`-`catch` and `except`
 
 Error handling can be done with `throw` and `try`-`catch` statement that allows throwing a value for raising an error and catching it to handle the error.
 
@@ -2602,6 +2741,23 @@ try {
 
 This allows catching different exceptions even if they are of the same type.
 
+The `except` keyword is used to mark the function as exception-throwing, which allows it to throw exceptions without needing to catch them.
+
+```eng
+except fn risky_operation() {
+    # code that may throw an error
+    throw 10;
+};
+```
+
+Note: functions that are not marked with `except` must handle all paths that can throw an exception by catching the exception.
+
+```eng
+fn main() {
+    risky_operation(); # Error: risky_operation can throw an exception but is not handled
+};
+```
+
 ### 5.11. `require` and `comply`
 
 `require` constructs are used to execute tasks that the user must explicitly comply to. It represents a contract between the entity and the user.
@@ -2648,7 +2804,18 @@ fn main() {
 };
 ```
 
-### 5.12. `with` and `be`
+### 5.12. `guard`
+
+The `guard` keyword can be used to conditionally and implicitly return the default value (or none in case of `void` function) if the condition is not met.
+
+```eng
+fn safe_div(x: int, y: int): int {
+    guard y != 0; # If y is 0, return 0 implicitly
+    return x / y;
+};
+```
+
+### 5.13. `with` and `be`
 
 All compound and control statements can be made to evaluates to a value using `be` statement. If no `be` statements are executed, the value is evaluated to the default value of the type.
 
@@ -2700,7 +2867,7 @@ let value = with {
 };
 ```
 
-### 5.13. `with` and `emit`
+### 5.14. `with` and `emit`
 
 Multiple values can be generated using `emit` statement inside `with` block that is inside an array.
 
@@ -2714,12 +2881,12 @@ let values = [
 ]; # values is [2, 4, 6, 8, 10]
 ```
 
-### 5.14. `defer` Blocks
+### 5.15. `defer`, `defect` and `affirm` Blocks
 
 `defer` block allows deferring execution of code until the surrounding scope is exited.
 
 ```eng
-fn main() {
+except fn main() {
     let file = io.open_file("data.txt");
 
     defer {
@@ -2732,7 +2899,39 @@ fn main() {
 };
 ```
 
-### 5.15. `label` and `goto`
+`defect` block allows deferring execution of code until the surrounding scope is exited with an exception.
+
+```eng
+except fn main() {
+    let file = io.open_file("data.txt");
+
+    defect {
+        io.close_file(file); # Ensures file is closed if an exception is thrown
+    };
+
+    # Do something with the file that may throw an exception
+    let content = io.read_file(file);
+    io.println(content);
+};
+```
+
+`affirm` block allows deferring execution of code until the surrounding scope is exited without an exception.
+
+```eng
+except fn main() {
+    let file = io.open_file("data.txt");
+
+    affirm {
+        io.close_file(file); # Ensures file is closed if no exception is thrown
+    };
+
+    # Do something with the file that may throw an exception
+    let content = io.read_file(file);
+    io.println(content);
+};
+```
+
+### 5.16. `label` and `goto`
 
 `label` and `goto` allows jumping to a specific point in the code within the same function.
 
@@ -2750,9 +2949,9 @@ fn main() {
 };
 ```
 
-### 5.16. Labeled Statements
+### 5.17. Labeled Statements
 
-Statements can be labeled to allow `break` and `cont` statements to target specific loops.
+Statements can be labeled to allow `endif` `break` and `cont` statements to target specific loops.
 
 ```eng
 fn main() {
@@ -2774,36 +2973,23 @@ fn main() {
 };
 ```
 
-Even `if`, `switch`, `try` and other blocks can be labeled as well, though, it is equivalent to defining a label inside the block.
+The `visit` statement can be used to jump to a label and return back to where it was called.
 
 ```eng
 fn main() {
-    let value = 10;
+    let count = 0;
 
-    label check_value if (value > 5) {
-        io.println("Value is more than 5.");
-    } else {
-        io.println("Value is 5 or less.");
+    label loop_start {
+        count++;
     }
+
+    visit loop_start;
+    visit loop_start;
+    io.println("Count: ${count}"); # Count: 2
 };
 ```
 
-Same as
-
-```eng
-fn main() {
-    let value = 10;
-
-    if (value > 5) {
-        label check_value;
-        io.println("Value is more than 5.");
-    } else {
-        io.println("Value is 5 or less.");
-    }
-};
-```
-
-### 5.17. Omission
+### 5.18. Omission
 
 Parenthesis or braces (but not both) can be omitted in all control statements to simplify raeding.
 
@@ -3160,6 +3346,24 @@ fn main() {
 
 Note: This is only possible when all the combination of possible types are covered by overloads. Otherwise, it will result in a compile-time error.
 
+### 6.8. Declaration and Implementation
+
+Functions can be declared without implementation using `decl` keyword, and implemented later using `impl` keyword. This allows private implementation of public function.
+
+`api.eng`:
+```eng
+decl fn public_function(x: int): int; # Declaration without implementation
+```
+
+`source.eng`:
+```eng
+impl fn public_function(x: int): int { # Implementation of the declared function
+    return x * 2;
+};
+```
+
+Note: The `impl` keyword is required for function implementation, even if the implementing function has the same signature and name as the declaration. Without it, it will be considered a new overload instead of the implementation of the declaration.
+
 ### 6.8. Variadic Arguments
 
 Functions can take a variable number of arguments using `...` syntax. This allows the function to accept any number of arguments of the specified type, or a mix of types. The arguments are collected into an array.
@@ -3408,6 +3612,25 @@ fn main() {
     io.println("Count: ${counter()}"); # Prints "Count: 0"
     io.println("Count: ${counter()}"); # Prints "Count: 1"
     io.println("Count: ${counter()}"); # Prints "Count: 2"
+};
+```
+
+Note: If a function is nested inside another function, the `retain` variable does not retain its value across calls to the outer function, but it does retain its value across calls to the inner function.
+
+```eng
+fn outer() {
+    fn inner() {
+        retain let count = 0;
+        return count++;
+    };
+
+    io.println("Inner Count: ${inner()}"); # Prints "Inner Count: 0"
+    io.println("Inner Count: ${inner()}"); # Prints "Inner Count: 1"
+};
+
+fn main() {
+    outer();
+    outer(); # The count is reset to 0 for the second call to outer
 };
 ```
 
@@ -3931,7 +4154,7 @@ class music {
     let music_data: int8* = nullptr;
     let music_data_size = 0;
 
-    copy(ref other_music: music) {
+    except copy(ref other_music: music) {
         music_data = copy other_music.music_data; # Memory copy with allocation
         if music_data == nullptr {
             throw runtime_error("Failed to allocate memory for music data");
@@ -4133,7 +4356,42 @@ fn print_owner(acc: account) {
 };
 ```
 
-### 7.13. Inheritance and Polymorphism
+### 7.13. Breaking Access Control
+
+Access control can be conciously broken by explicitly specifying the access modifier in the member access.
+
+```eng
+class vault {
+    priv let password: string;
+
+    prot fn check_code(phrase: string) {
+        return phrase == password;
+    };
+
+    pers fn unlock_vault() {
+        # ...
+    };
+
+    pub fn unlock(phrase: string) {
+        if (check_code(phrase)) {
+            unlock_vault();
+        }
+    };
+};
+
+fn main() {
+    let vault = vault();
+
+    # Accessing private member by breaking access control
+    vault.priv password = "1234"; # Setting password directly
+
+    if (vault.prot check_code("1234")) { # Calling protected function directly
+        vault.pers unlock_vault(); # Calling personal function directly
+    }
+};
+```
+
+### 7.14. Inheritance and Polymorphism
 
 Classes supports inheritance, including single inheritance, multi-level inheritance, multiple inheritance or hybrid of them.
 
@@ -4175,7 +4433,7 @@ class scrubber: prot painter, priv eraser {
 };
 ```
 
-### 7.14. Virtual and Override
+### 7.15. Virtual and Override
 
 Members, including functions and variable, can be declared as `virt`. Virtual members can be overriden by derived classes.
 
@@ -4224,7 +4482,7 @@ class brush: painter {
 };
 ```
 
-### 7.15. Diamond Inheritance
+### 7.16. Diamond Inheritance
 
 By default, a diamond-inheritance uses copies of members of the grandbase clase in each of the base classes of a class. It can be resolved using `base as base_type` since `base` is a value of variant of all the base classes.
 
@@ -4300,7 +4558,7 @@ fn main() {
 };
 ```
 
-### 7.16. Abstract Classes
+### 7.17. Abstract Classes
 
 Classes with virtual members without an implementation to fall back is considered an abstract class. An abstract class can still be used to create values. The virtual members are not resolved and `null`.
 
@@ -4334,7 +4592,7 @@ fn main() {
 };
 ```
 
-### 7.17. Sealed Classes
+### 7.18. Sealed Classes
 
 Classes can be declared as `seal` to prevent them from being inherited.
 
@@ -4356,7 +4614,7 @@ class derived_class: final_class { # Invalid, final_class is sealed
 };
 ```
 
-### 7.18. Retaining Instance Variables
+### 7.19. Retaining Instance Variables
 
 Instance variables can be declared `retain` to allow them to retain their value across different instances.
 
@@ -4380,7 +4638,48 @@ fn main() {
 
 They can also restrict access using `priv`, `prot` or `pers`.
 
-### 7.19. Member Functions as First-Class Citizens
+Note: using `retain` in a local variable of a function ties the value to the instance, not shared globally. To have a global shared value, use another `retain` in declaration.
+
+```eng
+class user {
+    let id: int;
+    let name: string;
+
+    fn gen_id {
+        retain let id_counter = 0;
+        id = id_counter++;
+    };
+
+    fn gen_id2 {
+        retain retain let id_counter = 0;
+        id = id_counter++;
+    };
+};
+
+fn main() {
+    let u1 = user(.name = "Alice");
+    let u2 = user(.name = "Bob");
+    let u3 = user(.name = "Charles");
+
+    u1.gen_id();
+    u2.gen_id();
+    u3.gen_id();
+
+    io.println("User: name: ${u1.name}, ID: ${u1.id}"); # Prints "User: name: Alice, ID: 0"
+    io.println("User: name: ${u2.name}, ID: ${u2.id}"); # Prints "User: name: Bob, ID: 0"
+    io.println("User: name: ${u3.name}, ID: ${u3.id}"); # Prints "User: name: Charles, ID: 0"
+
+    u1.gen_id2();
+    u2.gen_id2();
+    u3.gen_id2();
+
+    io.println("User: name: ${u1.name}, ID: ${u1.id}"); # Prints "User: name: Alice, ID: 0"
+    io.println("User: name: ${u2.name}, ID: ${u2.id}"); # Prints "User: name: Bob, ID: 1"
+    io.println("User: name: ${u3.name}, ID: ${u3.id}"); # Prints "User: name: Charles, ID: 2"
+};
+```
+
+### 7.20. Member Functions as First-Class Citizens
 
 Member functions can be treated as first-class values, meaning they can be assigned to variables, passed around, and called independently of their instances.
 
@@ -4399,7 +4698,7 @@ let add_func = calc.add;
 let result = add_func(2, 3); # Calls calc.add(2, 3)
 ```
 
-### 7.20. Member Functions as Free-Standing Functions
+### 7.21. Member Functions as Free-Standing Functions
 
 Member functions can also be used as free-standing functions, meaning they can be called with the class instance as the first argument (or passed to the `this` argument).
 
@@ -4425,7 +4724,7 @@ fn main() {
 };
 ```
 
-### 7.21. Mutable Constant Instances
+### 7.22. Mutable Constant Instances
 
 Mutable members can mutate its value even if an instance of the class is a constant.
 
@@ -4444,8 +4743,8 @@ class dataset {
         };
     };
 
-    mut let is_sum_cached = false;
-    mut let cached_sub = 0;
+    let! is_sum_cached = false;
+    let! cached_sub = 0;
 
     fn get_sum() {
         if (!is_sum_cached) {
@@ -4463,29 +4762,7 @@ fn main() {
 };
 ```
 
-You may also declare member to be mutable only when the instance is constant using `immut`.
-
-```eng
-class counter {
-    immut let count = 0;
-
-    fn increment() {
-        count++; # Invalid if instance is mutable
-    };
-};
-
-fn main() {
-    let my_counter: counter!; # Constant instance
-
-    my_counter.increment(); # Valid
-
-    let another_counter: counter; # Mutable instance
-
-    another_counter.increment(); # Invalid (cannot call this function on mutable instance)
-};
-```
-
-### 7.22. Class Unpacking
+### 7.23. Class Unpacking
 
 Accessible members of a class can be destructured into variables when using multi-variable declaration.
 
@@ -4525,24 +4802,57 @@ fn main() {
 };
 ```
 
-### 7.23. Class Destructuring
+### 7.24. Class Reopening
 
-Classes can also be destructured into variables, just like in match expression.
+Classes can be reopened to add new member functions or retaining member variables.
 
 ```eng
-class point {
-    let x: float;
-    let y: float;
+class user {
+    let id: int;
+    let name: string;
 };
 
-fn main() {
-    let p = point(.x = 10, .y = 20);
-    point(let x) = p; # Destructures p.x into variable x
-    point(let z = .y) = p; # Destructures p.y into variable z
+class user {
+    retain let id_counter = 0;
+
+    ctor(name: string) {
+        this.id = id_counter++;
+        this.name = name;
+    };
+
+    fn greet() {
+        io.println("Hello, ${name}!");
+    };
 };
 ```
 
-### 7.24. Anonymous Class Declaration
+Note that new member variables must be retaining, otherwise it will be a compilation error.
+
+Primitive types can also be reopened to add new member functions.
+
+```eng
+class int {
+    fn is_even() {
+        return this % 2 == 0;
+    };
+
+    fn is_odd() {
+        return this % 2 != 0;
+    };
+};
+
+fn main() {
+    let x = 10;
+
+    if (x.is_even()) {
+        io.println("${x} is even");
+    } else {
+        io.println("${x} is odd");
+    };
+};
+```
+
+### 7.25. Anonymous Class Declaration
 
 Classes can be used without providing a name for the class by using them anonymously in the code.
 
@@ -4726,7 +5036,7 @@ Code entities can be implicitly encapsulated into a namespace by declaring a nam
 ns components;
 
 class button { #{ ... }# }; # Actual name: components.button
-class label { #{ ... }# }; # Actual name: components.label
+class text { #{ ... }# }; # Actual name: components.text
 class tooltip { #{ ... }# }; # Actual name: components.tooltip
 ```
 
@@ -4775,6 +5085,23 @@ let int.min = -2147483648;
 fn main() {
     io.println("Max int: ${int.max}"); # Prints "Max int: 2147483647"
     io.println("Min int: ${int.min}"); # Prints "Min int: -2147483648"
+};
+```
+
+### 8.7. Global Namespace
+
+Global namespace can be accessed using `global` keyword. It is useful to access global entities that are shadowed by local entities.
+
+```eng
+let x = 10;
+
+ns local {
+    let x = 20;
+
+    fn print_x() {
+        io.println("Local x: ${x}"); # Prints "Local x: 20"
+        io.println("Global x: ${global.x}"); # Prints "Global x: 10"
+    };
 };
 ```
 
@@ -5079,6 +5406,37 @@ fn main() {
 };
 ```
 
+### 10.7. Linking Enums
+
+Linking enums to other enums allows linking variants of two or more enums together, which allows preserving guarantees about the values of the enums.
+
+```eng
+enum color_code: int {
+    red = 0xFF0000,
+    green = 0x00FF00,
+    blue = 0x0000FF;
+};
+
+enum color_name: string {
+    red = "red",
+    green = "green",
+    blue = "blue";
+};
+
+link color: color_code => color_name {
+    color_code.red => color_name.red,
+    color_code.green => color_name.green,
+    color_code.blue => color_name.blue;
+};
+
+fn main() {
+    let my_color: color = color_code.red;
+    io.println("My color: ${my_color as color_name}"); # Prints "My color: red"
+};
+```
+
+Note: Only works for both enums with unique values.
+
 ## 11. Forms
 
 Forms allow defining a type that can hold one of several different types. Forms also contains the currently active type, allowing to safely access the value without worrying about which type is currently stored.
@@ -5198,6 +5556,43 @@ fn main() {
     io.println("Circle area with multiplier: ${c.area()}");
     io.println("Rectangle area with multiplier: ${r.area()}");
     io.println("Triangle area with multiplier: ${t.area()}");
+};
+```
+
+### 11.2. Linking Forms and Enums
+
+Linking enums and forms allows linking variants of an enum to variants of a form, which allows preserving guarantees about the values of the form.
+
+```eng
+enum shape_type {
+    circle,
+    rectangle,
+    triangle;
+};
+
+form shape_value {
+    circle {
+        let radius: float;
+    },
+    rectangle {
+        let width: float;
+        let height: float;
+    },
+    triangle {
+        let base: float;
+        let height: float;
+    };
+};
+
+link shape_linked: shape_type => shape_value {
+    shape_type.circle => shape_value.circle,
+    shape_type.rectangle => shape_value.rectangle,
+    shape_type.triangle => shape_value.triangle;
+};
+
+fn main() {
+    let my_shape: shape_linked = shape_type.circle;
+    io.println("My shape's radius: ${(my_shape as shape_value.circle).radius}"); # Prints "My shape's radius: 0.0"
 };
 ```
 
@@ -5340,7 +5735,50 @@ There are 4 types of operators:
     };
     ```
 
-### 13.2. Custom Operators
+### 13.2. Comparison and Chaining
+
+Comparison operators (`<`, `>`, `<=`, `>=`, `==`, `!=`) are special infix operators that can be chained together. When chaining comparison operators, the result is true if the corresponding relation holds for every pair of the elements in the chain, considering either of the two operator bounding each pair.
+
+Mathematically, a chain $x_1, \odot_1, x_2, \odot_2, \dots, \odot_{n-1}, x_n$ evaluates to $\bigwedge_{1 \le i < j \le n} \big( (x_i ,\odot_i, x_j) \lor (x_i ,\odot_{j-1}, x_j) \big)$.
+
+Let:
+
+```eng
+let x = 5;
+let y = 10;
+let z = 15;
+```
+
+The comparison
+
+```eng
+x < y <= z
+```
+
+Is equivalent to
+
+```eng
+x < y && y <= z && (x < z || x <= z)
+```
+
+Which is equivalent to
+
+```eng
+x < y && y <= z && x <= z
+```
+
+More comparisons, their interpretation and simplified forms:
+
+```eng
+x < y < z -> (x < y) && (y < z) && (x < z || x < z) -> x < y && y < z && x < z
+x == y == z -> (x == y) && (y == z) && (x == z || x == z) -> x == y && y == z && x == z
+x != y != z -> (x != y) && (y != z) && (x != z || x != z) -> x != y && y != z && x != z
+x < y == z -> (x < y) && (y == z) && (x < z || x == z) -> x < y && y == z && x <= z
+x < y > z -> (x < y) && (y > z) && (x < z || x > z) -> x < y && y > z && x != z
+x == y == z != 1 -> (x == y) && (y == z) && (z != 1) && (x == z || x == z) && (x == -1 || x != -1) && (y == -1 || y != -1) -> x == y && y == z && z != 1
+```
+
+### 13.3. Custom Operators
 
 Defining custom operators requires specifying precedence as relative to other operator. And in case of infix operator, specifying associativity is also required. Only the valid operator symbols are allowed to be used when defining a custom operator.
 
@@ -5354,12 +5792,13 @@ operator > titration > eng.lang.op.exponentiation (a: float "^^" b: float) {
 
 This defines a custom operator `^^` that performs titration (repeated exponentiation) of first operand with second operand. This new operator is higher precedence than exponential operator `**`, and is right-associative.
 
-### 13.3. Auto Generation
+### 13.4. Auto Generation
 
 Operators are not automatically generated. Meaning, defining `<` and `==` does not automatically generate `!=`, `>=`, `>` or `<=`. To make it ease to define operators, use the `comparison` macro.
 
 ```eng
-eng.lang.gen.comparison!(): (a: float, b: float) {
+@eng.lang.gen.comparison
+fn diff(a: float, b: float) {
     return a - b;
 };
 ```
@@ -5372,7 +5811,7 @@ If the return value is equal to 0, the operators `==`, `<=` and `>=` will result
 
 If the return value is less than 0, the operators `<` and `!=` will result in truth.
 
-### 13.4. Overloading with Type Conversion
+### 13.5. Overloading with Type Conversion
 
 When implicit conversion is defined, operator overloading automatically considers the conversions when resolving overloads.
 
@@ -5400,6 +5839,35 @@ fn main() {
     let comp1 = complex(.real = 3.0, .imag = 4.0);
 
     let result = v1 + comp1; # v1 is implicitly converted to complex
+};
+```
+
+### 13.6. Overloading with Type Promotion
+
+When type promotion is defined, operator overloading automatically considers the promotions when resolving overloads.
+
+```eng
+class int_wrapper {
+    let value: int;
+};
+
+class float_wrapper {
+    let value: float;
+};
+
+promo promo_wrapper<
+    int_wrapper: float_wrapper
+>;
+
+op add<promo_wrapper wrapper>(a: wrapper "+" b: wrapper): wrapper {
+    return wrapper(.value = a.value + b.value);
+};
+
+fn main() {
+    let int_wrap = int_wrapper(.value = 10);
+    let float_wrap = float_wrapper(.value = 5.5);
+
+    let result = int_wrap + float_wrap; # int_wrap is promoted to float_wrapper, result is of type float_wrapper with value 15.5
 };
 ```
 
@@ -5453,7 +5921,7 @@ fn main() {
 Custom modifiers can be defined using the `mod` keyword. This allows defining new behaviors for types.
 
 ```eng
-mod logged<class type "/"> {
+mod logged:<typename type "/"> {
     let value: type;
 
     ctor(value: type) {
@@ -5465,7 +5933,7 @@ mod logged<class type "/"> {
         io.println("Destroying logged value: ${this.value}");
     };
 
-    copy(new_value: logged<type>) {
+    copy(new_value: logged:<type>) {
         io.println("Copying logged value: ${new_value.value}");
         this.value = new_value.value;
     };
@@ -5475,7 +5943,7 @@ mod logged<class type "/"> {
         this.value = new_value;
     };
 
-    move(new_value: logged<type> &) {
+    move(new_value: logged:<type> &) {
         io.println("Moving logged value: ${new_value.value}");
         this.value = new_value.value;
         new_value.value = type(); # Reset moved-from value
@@ -5487,7 +5955,7 @@ mod logged<class type "/"> {
         new_value = type(); # Reset moved-from value
     };
 
-    swap(other: logged<type> &) {
+    swap(other: logged:<type> &) {
         io.println("Swapping logged values: ${this.value} <-> ${other.value}");
         let temp = this.value;
         this.value = other.value;
@@ -5646,7 +6114,7 @@ class for_if_clause: eng.syn.parser {
     };
 };
 
-fn parse_zero_or_more:<class parser: eng.syn.parser>(input: eng.syn.parse_stream, parser: eng.syn.parser): parser[] {
+fn parse_zero_or_more:<typename parser: eng.syn.parser>(input: eng.syn.parse_stream, parser: eng.syn.parser): parser[] {
     let results: parser[] = [];
 
     while let result = input.parse:<parser>() {
@@ -6366,9 +6834,9 @@ fn main() {
         prom.resolve(10); # Set the value of the promise
     };
 
-    fut.then(): fn {
+    fut.then(): {
         return value * 2;
-    } .then(): fn {
+    }: {
         io.println("Chained future value: ${value}"); # Prints: Chained future value: 20
     };
 
@@ -6388,7 +6856,7 @@ fn main() {
         prom.reject("An error occurred"); # Signal an error
     };
 
-    fut.except(): fn {
+    fut.except(): {
         io.println("Chained future encountered an error: ${err}"); # Prints: Chained future encountered an error: An error occurred
     };
 
@@ -6450,7 +6918,7 @@ fn main() {
 Generics allows defining functions, classes and other entities that can operate on different types without being tied to a specific type.
 
 ```eng
-fn my_swap:<class type>(a: type&, b: type&) {
+fn my_swap:<typename type>(a: type&, b: type&) {
     (a, b) = (b, a);
 };
 
@@ -6465,7 +6933,7 @@ fn main() {
     let str1 = "Hello";
     let str2 = "World";
 
-    my_swap:<string>(str1, str2);
+    my_swap:<.type = string>(str1, str2); # Annotate type parameter
 
     io.println("str1: ${str1}, str2: ${str2}"); # Prints: str1: World, str2: Hello
 
@@ -6480,12 +6948,64 @@ fn main() {
 };
 ```
 
-### 19.2. Generics on Namespaces
+### 19.2. Implicit Generic Parameter
+
+The `auto` keyword can be used to implicitly define generic parameters based on usage, allowing for more concise code without explicitly specifying the type.
+
+```eng
+class pair:<typename first_type, typename second_type> {
+    let first: first_type;
+    let second: second_type;
+
+    ctor(first: first_type, second: second_type) {
+        this.first = first;
+        this.second = second;
+    };
+};
+
+fn swap_pair(p: auto pair) { # first_type and second_type are implicitly defined based on the pair argument
+    (p.first, p.second) = (p.second, p.first);
+};
+
+fn main() {
+    let my_pair = pair(.first = 1, .second = "Hello");
+
+    swap_pair(my_pair);
+
+    io.println("First: ${my_pair.first}, Second: ${my_pair.second}"); # Prints: First: Hello, Second: 1
+};
+```
+
+```eng
+class pair {
+    let first: auto;
+    let second: auto;
+
+    ctor(first: auto, second: auto) {
+        this.first = first;
+        this.second = second;
+    };
+};
+
+fn swap_pair(p: auto pair) {
+    (p.first, p.second) = (p.second, p.first);
+};
+
+fn main() {
+    let my_pair = pair(.first = 1, .second = "Hello");
+
+    swap_pair(my_pair);
+
+    io.println("First: ${my_pair.first}, Second: ${my_pair.second}"); # Prints: First: Hello, Second: 1
+};
+```
+
+### 19.3. Generics on Namespaces
 
 Generics can also be applied to namespaces to create generic modules.
 
 ```eng
-ns utils:<class type> {
+ns utils:<typename type> {
     fn identity(value: type): type {
         return value;
     };
@@ -6504,7 +7024,7 @@ fn main() {
 };
 ```
 
-### 19.3. Concepts
+### 19.4. Concepts
 
 Generics can also be constrained using concepts to restrict the types that can be used with the generic entity.
 
@@ -6513,7 +7033,7 @@ concept addable {
     retain fn add(a: self, b: self): self;
 };
 
-fn sum:<class type: addable>(a: type, b: type): type {
+fn sum:<typename type: addable>(a: type, b: type): type {
     return type.add(a, b);
 };
 
@@ -6544,7 +7064,7 @@ fn main() {
 };
 ```
 
-### 19.4. Concepts on Classes
+### 19.5. Concepts on Classes
 
 Constraints can also be applied to class definitions.
 
@@ -6564,7 +7084,7 @@ class pair: comparable {
 };
 ```
 
-### 19.5. `auto` and Constrained `auto`
+### 19.6. `auto` and Constrained `auto`
 
 Use of `auto` keyword allows a concept to define a weaker constraint that can be satisfied by any type that has the required members.
 
@@ -6573,7 +7093,7 @@ concept has_length {
     fn length(): auto;
 };
 
-fn print_length:<class type: has_length>(obj: type) {
+fn print_length:<typename type: has_length>(obj: type) {
     io.println("Length: ${obj.length()}");
 };
 
@@ -6610,7 +7130,7 @@ concept numeric {
     fn add(a: self, b: self): auto (int, float);
 };
 
-fn sum:<class type: numeric>(a: type, b: type): auto (int, float) {
+fn sum:<typename type: numeric>(a: type, b: type): auto (int, float) {
     return type.add(a, b);
 };
 
@@ -6631,7 +7151,7 @@ class my_float {
 };
 ```
 
-### 19.6. Concepts as Polymorphic Interfaces
+### 19.7. Concepts as Polymorphic Interfaces
 
 Concepts can also be used outside of generics to become polymorphic interfaces.
 
@@ -6667,7 +7187,7 @@ fn main() {
 };
 ```
 
-### 19.7. Arbitrary Constraints
+### 19.8. Arbitrary Constraints
 
 Concepts can also define arbitrary constraints using `where` clause.
 
@@ -6721,39 +7241,38 @@ Array pipeline provides a way to chain multiple array operations (combinators) t
 import: eng.std.arrayops; # Global import
 
 # Sample arrays
-let nums1 =         [1, 2, 3, 4, 5];
-let nums2 =         [6, 7, 8, 9, 10];
-let nums3 =         [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5];
-let orderless =     [3, 1, 4, 5, 2];
-let duplicates =    [3, 1, 4, 3, 2, 1, 5, 4];
-let str =           "arrays!";
-let str2 =          "are cool!";
+let nums1           = [1, 2, 3, 4, 5];
+let nums2           = [6, 7, 8, 9, 10];
+let nums3           = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5];
+let orderless       = [3, 1, 4, 5, 2];
+let duplicates      = [3, 1, 4, 3, 2, 1, 5, 4];
+let str             = "arrays!";
+let str2            = "are cool!";
 
 # Basic combinators
-let mapped =        nums1 -> map(): fn (x) = x * x;            # [1, 4, 9, 16, 25]
-let filtered =      nums1 -> filter(): fn (x) = x % 2 == 0;    # [2, 4]
-let sorted =        orderless -> sort();                        # [1, 2, 3, 4, 5]
-let uniqued =       duplicates -> unique();                     # [3, 1, 4, 2, 5]
+let mapped          = nums1 -> map:($): ($1 * $1);          # [1, 4, 9, 16, 25]
+let filtered        = nums1 -> filter:($): ($1 % 2 == 0);   # [2, 4]
+let sorted          = orderless -> sort:($);                # [1, 2, 3, 4, 5]
+let uniqued         = duplicates -> unique:($);             # [3, 1, 4, 2, 5]
 
 # Advanced combinators
-let take_first_2 =  nums1 -> take_first(2);                     # [1, 2]
-let take_last_2 =   nums1 -> take_last(2);                      # [4, 5]
-let drop_first_2 =  nums1: drop_first(2);                     # [3, 4, 5]
-let drop_last_2 =   nums1: drop_last(2);                      # [1, 2, 3]
-let reduced_sum =   nums1 -> reduce(0): fn (a, b) = a + b;     # 15
-let grouped =       nums3 -> group(2):                          # [[1, 2], [2, 3], [3, 3], [4, 4], [4, 4], [5, 5], [5, 5], [5]]
-let grouped_by =    nums3 -> group_by(): fn (a, b) = a == b;   # [[1], [2, 2], [3, 3, 3], [4, 4, 4, 4], [5, 5, 5, 5, 5]]
-let flattened =     grouped_by -> flatten();                    # [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5]
-let slided =        nums1 -> slide(3);                          # [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
-let nthed =         nums1 -> nth(2);                            # [1, 3, 5]
-let zipped =        (nums1, nums2) -> zip();                    # [(1, 6), (2, 7), (3, 8), (4, 9), (5, 10)]
-let adjacented =    nums1 -> adjacent(): fn (a, b) = a * b;    # [3, 5, 7, 9]
-let enumerated =    str -> enumerate();                         # [(0, 'a'), (1, 'r'), (2, 'r'), (3, 'a'), (4, 'y'), (5, 's'), (6, '!')]
-let joined =        (str, str2) -> join(" ");                   # "arrays! are cool!"
+let take_first_2    = nums1 -> take_first:($, 2);           # [1, 2]
+let take_last_2     = nums1 -> take_last:($, 2);            # [4, 5]
+let drop_first_2    = nums1 -> drop_first:($, 2);           # [3, 4, 5]
+let drop_last_2     = nums1 -> drop_last:($, 2);            # [1, 2, 3]
+let reduced_sum     = nums1 -> reduce:($, 0): ($1 + $2);    # 15
+let grouped         = nums3 -> group:($, 2):                # [[1, 2], [2, 3], [3, 3], [4, 4], [4, 4], [5, 5], [5, 5], [5]]
+let grouped_by      = nums3 -> group_by:($): ($1 == $2);    # [[1], [2, 2], [3, 3, 3], [4, 4, 4, 4], [5, 5, 5, 5, 5]]
+let flattened       = grouped_by -> flatten:($);            # [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5]
+let slided          = nums1 -> slide:($, 3);                # [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+let nthed           = nums1 -> nth:($, 2);                  # [1, 3, 5]
+let zipped          = (nums1, nums2) -> zip:($);            # [(1, 6), (2, 7), (3, 8), (4, 9), (5, 10)]
+let adjacented      = nums1 -> adjacent:($): ($1 * $2);     # [3, 5, 7, 9]
+let enumerated      = str -> enumerate:($);                 # [(0, 'a'), (1, 'r'), (2, 'r'), (3, 'a'), (4, 'y'), (5, 's'), (6, '!')]
+let joined          = (str, str2) -> join:($1, $2, " ");    # "arrays! are cool!"
 
 # Parallel combinators
-let sqr_n_sqrt =    (nums1, nums1)
-    -> (map(): fn (x) = x * x, map(): fn (x) = math.sqrt(x)); # ([1, 4, 9, 16, 25], [1.0, 1.4142135, 1.7320508, 2.0, 2.2360679])
+let sqr_n_sqrt      = (nums1, nums1) -> (map:(): ($1 * $1), map:(): (math.sqrt($1))); # ([1, 4, 9, 16, 25], [1.0, 1.4142135, 1.7320508, 2.0, 2.2360679])
 ```
 
 Note: Several combinators can also take optional addition parameters:
@@ -6762,7 +7281,7 @@ Note: Several combinators can also take optional addition parameters:
 - `slide()` can also take `step` parameter to specify the step size between slides.
 - `nth()` can also take `offset` parameter to specify the starting index for n-th selection.
 
-These combinators are non-exhaustive. There are several other combinators such as `differ`, `indices_of`, `deltas`, `singles`, `keys` (first in pair), `values` (last in pair), etc. in the standard library. Several combinators are also parallelized for performance. They all work with lazy arrays and produce lazy arrays where applicable.
+These combinators are non-exhaustive. There are several other combinators such as `differ`, `indices_of`, `deltas`, `singles`, `keys` (first in pair), `values` (last in pair), etc. in the standard library. Several combinators are also parallelized for performance.
 
 ### 20.3. Placeholder Pipeline
 
@@ -6818,11 +7337,11 @@ op scan_left_combinator(input: bool[] "->" scan_left) {
 
 fn filter_out_html_tags(input: string): string {
     return input
-        -> map(): (x in "<>")
-        |> adjacent($, $ -> scan_left(true): (x != y)): (x || y)
+        -> map(): ($1 in "<>")
+        |> adjacent($, $ -> scan_left(true): ($1 != $2)): ($1 || $2)
         |> zip($, input)
-        -> filter(): fn (pair) = !pair[0]
-        -> map(): fn (pair) = pair[1];
+        -> filter(): (!$1[0])
+        -> map(): ($1[1]);
 };
 ```
 
@@ -7041,9 +7560,115 @@ fn main() {
 };
 ```
 
-## 24. Reflection
+## 24. Lifetime and Ownership
 
-### 24.1. Type Introspection
+Engenide supports references and pointers with ownership semantics. References are created using `&` and pointers are created using `*`. Ownership of references and pointers can be transferred using move semantics.
+
+References can be created using `addr` keyword with `type&` type. The reference can be dereferenced using `*` operator.
+
+```eng
+let x = 10;
+let ref_x: int& = addr x; # Create a reference to x
+io.println("Value through reference: ${*ref_x}"); # Dereference the reference to get the value, prints: Value through reference: 10
+```
+
+Pointers can be created using `addr` keyword with `type*` type. The pointer can be dereferenced using `*` operator.
+
+```eng
+let x = 20;
+let ptr_x: int* = addr x; # Create a pointer to x
+io.println("Value through pointer: ${*ptr_x}"); # Dereference the pointer to get the value, prints: Value through pointer: 20
+```
+
+Pointers differ from references in that they can be null pointer and borrow checking is not applied to them. References are borrow-checked and cannot be null. They also cannot be copied or moved, but can be re-assigned to refer to a different value.
+
+```eng
+let null_ptr: int* = nullptr; # Valid null pointer
+let null_ref: int& = nullptr; # Error: References cannot be nullptr
+
+let x = 30;
+let y = 40;
+let ref_x: int& = addr x;
+ref_x = addr y; # Valid, reference can be re-assigned to refer to a different value
+```
+
+The lifetime of a variable is valid from it's declaration to the last use, not end of the scope.
+
+```
+let x = 50;
+let y = x; # The lifetime of x is valid until here, so it can be used to initialize y
+io.println("y: ${y}"); # Prints: y: 50
+```
+
+The lifetimes are automatically tracked by the compiler. Manually specifying lifetimes is not possible (and not necessary).
+
+The lifetime of the resource must outlive the lifetime of any references to it. The compiler will enforce this rule and produce an error if a reference is used after the resource it refers to has been destroyed.
+
+At the end of the lifetime of a variable, its destructor is called if it has one.
+
+```eng
+class my_resource {
+    ctor {
+        io.println("Resource acquired!");
+    };
+
+    copy {
+        io.println("Resource copied!");
+    };
+
+    move {
+        io.println("Resource moved!");
+    };
+
+    swap {
+        io.println("Resource swapped!");
+    };
+
+    dtor {
+        io.println("Resource released!");
+    };
+};
+
+fn main() {
+    # Prints:
+    # - Resource acquired! (constructor called)
+    let res1 = my_resource();
+
+    # Prints:
+    # - Resource copied!
+    # - Resource released! (destructor called since last use of res1 is here)
+    let res2 = copy res1;
+
+    # Prints:
+    # - Resource moved!
+    # - Resource released! (destructor called since last use of res2 is here)
+    let res3 = move res2;
+
+    # Prints:
+    # - Resource swapped!
+    # - Resource released! (destructor called since last use of res3 is here)
+    # - Resource released! (destructor called since last use of res4 is here)
+    let res4 = swap res3;
+};
+```
+
+In case of references, the lifetime of the resource is extended till the scope exit.
+
+```eng
+fn main() {
+    let res = my_resource(); # Prints: Resource acquired!
+
+    let ref_res: my_resource& = addr res; # Create a reference to res
+
+    use_resource(*ref_res); # Prints: Resource released! (destructor called since last use of res is here)
+};
+```
+
+Note: By default, the optimizer will use move semantics if the copy construction and destruction of a variable is in the same statement. Explicitly specifying `copy` or `move` will override the optimizer's decision.
+
+## 25. Reflection
+
+### 25.1. Type Introspection
 
 Type introspection allows inspecting type information at runtime.
 
@@ -7088,7 +7713,7 @@ fn main() {
 };
 ```
 
-### 24.2. Dynamic Invocation
+### 25.2. Dynamic Invocation
 
 Dynamic invocation allows invoking member function dynamically at runtime.
 
@@ -7136,7 +7761,7 @@ fn main() {
 };
 ```
 
-### 24.3. Reflecting Enum Types
+### 25.3. Reflecting Enum Types
 
 Reflecting enum types allows inspecting enum members at runtime.
 
@@ -7160,7 +7785,7 @@ fn main() {
 };
 ```
 
-## 25. Compile-time Evaluation
+## 26. Compile-time Evaluation
 
 `static` keyword allows defining compile-time constants and functions that must be fully evaluated at compile-time.
 
@@ -7229,9 +7854,9 @@ fn main() {
 };
 ```
 
-## 26. Tooling
+## 27. Tooling
 
-### 26.1. Architecture
+### 27.1. Architecture
 
 Engenide Engine is a composition of:
 
@@ -7241,9 +7866,9 @@ Engenide Engine is a composition of:
 4. **Engenide Assembler**: Both Compiler and Interpreter (JIT mode) uses the Assembler to convert bytecode into machine-level instructions.
 5. **Engenide Evaluator**: Engenide Processor and Interpreter (Live mode) uses Evaluator to evaluate bytecode. During processing, all code that are isolated from IO are evaluated during compile-time to allow minimal bytecode size. The runtime only needs to deal with IO related code.
 
-### 26.2. CLI Usage
+### 27.2. CLI Usage
 
-#### 26.2.1. Create a Project
+#### 27.2.1. Create a Project
 
 ```
 $ eng new my-awesome-project
@@ -7289,7 +7914,7 @@ fn main() {
 };
 ```
 
-#### 26.2.2. Build the project
+#### 27.2.2. Build the project
 
 1. Using compiler:
 
@@ -7317,7 +7942,7 @@ $ eng assemble hello_world.bc -o hello_world # Compile bytecode to native
 $ eng evaluate hello_world.bc # Interpret bytecode directly
 ```
 
-#### 26.2.3. Use toolchain without a Project
+#### 27.2.3. Use toolchain without a Project
 
 1. Using compiler:
 
@@ -7339,13 +7964,13 @@ $ eng assemble hello_world.bc -o hello_world # Compile bytecode to native
 $ eng evaluate hello_world.bc # Interpret bytecode directly
 ```
 
-### 26.3. Project Configuration
+### 27.3. Project Configuration
 
 The `project.eng` file is the main and only configuration file for an Engenide project. It is a full Engenide program that uses the `eng.project` module to define the project structure, build targets, dependencies, and other configurations.
 
 Note: The `project.eng` file is executed at build time, so it can include any valid Engenide code. The entire language is available for use in the `project.eng` file, including I/O. Use with care or break all CI/CD pipelines!
 
-#### 26.3.1. Project Metadata
+#### 27.3.1. Project Metadata
 
 Project metadata includes information about the project such as name, version, description, author, license, and other relevant details.
 
@@ -7356,7 +7981,7 @@ import project: eng.project;
 project.name = "My Awesome Project";
 ```
 
-#### 26.3.2. Build Targets
+#### 27.3.2. Build Targets
 
 Build targets define the output artifacts of the project, such as executables, libraries, or modules. Each target can have its own source files, dependencies, build options, and output settings.
 
@@ -7369,7 +7994,7 @@ my_executable.standard = "eng-25";
 my_executable.entry = "main()";
 ```
 
-#### 26.3.3. Dependencies
+#### 27.3.3. Dependencies
 
 Dependencies can be added to the project to include external libraries or modules.
 
@@ -7398,7 +8023,7 @@ let local_lib = project.add_local_dependency("local_lib", "./libs/local_lib.zip"
 
 Note for custom dependency types: Path/zip must contain a valid Engenide project with `project.eng` file.
 
-#### 26.3.4. Configuring Dependencies
+#### 27.3.4. Configuring Dependencies
 
 Dependencies can be expose certain configuration options to the consumers. These options can be set in the `project.eng` file of the consumer project.
 
@@ -7417,7 +8042,7 @@ let some_library = project.add_dependency("some_library", "1.2.3");
 some_library.configure(.feature_xyz = true);
 ```
 
-#### 26.3.5. Packaging and Publishing
+#### 27.3.5. Packaging and Publishing
 
 To publish a project, the project must be packaged first.
 
@@ -7430,7 +8055,7 @@ Warning: All the source files will be included in the package by default. Propri
 
 Note: The official Engenide Package Repository is reserved for already-popular open-source projects. For other projects, using a custom package repository is recommended and encouraged.
 
-#### 26.3.6. Custom Repository
+#### 27.3.6. Custom Repository
 
 Setting up and using a custom package repository is straightforward.
 
@@ -7458,7 +8083,7 @@ $ eng publish # Publishes to https://my.custom.repo.com
 let some_library = project.add_net_dependency("some_library", "https://my.custom.repo.com/some_library/1.0.0.zip");
 ```
 
-#### 26.3.7. Language Presets
+#### 27.3.7. Language Presets
 
 Engenide supports language presets to customize the language features and behaviors. Presets can be used to enable or disable specific features, set default behaviors, and configure language settings. It is helpful for teams to maintain consistent coding styles and practices across the project.
 
@@ -7496,7 +8121,7 @@ Using custom preset:
 project.preset = my_custom_preset;
 ```
 
-#### 26.3.8. Presets as Language Constructs
+#### 27.3.8. Presets as Language Constructs
 
 Presets can be used within the code itself selectively to enable or disable certain features in specific scopes. The `policy` keyword is used to apply a preset to a specific block of code.
 
@@ -7519,7 +8144,7 @@ fn main() {
 };
 ```
 
-## 27. Plugin System
+## 28. Plugin System
 
 Engenide supports a plugin system that allows extending the language capabilities by adding custom plugins. Plugins can be used to add new features, modify existing behaviors, or integrate with external tools, libraries or other languages.
 
@@ -7531,7 +8156,7 @@ Plugins are useful where macros are insufficient, such as adding new semantics o
 
 Plugin system is under development and will be documented in future versions.
 
-### 27.1. Example Plugins
+### 28.1. Example Plugins
 
 1. **Java Interop Plugin** - A plugin that allows interoperability with JVM code, enabling calling Java methods and using Java classes from Engenide.
 
@@ -7612,9 +8237,9 @@ fn main() {
 };
 ```
 
-## 28. Example Programs
+## 29. Example Programs
 
-### 28.1. Hello World
+### 29.1. Hello World
 
 ```eng
 import io: eng.std.io;
@@ -7625,7 +8250,7 @@ fn main() {
 };
 ```
 
-### 28.2. Fibonacci Sequence
+### 29.2. Fibonacci Sequence
 
 ```eng
 import io: eng.std.io;
@@ -7644,7 +8269,7 @@ fn main() {
 };
 ```
 
-### 28.3. Factorial Calculation
+### 29.3. Factorial Calculation
 
 ```eng
 import io: eng.std.io;
@@ -7666,7 +8291,7 @@ fn main() {
 
 Note: consider using `num!` (factorial operator).
 
-### 28.4. Prime Number Checker
+### 29.4. Prime Number Checker
 
 ```eng
 import io: eng.std.io;
@@ -7698,7 +8323,7 @@ fn main() {
 
 Note: consider using `math.is_prime`.
 
-### 28.5. Palindrome Checker
+### 29.5. Palindrome Checker
 
 ```eng
 import io: eng.std.io;
@@ -7717,7 +8342,7 @@ fn main() {
 };
 ```
 
-### 28.6. Word Count
+### 29.6. Word Count
 
 ```eng
 import io: eng.std.io;
@@ -7738,7 +8363,7 @@ fn main() {
 };
 ```
 
-### 28.7. Guess the Number
+### 29.7. Guess the Number
 
 ```eng
 import io: eng.std.io;
@@ -7769,7 +8394,7 @@ fn main() {
 };
 ```
 
-### 28.8. Simple Calculator
+### 29.8. Simple Calculator
 
 ```eng
 import io: eng.std.io;
@@ -7794,7 +8419,7 @@ fn main() {
 };
 ```
 
-### 28.9. Sum and Average
+### 29.9. Sum and Average
 
 ```eng
 import io: eng.std.io;
@@ -7819,7 +8444,7 @@ fn main() {
 };
 ```
 
-### 28.10. Multiplication Table
+### 29.10. Multiplication Table
 
 ```eng
 import io: eng.std.io;
@@ -7833,7 +8458,7 @@ fn main() {
 };
 ```
 
-### 28.11. GCD and LCM
+### 29.11. GCD and LCM
 
 ```eng
 import io: eng.std.io;
@@ -7862,7 +8487,7 @@ fn main() {
 
 Note: consider using `math.gcd` and `math.lcm`.
 
-### 28.12. Password Validator
+### 29.12. Password Validator
 
 ```eng
 import io: eng.std.io;
@@ -7904,7 +8529,7 @@ fn main() {
 };
 ```
 
-### 28.13. Sorting Algorithms
+### 29.13. Sorting Algorithms
 
 ```eng
 import io: eng.std.io;
@@ -8032,7 +8657,7 @@ fn main() {
 
 Note: consider using `arr.sort()`.
 
-### 28.14. Search Algorithms
+### 29.14. Search Algorithms
 
 ```eng
 import io: eng.std.io;
@@ -8086,7 +8711,7 @@ fn main() {
 
 Note: consider using `arr.index_of(target)`.
 
-### 28.15. Rock-Paper-Scissors
+### 29.15. Rock-Paper-Scissors
 
 ```eng
 import io: eng.std.io;
@@ -8138,7 +8763,7 @@ fn main() {
 };
 ```
 
-### 28.16. File Manager
+### 29.16. File Manager
 
 ```eng
 import io: eng.std.io;
@@ -8215,7 +8840,7 @@ fn main() {
 };
 ```
 
-### 28.17. FizzBuzz
+### 29.17. FizzBuzz
 
 ```eng
 import io: eng.std.io;
@@ -8235,7 +8860,7 @@ fn main() {
 };
 ```
 
-### 28.18. Countdown Timer
+### 29.18. Countdown Timer
 
 ```eng
 import io: eng.std.io;
@@ -8253,7 +8878,7 @@ fn main() {
 };
 ```
 
-### 28.19. Histogram Generator
+### 29.19. Histogram Generator
 
 ```eng
 import io: eng.std.io;
@@ -8277,7 +8902,7 @@ fn main() {
 };
 ```
 
-### 28.20. Unique Elements
+### 29.20. Unique Elements
 
 ```eng
 import io: eng.std.io;
@@ -8297,7 +8922,7 @@ fn main() {
 
 Note: consider using `arr.unique()`.
 
-### 28.21. Matrix Operations
+### 29.21. Matrix Operations
 
 ```eng
 import io: eng.std.io;
@@ -8337,7 +8962,7 @@ fn main() {
 
 Note: consider using `math.matrix`.
 
-### 28.22. CSV Address Book Reader
+### 29.22. CSV Address Book Reader
 
 ```eng
 import io: eng.std.io;
@@ -8370,7 +8995,7 @@ fn main() {
 };
 ```
 
-### 28.23. Directory Size Calculator
+### 29.23. Directory Size Calculator
 
 ```eng
 import io: eng.std.io;
@@ -8399,7 +9024,7 @@ fn main() {
 };
 ```
 
-### 28.24. Caesar Cipher
+### 29.24. Caesar Cipher
 
 ```eng
 import io: eng.std.io;
@@ -8421,7 +9046,7 @@ fn main() {
 };
 ```
 
-### 28.25. Sudoku Verifier
+### 29.25. Sudoku Verifier
 
 ```eng
 import io: eng.std.io;
@@ -8474,7 +9099,7 @@ fn main() {
 };
 ```
 
-### 28.26. Grid Pathfinding (A* Algorithm)
+### 29.26. Grid Pathfinding (A* Algorithm)
 
 ```eng
 import io: eng.std.io;
@@ -8504,7 +9129,7 @@ fn a_star(start: (int, int), goal: (int, int), grid: bool[,]): (int, int)[]? {
     let g_score: (int, int) => int = { start: 0 };
 
     while open_set.count > 0 {
-        let _, current = open_set.pop_min_by(): fn {
+        let _, current = open_set.pop_min_by(): {
             let (f_score, _) in x;
             return f_score;
         };
@@ -8561,7 +9186,7 @@ fn main() {
 };
 ```
 
-### 28.27. Expression Evaluator
+### 29.27. Expression Evaluator
 
 ```eng
 import io: eng.std.io;
@@ -8734,7 +9359,7 @@ fn main() {
 };
 ```
 
-### 28.28. Random Password Generator
+### 29.28. Random Password Generator
 
 ```eng
 import io: eng.std.io;
@@ -8791,7 +9416,7 @@ fn main() {
 };
 ```
 
-### 28.29. Book Borrowing Library
+### 29.29. Book Borrowing Library
 
 ```eng
 import io: eng.std.io;
@@ -8820,8 +9445,8 @@ class library {
     };
 
     fn borrow_book(member_name: string, book_title: string): bool {
-        let member = members.find(): (x.name == member_name);
-        let book = books.find(): (x.title == book_title && !x.is_borrowed);
+        let member = members.find(): ($1.name == member_name);
+        let book = books.find(): ($1.title == book_title && !$1.is_borrowed);
 
         if member != null && book != null {
             book.is_borrowed = true;
@@ -8832,8 +9457,8 @@ class library {
     };
 
     fn return_book(member_name: string, book_title: string): bool {
-        let member = members.find(): (x.name == member_name);
-        let book = member?.borrowed_books.find(): (x.title == book_title);
+        let member = members.find(): ($1.name == member_name);
+        let book = member?.borrowed_books.find(): ($1.title == book_title);
 
         if member != null && book != null {
             book.is_borrowed = false;
@@ -8868,7 +9493,7 @@ fn main() {
 };
 ```
 
-### 28.30. Shape Area Calculator
+### 29.30. Shape Area Calculator
 
 ```eng
 import io: eng.std.io;
@@ -8916,7 +9541,7 @@ fn main() {
 };
 ```
 
-### 28.31. Bank Account Management
+### 29.31. Bank Account Management
 
 ```eng
 import io: eng.std.io;
@@ -8960,7 +9585,7 @@ fn main() {
 };
 ```
 
-### 28.32. Logger
+### 29.32. Logger
 
 ```eng
 import io: eng.std.io;
@@ -9102,7 +9727,7 @@ fn main() {
 };
 ```
 
-### 28.33. Chat Application
+### 29.33. Chat Application
 
 `server.eng`:
 ```eng
@@ -9177,7 +9802,7 @@ fn main() {
 };
 ```
 
-### 28.34. Two Player Tic-Tac-Toe
+### 29.34. Two Player Tic-Tac-Toe
 
 `server.eng`:
 ```eng
@@ -9369,13 +9994,13 @@ fn main() {
 };
 ```
 
-### 28.35. Game of Life
+### 29.35. Game of Life
 
 ```eng
 import io: eng.std.io;
 
 fn print_grid(grid: bool[][]) {
-    io.print(grid.map(): (x.map(): (with if x { be "##" } else { be "  "; }).join()).join("\n"));
+    io.print(grid.map(): ($1.map(): (with if x { be "##" } else { be "  "; }).join()).join("\n"));
 };
 
 fn get_next_generation(current: bool[][]): bool[][] {
@@ -9433,7 +10058,7 @@ fn main() {
 };
 ```
 
-### 28.36. Sushi For Two
+### 29.36. Sushi For Two
 
 ```eng
 import io: eng.std.io;
@@ -9446,7 +10071,7 @@ fn main() {
 
     let solution = sushi
         -> aops.group_by(): (x == y)
-        -> aops.map(): (x.count)
+        -> aops.map(): ($1.count)
         -> aops.adjacent(): min
         -> aops.max() * 2; # 4
 
@@ -9454,143 +10079,155 @@ fn main() {
 };
 ```
 
-## 29. Appendix A - List of Keywords
+## 30. Appendix A - List of Keywords
 
-1. `acq` - Acquiring memory ordering for atomic operations.
-2. `alias` - Declares type alias.
-3. `alive` - Checks if a thread is running.
-4. `alloc` - Allocates a memory block on the heap.
-5. `ar` - Acquiring and releasing memory ordering for atomic operations.
-6. `as` - Converts a value to a different type; Obtains a value of a variant type.
-7. `async` - Declares a function as a coroutine.
-8. `atomic` - Declares an atomic variable for lock-free shared memory access.
-9. `auto` - Infers the type of a variable or return type of a function; Defines a weakly constrained concept.
-10. `await` - Pauses execution of a coroutine until the awaited coroutine terminates.
-11. `base` - Refers to the base class instance in inheritance; Refers to a variant value in multiple inheritance.
-12. `be` - Resolves a value in a `with`-`be` block.
-13. `break` - Exits from a loop or switch statement.
-14. `case` - Defines a case in a switch statement; Substitutes the value in a matching expression.
-15. `cast` - Defines an implicit or explicit casting function.
-16. `cata` - Catalyzes a grandbase class to facilitate base classes without duplication.
-17. `catch` - Defines an exception handler block.
-18. `cease` - Cancels a coroutine; Cancels a thread.
-19. `class` - Declares a class type.
-20. `comply` - Complies to a `require` requirement.
-21. `concept` - Declares a concept for generics constraints.
-22. `cont` - Continues to the next iteration of a loop.
-23. `copy` - Explicitly copies a value; Defines a copy constructor for a class.
-24. `ctor` - Defines a constructor for a class.
-25. `cv` - Declares a conditional variable for thread synchronization.
-26. `cvn` - Notifies `n` threads waiting on a conditional variable.
-27. `cvw` - Waits on a conditional variable.
-28. `dealloc` - Deallocates a memory block from the heap.
-29. `default` - Defines a default value for a type; Specifies the default value of an enum type.
-30. `defer` - Defers execution of a block until the surrounding scope exits.
-31. `detach` - Detaches a thread, allowing it to run independently.
-32. `do` - Starts a do-while loop.
-33. `dtor` - Defines a destructor for a class.
-34. `dynamic` - Declares an entity as non-compile-time evaluable.
-35. `ego` - Refers to the current function.
-36. `else` - Defines the else block in an `if`-`else`, `while`-`else` or `for`-`else` statement; Defines a default case in a switch statement.
-37. `emit` - Emits a value in a `with`-`emit` generator expression.
-38. `enum` - Declares an enumeration type.
-39. `export` - Exports a function, class or variable or namespace.
-40. `first` - Defines a generator for first value in an enumerator member.
-41. `fn` - Declares a function.
-42. `for` - Starts a for loop.
-43. `fork` - Creates a thread to run a function parallelly.
-44. `form` - Declares a form type.
-45. `friend` - Declares a friend function or class in a class or namespace.
-46. `get` - Defines a getter for a property.
-47. `goto` - Jumps to a label.
-48. `if` - Starts an if statement.
-49. `immut` - Declares a mutable member in a class that can only be mutated from immutable instance.
-50. `import` - Imports a function, class, variable or namespace.
-51. `impure` - Declares a function as fake pure.
-52. `in` - Checks if a value is in a collection; Iterates over elements in a for loop.
-53. `into` - Defines an explicit-only casting function.
-54. `is` - Checks if a value is of a specific type.
-55. `join` - Joins a thread, waiting for it to terminate.
-56. `label` - Declares a label for `goto` statement.
-57. `let` - Declares a variable, constant or a member.
-58. `lit` - Declares a literal typing function.
-59. `lock` - Locks a mutex for thread synchronization.
-60. `loft` - Refers to the base class type in inheritance; Refers to a variant type in multiple inheritance.
-61. `macro` - Declares a macro.
-62. `match` - Starts a match expression.
-63. `move` - Moves a value, transferring ownership; Defines a move constructor for a class.
-64. `mut` - Declares a mutable member in a class.
-65. `mutex` - Declares a mutex for thread synchronization.
-66. `next` - Defines a generator for next value in an enumerator member.
-67. `ns` - Declares a namespace.
-68. `once` - Defines a first-iteration block in a `for` or `while` loop.
-69. `onward` - Defines a subsequent-iteration block in a `for` or `while` loop.
-70. `op` - Declares an operator overload.
-71. `orid` - Overrides a virtual member function in a derived class.
-72. `pers` - Defines a personal-access (namespace-visible) member in a class.
-73. `policy` - Applies a language preset to a block. expression or entire file.
-74. `priv` - Defines a private-access (class-visible) member in a class.
-75. `probe` - Probes if a coroutine can be awaited without blocking.
-76. `prop` - Declares a property type.
-77. `prot` - Defines a protected-access (class and derived-visible) member in a class.
-78. `pub` - Defines a public-access (world-visible) member in a class.
-79. `pure` - Declares a function as side-effect-free.
-80. `range` - Defines a range index type.
-81. `realloc` - Reallocates a memory block on the heap.
-82. `rel` - Releasing memory ordering for atomic operations.
-83. `require` - Declares a requirement for `comply` statement.
-84. `retain` - Defines a static variable; Defines a static function defined in a class.
-85. `return` - Returns a value from a function.
-86. `rlx` - Relaxed memory ordering for atomic operations.
-87. `self` - Refers to the current class type in a class definition.
-88. `sem` - Declares a semaphore for thread synchronization.
-89. `semacq` - Acquiring memory ordering for semaphore operations.
-90. `semrel` - Releasing memory ordering for semaphore operations
-91. `set` - Defines a setter for a property.
-92. `seq` - Sequentially consistent memory ordering for atomic operations.
-93. `sizeof` - Obtains the size of a type in bytes.
-94. `static` - Declares a compile-time constant or function.
-95. `swap` - Swaps two values; Defines a swap constructor for a class.
-96. `switch` - Starts a switch statement.
-97. `this` - Refers to the current class instance in a class definition.
-98. `throw` - Throws an exception.
-99. `try` - Starts a try block for exception handling.
-100. `undef` - Undefines an entity.
-101. `unlock` - Unlocks a mutex for other threads to access.
-102. `virt` - Defines a virtual member function in a class.
-103. `where` - Defines arbitrary constraints in a concept definition.
-104. `while` - Starts a while loop.
-105. `with` - Starts a `with`-`be` block.
-106. `yield` - Pauses execution of a coroutine and yields a value.
+- `acq` - Acquiring memory ordering for atomic operations.
+- `addr` - Obtain an address of a variable or function.
+- `affirm` - Defers execution of a block until the surrounding scope exits not due to an exception.
+- `alias` - Declares entity alias.
+- `alive` - Checks if a thread is running.
+- `alloc` - Allocates a memory block on the heap.
+- `ar` - Acquiring and releasing memory ordering for atomic operations.
+- `as` - Converts a value to a different type; Obtains a value of a variant type.
+- `async` - Declares a function as a coroutine.
+- `atlast` - Defines a after-last-iteration block in a `for` or `while` loop.
+- `atomic` - Declares an atomic variable for lock-free shared memory access.
+- `auto` - Infers the type of a variable or return type of a function; Defines a weakly constrained concept; Defines automatic template parameter.
+- `await` - Pauses execution of a coroutine until the awaited coroutine terminates.
+- `base` - Refers to the base class instance in inheritance; Refers to a variant value in multiple inheritance.
+- `be` - Resolves a value in a `with`-`be` block.
+- `break` - Exits from a loop or switch statement.
+- `case` - Defines a case in a switch statement; Substitutes the value in a matching expression.
+- `cast` - Defines an implicit or explicit casting function.
+- `cata` - Catalyzes a grandbase class to facilitate base classes without duplication.
+- `catch` - Defines an exception handler block.
+- `cease` - Cancels a coroutine; Cancels a thread.
+- `class` - Declares a class type.
+- `comply` - Complies to a `require` requirement.
+- `concept` - Declares a concept for generics constraints.
+- `cont` - Continues to the next iteration of a loop.
+- `copy` - Explicitly copies a value; Defines a copy constructor for a class.
+- `ctor` - Defines a constructor for a class.
+- `cv` - Declares a conditional variable for thread synchronization.
+- `cvn` - Notifies `n` threads waiting on a conditional variable.
+- `cvw` - Waits on a conditional variable.
+- `dealloc` - Deallocates a memory block from the heap.
+- `decl` - Defines a function prototype without providing an implementation.
+- `default` - Defines a default value for a type; Specifies the default value of an enum type.
+- `defect` - Defers execution of a block until the surrounding scope exits due to an exception.
+- `defer` - Defers execution of a block until the surrounding scope exits.
+- `detach` - Detaches a thread, allowing it to run independently.
+- `do` - Starts a do-while loop.
+- `dtor` - Defines a destructor for a class.
+- `dynamic` - Declares an entity as non-compile-time evaluable.
+- `ego` - Refers to the current function.
+- `else` - Defines the else block in an `if`-`else`, `while`-`else` or `for`-`else` statement; Defines a default case in a switch statement.
+- `emit` - Emits a value in a `with`-`emit` generator expression.
+- `endif` - Breaks out of an `if` statement.
+- `enum` - Declares an enumeration type.
+- `except` - Indicates that a function can throw an exception.
+- `export` - Exports a function, class or variable or namespace.
+- `first` - Defines a generator for first value in an enumerator member.
+- `fn` - Declares a function.
+- `for` - Starts a for loop.
+- `forr` - Starts a reverse for loop.
+- `fork` - Creates a thread to run a function parallelly.
+- `form` - Declares a form type.
+- `friend` - Declares a friend function or class in a class or namespace.
+- `get` - Defines a getter for a property.
+- `global` - Refers to the global namespace.
+- `goto` - Jumps to a label.
+- `guard` - Defines a guarding condition for implicit return in a function.
+- `if` - Starts an if statement.
+- `impl` - Defines an implementation of a function.
+- `import` - Imports a function, class, variable or namespace.
+- `impure` - Declares a function as fake pure.
+- `in` - Checks if a value is in a collection; Iterates over elements in a for loop.
+- `into` - Defines an explicit-only casting function.
+- `is` - Checks if a value is of a specific type.
+- `join` - Joins a thread, waiting for it to terminate.
+- `label` - Declares a label for `goto` statement.
+- `let` - Declares a variable, constant or a member.
+- `link` - Links enums or forms to create new variant-linked type.j
+- `lit` - Declares a literal typing function.
+- `lock` - Locks a mutex for thread synchronization.
+- `loft` - Refers to the base class type in inheritance; Refers to a variant type in multiple inheritance.
+- `macro` - Declares a macro.
+- `match` - Starts a match expression.
+- `move` - Moves a value, transferring ownership; Defines a move constructor for a class.
+- `mutex` - Declares a mutex for thread synchronization.
+- `next` - Defines a generator for next value in an enumerator member.
+- `ns` - Declares a namespace.
+- `once` - Defines a first-iteration block in a `for` or `while` loop.
+- `onward` - Defines a subsequent-iteration block in a `for` or `while` loop.
+- `op` - Declares an operator overload.
+- `orid` - Overrides a virtual member function in a derived class.
+- `pers` - Defines a personal-access (namespace-visible) member in a class.
+- `policy` - Applies a language preset to a block. expression or entire file.
+- `priv` - Defines a private-access (class-visible) member in a class.
+- `probe` - Probes if a coroutine can be awaited without blocking.
+- `promo` - Defines type promotion.
+- `prop` - Declares a property type.
+- `prot` - Defines a protected-access (class and derived-visible) member in a class.
+- `pub` - Defines a public-access (world-visible) member in a class.
+- `pure` - Declares a function as side-effect-free.
+- `range` - Defines a range index type.
+- `realloc` - Reallocates a memory block on the heap.
+- `rel` - Releasing memory ordering for atomic operations.
+- `require` - Declares a requirement for `comply` statement.
+- `retain` - Defines a static variable; Defines a static function defined in a class.
+- `return` - Returns a value from a function.
+- `rlx` - Relaxed memory ordering for atomic operations.
+- `self` - Refers to the current class type in a class definition.
+- `sem` - Declares a semaphore for thread synchronization.
+- `semacq` - Acquiring memory ordering for semaphore operations.
+- `semrel` - Releasing memory ordering for semaphore operations
+- `set` - Defines a setter for a property.
+- `seq` - Sequentially consistent memory ordering for atomic operations.
+- `sizeof` - Obtains the size of a type in bytes.
+- `static` - Declares a compile-time constant or function.
+- `swap` - Swaps two values; Defines a swap constructor for a class.
+- `switch` - Starts a switch statement.
+- `this` - Refers to the current class instance in a class definition.
+- `throw` - Throws an exception.
+- `try` - Starts a try block for exception handling.
+- `undef` - Undefines an entity.
+- `unlock` - Unlocks a mutex for other threads to access.
+- `virt` - Defines a virtual member function in a class.
+- `visit` - Goto a label and comeback to the calling location.
+- `where` - Defines arbitrary constraints in a concept definition.
+- `while` - Starts a while loop.
+- `with` - Starts a `with`-`be` block.
+- `yield` - Pauses execution of a coroutine and yields a value.
 
-## 30. Appendix B - List of Built-in Operators
+## 31. Appendix B - List of Built-in Operators
 
 These operators are ranked from highest precedence to lowest precedence (higher number = lower precedence).
 
-1. `*x`, `/x`
-2. `+x`, `-x`
-3. `!x`, `~x`
-4. `x!`, `x%`, `x%%`, `x%%%`
-5. `++x`, `--x`
-6. `x++`, `x--`
-7. `x << y`, `x >> y`
-8. `x <<< y`, `x >>> y`
-9. `x <<& y`, `x <<| y`, `x >>& y`, `x >>| y`
-10. `x ^ y`
-11. `x & y`, `x | y`
-12. `x <? y`, `x >? y`, `x <=? y`, `x >=? y`
-13. `x ** y`
-14. `x // y`
-15. `x % y`, `x %% y`
-16. `x * y`, `x / y`
-17. `x + y`, `x - y`
-18. `|x|`
-19. `x[y]`
-20. `x == y`, `x != y`
-21. `x < y`, `x > y`, `x <= y`, `x >= y`
-22. `x && y`, `x || y`
-23. `x -> y`, `x |> y`
-24. `x = y`
+- `*x`, `/x`
+- `+x`, `-x`
+- `!x`, `~x`
+- `x!`, `x%`
+- `++x`, `--x`
+- `x++`, `x--`
+- `x << y`, `x >> y`
+- `x <<< y`, `x >>> y`
+- `x <<& y`, `x <<| y`, `x >>& y`, `x >>| y`
+- `x ^ y`
+- `x & y`, `x | y`
+- `x <? y`, `x >? y`, `x <=? y`, `x >=? y`
+- `x ** y`
+- `x // y`
+- `x % y`, `x %% y`
+- `x * y`, `x / y`
+- `x + y`, `x - y`
+- `|x|`
+- `x[y]`
+- `x == y`, `x != y`
+- `x < y`, `x > y`, `x <= y`, `x >= y`
+- `x && y`, `x || y`
+- `x -> y`, `x |> y`
+- `x = y`
 
 Variants of the operators also exist for different purposes.
 1. All the binary operators also has their shorthand assignment counterparts by adding a `=` suffix to the operator symbol, e.g., `x += y` (addition_assignment). In case of conflicts (`x <= y`), a double `=` is used instead (e.g., `x <=== y` for less_than_equals_assignment).
@@ -9598,109 +10235,105 @@ Variants of the operators also exist for different purposes.
 3. All the operators also has their array-element-wise counterparts enclosing the operator symbol with `[` and `]`, or `[` and `>`, or `<` and `]`, e.g., `x [+] y` (array_addition), `x <==] y` (array_equality_short), `x [||?> y` (array_nullable_logical_and_long), etc.
 
 Operator descriptions:
-1. `*x` - Unary prefix `*` operator (`multiplicative_identity`; `dereference`) that:
+- `*x` - Unary prefix `*` operator (`multiplicative_identity`; `dereference`) that:
    - Dereferences a pointer to obtain the value it points to.
    - Identity operator for numeric types (no-op).
-2. `/x` - Unary prefix `/` operator (`reciprocal`) that:
+- `/x` - Unary prefix `/` operator (`reciprocal`) that:
    - Computes the reciprocal of a numeric value.
-3. `+x` - Unary prefix `+` operator (`additive_identity`) that:
+- `+x` - Unary prefix `+` operator (`additive_identity`) that:
    - Identity operator for numeric types (no-op).
-4. `-x` - Unary prefix `-` operator (`negation`) that:
+- `-x` - Unary prefix `-` operator (`negation`) that:
    - Negates a numeric value.
-5. `!x` - Unary prefix `!` operator (`logical_not`) that:
+- `!x` - Unary prefix `!` operator (`logical_not`) that:
    - Performs logical NOT operation on a boolean value.
-6. `~x` - Unary prefix `~` operator (`bitwise_not`) that:
+- `~x` - Unary prefix `~` operator (`bitwise_not`) that:
    - Performs bitwise NOT operation on an integer value.
-7. `x!` - Unary suffix `!` operator (`factorial`) that:
+- `x!` - Unary suffix `!` operator (`factorial`) that:
    - Computes the factorial of an unsigned integer value.
-8. `x%` - Unary suffix `%` operator (`percent`) that:
+- `x%` - Unary suffix `%` operator (`percent`) that:
    - Computes the percentage value of a numeric value (divides by 100).
-9. `x%%` - Unary suffix `%%` operator (`permille`) that:
-    - Computes the permille value of a numeric value (divides by 1000).
-10. `x%%%` - Unary suffix `%%%` operator (`permyriad`) that:
-     - Computes the permyriad value of a numeric value (divides by 10000).
-11. `++x` - Unary prefix `++` operator (`pre_increment`) that:
+- `++x` - Unary prefix `++` operator (`pre_increment`) that:
    - Increments a numeric value by 1 and returns the incremented value.
-12. `--x` - Unary prefix `--` operator (`pre_decrement`) that:
+- `--x` - Unary prefix `--` operator (`pre_decrement`) that:
     - Decrements a numeric value by 1 and returns the decremented value.
-13. `x++` - Unary suffix `++` operator (`post_increment`) that:
+- `x++` - Unary suffix `++` operator (`post_increment`) that:
     - Returns the current value and then increments it by 1.
-14. `x--` - Unary suffix `--` operator (`post_decrement`) that:
+- `x--` - Unary suffix `--` operator (`post_decrement`) that:
     - Returns the current value and then decrements it by 1.
-15. `x << y` - Binary infix `<<` operator (`left_shift`) that:
+- `x << y` - Binary infix `<<` operator (`left_shift`) that:
     - Shifts the bits of `x` to the left by `y` positions.
-16. `x >> y` - Binary infix `>>` operator (`right_shift`) that:
+- `x >> y` - Binary infix `>>` operator (`right_shift`) that:
     - Shifts the bits of `x` to the right by `y` positions.
-17. `x <<< y` - Binary infix `<<<` operator (`left_rotate`) that:
+- `x <<< y` - Binary infix `<<<` operator (`left_rotate`) that:
     - Rotates the bits of `x` to the left by `y` positions.
-18. `x >>> y` - Binary infix `>>>` operator (`right_rotate`) that:
+- `x >>> y` - Binary infix `>>>` operator (`right_rotate`) that:
     - Rotates the bits of `x` to the right by `y` positions.
-19. `x <<& y` - Binary infix `<<&` operator (`left_shift_zero`) that:
+- `x <<& y` - Binary infix `<<&` operator (`left_shift_zero`) that:
     - Shifts the bits of `x` to the left by `y` positions, filling with zeros.
-20. `x <<| y` - Binary infix `<<|` operator (`left_shift_one`) that:
+- `x <<| y` - Binary infix `<<|` operator (`left_shift_one`) that:
     - Shifts the bits of `x` to the left by `y` positions, filling with ones.
-21. `x >>& y` - Binary infix `>>&` operator (`right_shift_zero`) that:
+- `x >>& y` - Binary infix `>>&` operator (`right_shift_zero`) that:
     - Shifts the bits of `x` to the right by `y` positions, filling with zeros.
-22. `x >>| y` - Binary infix `>>|` operator (`right_shift_one`) that:
+- `x >>| y` - Binary infix `>>|` operator (`right_shift_one`) that:
     - Shifts the bits of `x` to the right by `y` positions, filling with ones.
-23. `x ^ y` - Binary infix `^` operator (`bitwise_xor`) that:
+- `x ^ y` - Binary infix `^` operator (`bitwise_xor`) that:
     - Performs bitwise XOR operation between `x` and `y`.
-24. `x & y` - Binary infix `&` operator (`bitwise_and`) that:
+- `x & y` - Binary infix `&` operator (`bitwise_and`) that:
     - Performs bitwise AND operation between `x` and `y`.
-25. `x | y` - Binary infix `|` operator (`bitwise_or`) that:
+- `x | y` - Binary infix `|` operator (`bitwise_or`) that:
     - Performs bitwise OR operation between `x` and `y`.
-26. `x <? y` - Binary infix `<?` operator (`minimum`) that:
+- `x <? y` - Binary infix `<?` operator (`minimum`) that:
     - Returns the minimum of `x` and `y`.
-27. `x >? y` - Binary infix `>?` operator (`maximum`) that:
+- `x >? y` - Binary infix `>?` operator (`maximum`) that:
     - Returns the maximum of `x` and `y`.
-28. `x <=? y` - Binary infix `<=?` operator (`minimum_equals`) that:
+- `x <=? y` - Binary infix `<=?` operator (`minimum_equals`) that:
     - Returns the minimum of `x` and `y`, or `x` if they are equal.
-29. `x >=? y` - Binary infix `>=?` operator (`maximum_equals`) that:
+- `x >=? y` - Binary infix `>=?` operator (`maximum_equals`) that:
     - Returns the maximum of `x` and `y`, or `x` if they are equal.
-30. `x ** y` - Binary infix `**` operator (`exponentiation`) that:
+- `x ** y` - Binary infix `**` operator (`exponentiation`) that:
     - Raises `x` to the power of `y`.
-31. `x // y` - Binary infix `//` operator (`flooring_division`) that:
+- `x // y` - Binary infix `//` operator (`flooring_division`) that:
     - Performs flooring division of `x` by `y`.
-32. `x % y` - Binary infix `%` operator (`modulus`) that:
+- `x % y` - Binary infix `%` operator (`modulus`) that:
     - Computes the modulus of `x` by `y`.
-33. `x %% y` - Binary infix `%%` operator (`wrapping_modulus`) that:
+- `x %% y` - Binary infix `%%` operator (`wrapping_modulus`) that:
     - Computes the wrapping modulus of `x` by `y`.
-34. `x * y` - Binary infix `*` operator (`multiplication`) that:
+- `x * y` - Binary infix `*` operator (`multiplication`) that:
     - Multiplies `x` by `y`.
-35. `x / y` - Binary infix `/` operator (`division`) that:
+- `x / y` - Binary infix `/` operator (`division`) that:
     - Divides `x` by `y`.
-36. `x + y` - Binary infix `+` operator (`addition`) that:
+- `x + y` - Binary infix `+` operator (`addition`) that:
     - Adds `x` and `y`.
-37. `x - y` - Binary infix `-` operator (`subtraction`) that:
+- `x - y` - Binary infix `-` operator (`subtraction`) that:
     - Subtracts `y` from `x`.
-38. `|x|` - Multi-part operator (`absolute`) that:
+- `|x|` - Multi-part operator (`absolute`) that:
     - Computes the absolute value of `x`.
-39. `x[y]` - Multi-part operator (`indexing`) that:
+- `x[y]` - Multi-part operator (`indexing`) that:
     - Accesses the element at index `y` in collection `x`.
-40. `x == y` - Binary infix `==` operator (`equality`) that:
+- `x == y` - Binary infix `==` operator (`equality`) that:
     - Checks if `x` is equal to `y`.
-41. `x != y` - Binary infix `!=` operator (`inequality`) that:
+- `x != y` - Binary infix `!=` operator (`inequality`) that:
     - Checks if `x` is not equal to `y`.
-42. `x < y` - Binary infix `<` operator (`less_than`) that:
+- `x < y` - Binary infix `<` operator (`less_than`) that:
     - Checks if `x` is less than `y`.
-43. `x > y` - Binary infix `>` operator (`more_than`) that:
+- `x > y` - Binary infix `>` operator (`more_than`) that:
     - Checks if `x` is more than `y`.
-44. `x <= y` - Binary infix `<=` operator (`less_than_equals`) that:
+- `x <= y` - Binary infix `<=` operator (`less_than_equals`) that:
     - Checks if `x` is less than or equal to `y`.
-45. `x >= y` - Binary infix `>=` operator (`more_than_equals`) that:
+- `x >= y` - Binary infix `>=` operator (`more_than_equals`) that:
     - Checks if `x` is more than or equal to `y`.
-46. `x && y` - Binary infix `&&` operator (`logical_and`) that:
+- `x && y` - Binary infix `&&` operator (`logical_and`) that:
     - Performs logical AND operation between `x` and `y`.
-47. `x || y` - Binary infix `||` operator (`logical_or`) that:
+- `x || y` - Binary infix `||` operator (`logical_or`) that:
     - Performs logical OR operation between `x` and `y`.
-48. `x -> y` - Binary infix `->` operator (`pipeline`) that:
+- `x -> y` - Binary infix `->` operator (`pipeline`) that:
     - Performs array pipeline operation, passing each element of array `x` to function `y`.
-49. `x |> y` - Binary infix `|>` operator (`placeholder_pipeline`) that:
+- `x |> y` - Binary infix `|>` operator (`placeholder_pipeline`) that:
     - Performs placeholder pipeline operation, passing `x` to function `y` where `$` is used as placeholder.
-50. `x = y` - Binary infix `=` operator (`assignment`) that:
+- `x = y` - Binary infix `=` operator (`assignment`) that:
     - Assigns the value of `y` to `x`.
 
-### 30.1. Non-numeric Types Operators
+### 31.1. Non-numeric Types Operators
 
 List of unique operators associated with non-numeric standard types:
 
@@ -9716,7 +10349,7 @@ List of unique operators associated with non-numeric standard types:
     - `x ⋅ y` - Computes the dot product of vectors `x` and `y`.
     - `x × y` - Computes the cross product of vectors `x` and `y`.
 
-## 31. Appendix C - Language Presets
+## 32. Appendix C - Language Presets
 
 List of language presets (aka. the language difficulty modes):
 
@@ -9746,12 +10379,12 @@ List of language presets (aka. the language difficulty modes):
     - The "No fun allowed" mode.
     - This is preferable for nobody.
 
-### 31.1. `hostile` Presets Features
+### 32.1. `hostile` Presets Features
 
 List of all the features enabled in `hostile` preset:
 1. None lol
 
-### 31.2. `strict` Presets Features
+### 32.2. `strict` Presets Features
 
 List of all the features enabled in `strict` preset:
 1. `multi_line_comment` - Allows multi-line comments using `#{ ... }#`.
@@ -9835,7 +10468,7 @@ List of all the features enabled in `strict` preset:
 79. `compile_time_evaluation` - Allows compile-time evaluation of expressions and functions.
 80. `policy_mutation` - Allows mutation of policies in source code.
 
-### 31.3. `balanced` Presets Features
+### 32.3. `balanced` Presets Features
 
 List of all the features enabled in `balanced` preset:
 0. All features in `strict` preset, AND:
@@ -9879,7 +10512,7 @@ List of all the features enabled in `balanced` preset:
 38. `engine_macro` - Allows defining engine macros.
 39. `concept_as_polymorphism` - Allows concepts to be used for polymorphism and dynamic dispatch.
 
-### 31.4. `friendly` Presets Features
+### 32.4. `friendly` Presets Features
 
 List of all the features enabled in `friendly` preset:
 0. All features in `balanced` preset, AND:
@@ -9893,7 +10526,7 @@ List of all the features enabled in `friendly` preset:
 8. `undefining_entity` - Allows undefining previously defined entities using `undef`.
 9. `manual_memory_management` - Allows manual memory management using `alloc`, `dealloc` and `realloc`, along with raw pointers.
 
-### 31.5. `express` Presets Features
+### 32.5. `express` Presets Features
 
 List of all the features enabled in `express` preset:
 0. All features in `friendly` preset, AND:
