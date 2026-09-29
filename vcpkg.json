@@ -1,0 +1,7 @@
+{
+  "name": "engenide",
+  "version": "0.1.0",
+  "dependencies": [
+    "icu"
+  ]
+}
