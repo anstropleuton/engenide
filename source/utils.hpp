@@ -1,4 +1,4 @@
-/// @file eng_utils.hpp
+/// @file utils.hpp
 /// Defines several utilities.
 /// @note This is a private header.
 ///

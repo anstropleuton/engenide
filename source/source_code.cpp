@@ -12,7 +12,7 @@
 #include <limits>
 #include <memory>
 
-#include "eng_utils.hpp"
+#include "utils.hpp"
 #include "unicode/ucnv.h"
 #include "unicode/ucnv_err.h"
 #include "unicode/utypes.h"
@@ -104,8 +104,8 @@ auto eng::source_code::load_file(std::filesystem::path const &filename) -> sourc
         }
     }
 
-    if (line_begin < code.content.size())
-        code.lines.emplace_back(line_begin, code.content.size());
+    if (line_begin < write)
+        code.lines.emplace_back(line_begin, write);
 
     code.content.resize(write);
 

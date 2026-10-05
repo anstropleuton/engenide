@@ -8,5 +8,6 @@ project(engenide
 )
 
 find_package(ICU REQUIRED COMPONENTS uc)
+find_package(CLI11 CONFIG REQUIRED)
 
 add_subdirectory(source)

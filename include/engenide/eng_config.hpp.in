@@ -1,0 +1,18 @@
+/// @file eng_config.hpp
+/// Defines Engenide configuration.
+///
+/// Part of Engenide, a general-purpose systems language between C++ and Rust.
+/// @copyright (c) 2026 Anstro Pleuton
+/// MIT Licensed.
+
+#pragma once
+
+namespace eng {
+    constexpr auto engenide_version_str{"@PROJECT_VERSION@"};
+    constexpr auto engenide_version_major{@PROJECT_VERSION_MAJOR@};
+    constexpr auto engenide_version_major_str{"@PROJECT_VERSION_MAJOR@"};
+    constexpr auto engenide_version_minor{@PROJECT_VERSION_MINOR@};
+    constexpr auto engenide_version_minor_str{"@PROJECT_VERSION_MINOR@"};
+    constexpr auto engenide_version_patch{@PROJECT_VERSION_PATCH@};
+    constexpr auto engenide_version_patch_str{"@PROJECT_VERSION_PATCH@"};
+}
