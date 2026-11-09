@@ -1,0 +1,84 @@
+---
+Checks: >
+  -*,
+  bugprone-*,
+  cert-*,
+  clang-analyzer-*,
+  concurrency-*,
+  cppcoreguidelines-*,
+  misc-*,
+  modernize-*,
+  performance-*,
+  portability-*,
+  readability-*,
+
+  -bugprone-easily-swappable-parameters,
+  -bugprone-exception-escape,
+  -bugprone-signed-bitwise,
+  -cert-err58-cpp,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
+  -cppcoreguidelines-avoid-do-while,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-type-vararg,
+  -misc-misplaced-const,
+  -misc-no-recursion,
+  -misc-non-private-member-variables-in-classes,
+  -modernize-use-designated-initializers,
+  -portability-avoid-pragma-once,
+  -readability-avoid-nested-conditional-operator,
+  -readability-identifier-length,
+  -readability-implicit-bool-conversion,
+  -readability-magic-numbers,
+  -readability-math-missing-parentheses,
+  -readability-named-parameter,
+  -readability-uppercase-literal-suffix,
+
+# Only report diagnostics from our headers.
+HeaderFilterRegex: '.*[/\\](include|source|test|example)[/\\].*'
+SystemHeaders: false
+FormatStyle: file
+UseColor: true
+
+CheckOptions:
+  modernize-use-auto.MinTypeNameLength: 0
+
+  readability-braces-around-statements.ShortStatementLines: 3
+  readability-function-cognitive-complexity.Threshold: 50
+  readability-function-size.LineThreshold: 200
+
+  # Naming: everything lower_case, macros UPPER_CASE
+  readability-identifier-naming.ClassCase: lower_case
+  readability-identifier-naming.ConceptCase: lower_case
+  readability-identifier-naming.ConstantCase: lower_case
+  readability-identifier-naming.ConstexprVariableCase: lower_case
+  readability-identifier-naming.EnumCase: lower_case
+  readability-identifier-naming.EnumConstantCase: lower_case
+  readability-identifier-naming.FunctionCase: lower_case
+  readability-identifier-naming.GlobalConstantCase: lower_case
+  readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
+  readability-identifier-naming.MemberCase: lower_case
+  readability-identifier-naming.MethodCase: lower_case
+  readability-identifier-naming.NamespaceCase: lower_case
+  readability-identifier-naming.ParameterCase: lower_case
+  readability-identifier-naming.PrivateMemberCase: lower_case
+  readability-identifier-naming.PrivateMemberSuffix: _
+  readability-identifier-naming.PrivateMethodCase: lower_case
+  readability-identifier-naming.PrivateMethodSuffix: _
+  readability-identifier-naming.ProtectedMemberCase: lower_case
+  readability-identifier-naming.ProtectedMemberSuffix: _
+  readability-identifier-naming.ProtectedMethodCase: lower_case
+  readability-identifier-naming.ProtectedMethodSuffix: _
+  readability-identifier-naming.StructCase: lower_case
+  readability-identifier-naming.TemplateParameterCase: lower_case
+  readability-identifier-naming.TypeAliasCase: lower_case
+  readability-identifier-naming.TypedefCase: lower_case
+  readability-identifier-naming.UnionCase: lower_case
+  readability-identifier-naming.VariableCase: lower_case
+
+  misc-include-cleaner.IgnoreHeaders: '.*[/\\](unicode)[/\\].*;.*[/\\](windows|windef|minwindef|minwinbase|winnt|basetsd|winerror|guiddef)\.h;.*[/\\](winbase|processenv|processthreadsapi|errhandlingapi|handleapi|fileapi|libloaderapi)\.h;.*[/\\](synchapi|sysinfoapi|memoryapi|heapapi|ioapiset|namedpipeapi|timezoneapi)\.h;.*[/\\](consoleapi|wincon|wincontypes|stringapiset|winnls|winuser|wingdi|winreg|winsvc|winver)\.h;^/usr/include/(.*/)?(bits|asm|asm-generic|linux)/.*;.*[/\\](fcntl|signal|termios|dirent|poll|pthread)\.h;.*[/\\]sys[/\\](stat|mman|socket|ioctl|wait)\.h'

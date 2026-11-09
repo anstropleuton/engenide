@@ -1,5 +1,5 @@
 {
-  "version": 10,
+  "version": 8,
   "cmakeMinimumRequired": {
     "major": 4,
     "minor": 0,
@@ -13,36 +13,344 @@
       "binaryDir": "${sourceDir}/build/${presetName}",
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_COLOR_DIAGNOSTICS": "ON"
       }
     },
+
+    {
+      "name": "cfg-debug",
+      "hidden": true,
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "cfg-release",
+      "hidden": true,
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "tidy",
+      "hidden": true,
+      "cacheVariables": { "ENABLE_CLANG_TIDY": "ON" },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "enableClangTidyCodeAnalysis": true
+        }
+      }
+    },
+
     {
       "name": "debug",
       "displayName": "Debug",
-      "inherits": "base",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
-      }
+      "inherits": ["base", "cfg-debug"]
+    },
+    {
+      "name": "debug-tidy",
+      "displayName": "Debug + clang-tidy",
+      "inherits": ["base", "cfg-debug", "tidy"]
     },
     {
       "name": "release",
       "displayName": "Release",
+      "inherits": ["base", "cfg-release"]
+    },
+
+    {
+      "name": "tc-win-msvc",
+      "hidden": true,
       "inherits": "base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "cl"
       }
+    },
+    {
+      "name": "tc-win-clang-cl",
+      "hidden": true,
+      "inherits": "base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl"
+      }
+    },
+    {
+      "name": "tc-win-clang",
+      "hidden": true,
+      "inherits": "base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
+      "name": "tc-win-mingw",
+      "hidden": true,
+      "inherits": "base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
+        "VCPKG_TARGET_TRIPLET": "x64-mingw-dynamic"
+      }
+    },
+    {
+      "name": "tc-linux-gcc",
+      "hidden": true,
+      "inherits": "base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      }
+    },
+    {
+      "name": "tc-linux-clang",
+      "hidden": true,
+      "inherits": "base",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+
+    {
+      "name": "win-msvc-debug",
+      "displayName": "Windows MSVC Debug",
+      "inherits": ["tc-win-msvc", "cfg-debug"]
+    },
+    {
+      "name": "win-msvc-release",
+      "displayName": "Windows MSVC Release",
+      "inherits": ["tc-win-msvc", "cfg-release"]
+    },
+
+    {
+      "name": "win-clang-cl-debug",
+      "displayName": "Windows clang-cl Debug",
+      "inherits": ["tc-win-clang-cl", "cfg-debug"]
+    },
+    {
+      "name": "win-clang-cl-release",
+      "displayName": "Windows clang-cl Release",
+      "inherits": ["tc-win-clang-cl", "cfg-release"]
+    },
+    {
+      "name": "win-clang-cl-debug-tidy",
+      "displayName": "Windows clang-cl Debug + clang-tidy",
+      "inherits": ["tc-win-clang-cl", "cfg-debug", "tidy"]
+    },
+
+    {
+      "name": "win-clang-debug",
+      "displayName": "Windows Clang Debug",
+      "inherits": ["tc-win-clang", "cfg-debug"]
+    },
+    {
+      "name": "win-clang-release",
+      "displayName": "Windows Clang Release",
+      "inherits": ["tc-win-clang", "cfg-release"]
+    },
+    {
+      "name": "win-clang-debug-tidy",
+      "displayName": "Windows Clang Debug + clang-tidy",
+      "inherits": ["tc-win-clang", "cfg-debug", "tidy"]
+    },
+
+    {
+      "name": "win-mingw-debug",
+      "displayName": "Windows MinGW Debug",
+      "inherits": ["tc-win-mingw", "cfg-debug"]
+    },
+    {
+      "name": "win-mingw-release",
+      "displayName": "Windows MinGW Release",
+      "inherits": ["tc-win-mingw", "cfg-release"]
+    },
+
+    {
+      "name": "linux-gcc-debug",
+      "displayName": "Linux GCC Debug",
+      "inherits": ["tc-linux-gcc", "cfg-debug"]
+    },
+    {
+      "name": "linux-gcc-release",
+      "displayName": "Linux GCC Release",
+      "inherits": ["tc-linux-gcc", "cfg-release"]
+    },
+    {
+      "name": "linux-clang-debug",
+      "displayName": "Linux Clang Debug",
+      "inherits": ["tc-linux-clang", "cfg-debug"]
+    },
+    {
+      "name": "linux-clang-release",
+      "displayName": "Linux Clang Release",
+      "inherits": ["tc-linux-clang", "cfg-release"]
+    },
+    {
+      "name": "linux-clang-debug-tidy",
+      "displayName": "Linux Clang Debug + clang-tidy",
+      "inherits": ["tc-linux-clang", "cfg-debug", "tidy"]
     }
   ],
   "buildPresets": [
     {
+      "name": "base",
+      "hidden": true,
+      "environment": { "CLICOLOR_FORCE": "1" }
+    },
+    {
       "name": "debug",
+      "inherits": ["base"],
       "displayName": "Debug",
       "configurePreset": "debug"
     },
     {
+      "name": "debug-tidy",
+      "inherits": ["base"],
+      "displayName": "Debug + clang-tidy",
+      "configurePreset": "debug-tidy"
+    },
+    {
       "name": "release",
+      "inherits": ["base"],
       "displayName": "Release",
       "configurePreset": "release"
+    },
+
+    {
+      "name": "win-msvc-debug",
+      "inherits": ["base"],
+      "displayName": "Windows MSVC Debug",
+      "configurePreset": "win-msvc-debug"
+    },
+    {
+      "name": "win-msvc-release",
+      "inherits": ["base"],
+      "displayName": "Windows MSVC Release",
+      "configurePreset": "win-msvc-release"
+    },
+
+    {
+      "name": "win-clang-cl-debug",
+      "inherits": ["base"],
+      "displayName": "Windows clang-cl Debug",
+      "configurePreset": "win-clang-cl-debug"
+    },
+    {
+      "name": "win-clang-cl-release",
+      "inherits": ["base"],
+      "displayName": "Windows clang-cl Release",
+      "configurePreset": "win-clang-cl-release"
+    },
+    {
+      "name": "win-clang-cl-debug-tidy",
+      "inherits": ["base"],
+      "displayName": "Windows clang-cl Debug + clang-tidy",
+      "configurePreset": "win-clang-cl-debug-tidy"
+    },
+
+    {
+      "name": "win-clang-debug",
+      "inherits": ["base"],
+      "displayName": "Windows Clang Debug",
+      "configurePreset": "win-clang-debug"
+    },
+    {
+      "name": "win-clang-release",
+      "inherits": ["base"],
+      "displayName": "Windows Clang Release",
+      "configurePreset": "win-clang-release"
+    },
+    {
+      "name": "win-clang-debug-tidy",
+      "inherits": ["base"],
+      "displayName": "Windows Clang Debug + clang-tidy",
+      "configurePreset": "win-clang-debug-tidy"
+    },
+
+    {
+      "name": "win-mingw-debug",
+      "inherits": ["base"],
+      "displayName": "Windows MinGW Debug",
+      "configurePreset": "win-mingw-debug"
+    },
+    {
+      "name": "win-mingw-release",
+      "inherits": ["base"],
+      "displayName": "Windows MinGW Release",
+      "configurePreset": "win-mingw-release"
+    },
+
+    {
+      "name": "linux-gcc-debug",
+      "inherits": ["base"],
+      "displayName": "Linux GCC Debug",
+      "configurePreset": "linux-gcc-debug"
+    },
+    {
+      "name": "linux-gcc-release",
+      "inherits": ["base"],
+      "displayName": "Linux GCC Release",
+      "configurePreset": "linux-gcc-release"
+    },
+    {
+      "name": "linux-clang-debug",
+      "inherits": ["base"],
+      "displayName": "Linux Clang Debug",
+      "configurePreset": "linux-clang-debug"
+    },
+    {
+      "name": "linux-clang-release",
+      "inherits": ["base"],
+      "displayName": "Linux Clang Release",
+      "configurePreset": "linux-clang-release"
+    },
+    {
+      "name": "linux-clang-debug-tidy",
+      "inherits": ["base"],
+      "displayName": "Linux Clang Debug + clang-tidy",
+      "configurePreset": "linux-clang-debug-tidy"
     }
   ],
   "testPresets": [
@@ -53,10 +361,254 @@
       "output": { "outputOnFailure": true }
     },
     {
+      "name": "debug-tidy",
+      "displayName": "Debug + clang-tidy",
+      "configurePreset": "debug-tidy",
+      "output": { "outputOnFailure": true }
+    },
+    {
       "name": "release",
       "displayName": "Release",
       "configurePreset": "release",
       "output": { "outputOnFailure": true }
+    },
+
+    {
+      "name": "win-msvc-debug",
+      "displayName": "Windows MSVC Debug",
+      "configurePreset": "win-msvc-debug",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "win-msvc-release",
+      "displayName": "Windows MSVC Release",
+      "configurePreset": "win-msvc-release",
+      "output": { "outputOnFailure": true }
+    },
+
+    {
+      "name": "win-clang-cl-debug",
+      "displayName": "Windows clang-cl Debug",
+      "configurePreset": "win-clang-cl-debug",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "win-clang-cl-release",
+      "displayName": "Windows clang-cl Release",
+      "configurePreset": "win-clang-cl-release",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "win-clang-cl-debug-tidy",
+      "displayName": "Windows clang-cl Debug + clang-tidy",
+      "configurePreset": "win-clang-cl-debug-tidy",
+      "output": { "outputOnFailure": true }
+    },
+
+    {
+      "name": "win-clang-debug",
+      "displayName": "Windows Clang Debug",
+      "configurePreset": "win-clang-debug",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "win-clang-release",
+      "displayName": "Windows Clang Release",
+      "configurePreset": "win-clang-release",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "win-clang-debug-tidy",
+      "displayName": "Windows Clang Debug + clang-tidy",
+      "configurePreset": "win-clang-debug-tidy",
+      "output": { "outputOnFailure": true }
+    },
+
+    {
+      "name": "win-mingw-debug",
+      "displayName": "Windows MinGW Debug",
+      "configurePreset": "win-mingw-debug",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "win-mingw-release",
+      "displayName": "Windows MinGW Release",
+      "configurePreset": "win-mingw-release",
+      "output": { "outputOnFailure": true }
+    },
+
+    {
+      "name": "linux-gcc-debug",
+      "displayName": "Linux GCC Debug",
+      "configurePreset": "linux-gcc-debug",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "linux-gcc-release",
+      "displayName": "Linux GCC Release",
+      "configurePreset": "linux-gcc-release",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "linux-clang-debug",
+      "displayName": "Linux Clang Debug",
+      "configurePreset": "linux-clang-debug",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "linux-clang-release",
+      "displayName": "Linux Clang Release",
+      "configurePreset": "linux-clang-release",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "linux-clang-debug-tidy",
+      "displayName": "Linux Clang Debug + clang-tidy",
+      "configurePreset": "linux-clang-debug-tidy",
+      "output": { "outputOnFailure": true }
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "debug",
+      "steps": [
+        { "type": "configure", "name": "debug" },
+        { "type": "build", "name": "debug" },
+        { "type": "test", "name": "debug" }
+      ]
+    },
+    {
+      "name": "release",
+      "steps": [
+        { "type": "configure", "name": "release" },
+        { "type": "build", "name": "release" },
+        { "type": "test", "name": "release" }
+      ]
+    },
+
+    {
+      "name": "win-msvc-debug",
+      "steps": [
+        { "type": "configure", "name": "win-msvc-debug" },
+        { "type": "build", "name": "win-msvc-debug" },
+        { "type": "test", "name": "win-msvc-debug" }
+      ]
+    },
+    {
+      "name": "win-msvc-release",
+      "steps": [
+        { "type": "configure", "name": "win-msvc-release" },
+        { "type": "build", "name": "win-msvc-release" },
+        { "type": "test", "name": "win-msvc-release" }
+      ]
+    },
+
+    {
+      "name": "win-clang-cl-debug",
+      "steps": [
+        { "type": "configure", "name": "win-clang-cl-debug" },
+        { "type": "build", "name": "win-clang-cl-debug" },
+        { "type": "test", "name": "win-clang-cl-debug" }
+      ]
+    },
+    {
+      "name": "win-clang-cl-release",
+      "steps": [
+        { "type": "configure", "name": "win-clang-cl-release" },
+        { "type": "build", "name": "win-clang-cl-release" },
+        { "type": "test", "name": "win-clang-cl-release" }
+      ]
+    },
+    {
+      "name": "win-clang-cl-debug-tidy",
+      "steps": [
+        { "type": "configure", "name": "win-clang-cl-debug-tidy" },
+        { "type": "build", "name": "win-clang-cl-debug-tidy" },
+        { "type": "test", "name": "win-clang-cl-debug-tidy" }
+      ]
+    },
+
+    {
+      "name": "win-clang-debug",
+      "steps": [
+        { "type": "configure", "name": "win-clang-debug" },
+        { "type": "build", "name": "win-clang-debug" },
+        { "type": "test", "name": "win-clang-debug" }
+      ]
+    },
+    {
+      "name": "win-clang-release",
+      "steps": [
+        { "type": "configure", "name": "win-clang-release" },
+        { "type": "build", "name": "win-clang-release" },
+        { "type": "test", "name": "win-clang-release" }
+      ]
+    },
+    {
+      "name": "win-clang-debug-tidy",
+      "steps": [
+        { "type": "configure", "name": "win-clang-debug-tidy" },
+        { "type": "build", "name": "win-clang-debug-tidy" },
+        { "type": "test", "name": "win-clang-debug-tidy" }
+      ]
+    },
+
+    {
+      "name": "win-mingw-debug",
+      "steps": [
+        { "type": "configure", "name": "win-mingw-debug" },
+        { "type": "build", "name": "win-mingw-debug" },
+        { "type": "test", "name": "win-mingw-debug" }
+      ]
+    },
+    {
+      "name": "win-mingw-release",
+      "steps": [
+        { "type": "configure", "name": "win-mingw-release" },
+        { "type": "build", "name": "win-mingw-release" },
+        { "type": "test", "name": "win-mingw-release" }
+      ]
+    },
+
+    {
+      "name": "linux-gcc-debug",
+      "steps": [
+        { "type": "configure", "name": "linux-gcc-debug" },
+        { "type": "build", "name": "linux-gcc-debug" },
+        { "type": "test", "name": "linux-gcc-debug" }
+      ]
+    },
+    {
+      "name": "linux-gcc-release",
+      "steps": [
+        { "type": "configure", "name": "linux-gcc-release" },
+        { "type": "build", "name": "linux-gcc-release" },
+        { "type": "test", "name": "linux-gcc-release" }
+      ]
+    },
+    {
+      "name": "linux-clang-debug",
+      "steps": [
+        { "type": "configure", "name": "linux-clang-debug" },
+        { "type": "build", "name": "linux-clang-debug" },
+        { "type": "test", "name": "linux-clang-debug" }
+      ]
+    },
+    {
+      "name": "linux-clang-release",
+      "steps": [
+        { "type": "configure", "name": "linux-clang-release" },
+        { "type": "build", "name": "linux-clang-release" },
+        { "type": "test", "name": "linux-clang-release" }
+      ]
+    },
+    {
+      "name": "linux-clang-debug-tidy",
+      "steps": [
+        { "type": "configure", "name": "linux-clang-debug-tidy" },
+        { "type": "build", "name": "linux-clang-debug-tidy" },
+        { "type": "test", "name": "linux-clang-debug-tidy" }
+      ]
     }
   ]
 }

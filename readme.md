@@ -1,8 +1,6 @@
 # Engenide
 
-Engenide is a systems programming language that you can say is like "C++ and
-Rust with my own taste". A middle ground between them, with a focus on
-extensibility and ergonomics.
+Engenide is an enjoyable systems programming language.
 
 Currently, very early in the development.
 
@@ -54,15 +52,27 @@ fn hello throws {
 
 ## Usage
 
+### Prerequisites
+
+- A C++23 compiler
+- CMake (4.0.0 or newer)
+- vcpkg
+
 *TODO: Add usage*
 
 ```shell
 git clone --depth=1 https://github.com/anstropleuton/engenide.git
 cd engenide
 cmake --preset release
+cmake --build build/release
 ```
 
-The `eng` binary or `eng.exe` is the engine compiler.
+The `eng.exe` binary is the engine compiler.
+
+```shell
+./build/release/source/eng --version
+0.1.0
+```
 
 ## License
 

@@ -1,0 +1,36 @@
+CompileFlags:
+  Add:
+    - -std=c++23
+    - -Wall
+    - -Wextra
+    - -Wpedantic
+    - -Wno-braced-scalar-init
+    - -Wno-missing-designated-field-initializers
+
+  CompilationDatabase: build/
+  Compiler: clang++
+
+Diagnostics:
+  MissingIncludes: Strict
+  UnusedIncludes: Strict
+  Includes:
+    IgnoreHeader:
+      - '.*[/\\](unicode)[/\\].*'
+      - '.*[/\\](windows|windef|minwindef|minwinbase|winnt|basetsd|winerror|guiddef)\.h'
+      - '.*[/\\](winbase|processenv|processthreadsapi|errhandlingapi|handleapi|fileapi|libloaderapi)\.h'
+      - '.*[/\\](synchapi|sysinfoapi|memoryapi|heapapi|ioapiset|namedpipeapi|timezoneapi)\.h'
+      - '.*[/\\](consoleapi|wincon|wincontypes|stringapiset|winnls|winuser|wingdi|winreg|winsvc|winver)\.h'
+      - "^/usr/include/(.*/)?(bits|asm|asm-generic|linux)/.*"
+      - '.*[/\\](fcntl|signal|termios|dirent|poll|pthread)\.h'
+      - '.*[/\\]sys[/\\](stat|mman|socket|ioctl|wait)\.h'
+  ClangTidy:
+    FastCheckFilter: None
+
+Documentation:
+  CommentFormat: Doxygen
+
+---
+If:
+  PathMatch: .*\.in
+Diagnostics:
+  Suppress: "expected_expression"

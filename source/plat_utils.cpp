@@ -1,4 +1,4 @@
-/// @file plat_utils.cpp
+/// @file
 /// Implementation for @ref plat_utils.hpp.
 ///
 /// Part of Engenide, a general-purpose systems language between C++ and Rust.
@@ -7,39 +7,44 @@
 
 #include "plat_utils.hpp"
 
+#include <string_view>
+
 #ifdef _WIN32
-#include <windows.h>
-#elifdef __linux__
-#include <cerrno>
-#include <unistd.h>
+#    include <windows.h>
+#else
+#    include <unistd.h>
+
+#    include <cerrno>
 #endif
 
 #ifdef _WIN32
 
-static auto is_console(HANDLE const handle) -> bool {
-    auto mode{DWORD{}};
-    return GetConsoleMode(handle, &mode) != 0;
-}
-
-static auto write_file(HANDLE const handle, std::string_view const bytes) -> void {
-    auto remaining{bytes};
-    while (!remaining.empty()) {
-        auto       written{DWORD{}};
-        auto const count{static_cast<DWORD>(remaining.size())};
-        if (!static_cast<bool>(WriteFile(handle, remaining.data(), count, &written, nullptr)) || written == 0)
-            return;
-        remaining.remove_prefix(written);
+namespace {
+    auto is_console(HANDLE const handle) -> bool {
+        auto mode{DWORD{}};
+        return GetConsoleMode(handle, &mode) != 0;
     }
-}
 
-static auto write_console(HANDLE const handle, std::wstring_view const text) -> void {
-    auto remaining{text};
-    while (!remaining.empty()) {
-        auto       written{DWORD{}};
-        auto const count{static_cast<DWORD>(remaining.size())};
-        if (!static_cast<bool>(WriteConsoleW(handle, remaining.data(), count, &written, nullptr)) || written == 0)
-            return;
-        remaining.remove_prefix(written);
+    auto write_file(HANDLE const handle, std::string_view const bytes) -> void {
+        auto remaining{bytes};
+        while (!remaining.empty()) {
+            auto       written{DWORD{}};
+            auto const count{static_cast<DWORD>(remaining.size())};
+            if (!static_cast<bool>(WriteFile(handle, remaining.data(), count, &written, nullptr)) || written == 0)
+                return;
+            remaining.remove_prefix(written);
+        }
+    }
+
+    auto write_console(HANDLE const handle, std::wstring_view const text) -> void {
+        auto remaining{text};
+        while (!remaining.empty()) {
+            auto       written{DWORD{}};
+            auto const count{static_cast<DWORD>(remaining.size())};
+            if (!static_cast<bool>(WriteConsoleW(handle, remaining.data(), count, &written, nullptr)) || written == 0)
+                return;
+            remaining.remove_prefix(written);
+        }
     }
 }
 
@@ -69,8 +74,7 @@ auto write_text(std::string_view const text) -> void {
     while (!remaining.empty()) {
         auto const written{write(STDOUT_FILENO, remaining.data(), remaining.size())};
         if (written < 0) {
-            if (errno == EINTR)
-                continue;
+            if (errno == EINTR) continue;
             return;
         }
         remaining.remove_prefix(static_cast<std::size_t>(written));

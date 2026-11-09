@@ -1,5 +1,5 @@
-/// @file eng_config.hpp
-/// Defines Engenide configuration.
+/// @file
+/// Engenide configuration.
 ///
 /// Part of Engenide, a general-purpose systems language between C++ and Rust.
 /// @copyright (c) 2026 Anstro Pleuton
